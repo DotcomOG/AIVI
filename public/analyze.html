@@ -1,17 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- TAKEN FROM OLD DEPO -->
-  <!-- analyze.html - v3.1.7 - Logos above text, updated Gemini filename -->
+  <!-- analyze.html - v2025.12.12-2 -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, LLM insights + score card -->
-  <!-- Lead generation page - Full 25-page report available via form submission -->
+  <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: October 30, 2025 -->
+  <!-- Last updated: 2025-12-12 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnipeRank - AI SEO Analysis</title>
+  <title>AIVI - AI Visibility Index</title>
   <style>
     :root{
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
@@ -105,11 +103,11 @@
   </style>
 </head>
 <body>
-  <h1>SnipeRank</h1>
-  <h2>AI SEO Analysis</h2>
+  <h1>AIVI</h1>
+  <h2>AI Visibility Index</h2>
 
   <div class="info-row">
-    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">quontora</a></div>
+    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
   </div>
 
@@ -159,12 +157,12 @@
     <p>After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
     <a href="https://calendly.com/quontora" class="btn-primary" target="_blank" rel="noopener">Schedule Free Consultation</a>
     <div class="consultation-info">
-      <strong>What we'll cover:</strong> Your AI SEO opportunities, implementation timeline, and how to get found by ChatGPT, Gemini, and other AI platforms.
+      <strong>What we'll cover:</strong> Your AI visibility opportunities, implementation timeline, and how to get found by ChatGPT, Gemini, and other AI platforms.
     </div>
   </section>
 
   <div class="footer">
-    © 2025 SnipeRank by <a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a>. Last updated October 30.
+    © 2025 AIVI by <a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a>. Last updated December 12.
   </div>
 
   <!-- Progress Overlay -->
@@ -188,26 +186,26 @@
   <div id="breakdown-modal" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <h3 class="modal-title">What goes into your SnipeRank score?</h3>
+        <h3 class="modal-title">What goes into your AIVI score?</h3>
         <button class="modal-close" id="modal-close">×</button>
       </div>
       <div class="modal-content">
-        <p>Your SnipeRank score is calculated based on <strong>50+ SEO factors</strong> optimized for AI search engines. Our analysis evaluates how well your website performs across four critical pillars:</p>
-        
+        <p>Your AIVI score is calculated based on signals optimized for AI discovery engines. Our analysis evaluates how well your website performs across four critical pillars:</p>
+
         <p><strong>🎯 AI Access Readiness (25 points)</strong><br>
         How easily AI systems can discover, crawl, and understand your site structure.</p>
-        
+
         <p><strong>🔒 Trust & Verification Signals (25 points)</strong><br>
         Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
-        
+
         <p><strong>📝 LLM Interpretability & Clarity (25 points)</strong><br>
         Content organization, semantic markup, and clarity for AI language models.</p>
-        
+
         <p><strong>🔍 Prompt-Pattern Alignment (25 points)</strong><br>
-        How well your content matches common search patterns and query structures.</p>
-        
+        How well your content matches common query patterns and question formats.</p>
+
         <p style="margin-top:16px;font-style:italic;color:#666;">
-          Each factor is weighted based on its impact on AI search visibility and ranking potential.
+          Each signal is weighted based on its impact on AI visibility and citation likelihood.
         </p>
       </div>
     </div>
@@ -225,21 +223,21 @@
     };
 
     function logoDivFor(engine){
-      const wrap = document.createElement('div'); 
+      const wrap = document.createElement('div');
       wrap.className = 'llm-logo';
       const p = LOGO_SOURCES[engine];
       if (!p) {
         wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`;
         return wrap;
       }
-      const img = document.createElement('img'); 
-      img.alt = `${engine} logo`; 
+      const img = document.createElement('img');
+      img.alt = `${engine} logo`;
       img.src = p;
       img.onload = () => {wrap.innerHTML = ''; wrap.appendChild(img)};
       img.onerror = () => {wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`};
       return wrap;
     }
-    
+
     function transformAIInsights(root){
       const title = [...root.querySelectorAll('h2,h3,h4,.section-title')].find(n => /ai\s*engine\s*insights?/i.test((n.textContent || '').trim()));
       if (!title) return;
@@ -249,30 +247,30 @@
       const bullets = [...ul.querySelectorAll('li')].map(li => (li.textContent || '').trim());
       if (!bullets.length) return;
       const engines = ['ChatGPT','Claude','Gemini','Copilot','Perplexity'];
-      const box = document.createElement('div'); 
+      const box = document.createElement('div');
       box.className = 'llm-insights';
       engines.forEach((e, i) => {
-        const t = bullets[i]; 
-        if (!t) return; 
-        const row = document.createElement('div'); 
-        row.className = 'llm-row'; 
-        row.appendChild(logoDivFor(e)); 
-        const p = document.createElement('p'); 
-        p.textContent = t; 
-        row.appendChild(p); 
+        const t = bullets[i];
+        if (!t) return;
+        const row = document.createElement('div');
+        row.className = 'llm-row';
+        row.appendChild(logoDivFor(e));
+        const p = document.createElement('p');
+        p.textContent = t;
+        row.appendChild(p);
         box.appendChild(row);
       });
       ul.replaceWith(box);
     }
-    
+
     function renderScoreCard(total, pillars, highlights){
       document.getElementById("scoreNumber").textContent = `${total}/100`;
       document.getElementById("scoreBand").textContent =
-        total >= 70 ? "Rank: Highly Visible ★★★★☆" : 
-        total >= 55 ? "Rank: Partially Visible ★★★☆☆" : 
-        total >= 40 ? "Rank: Needs Work ★★☆☆☆" : 
+        total >= 70 ? "Rank: Highly Visible ★★★★☆" :
+        total >= 55 ? "Rank: Partially Visible ★★★☆☆" :
+        total >= 40 ? "Rank: Needs Work ★★☆☆☆" :
         "Rank: Low Visibility ★☆☆☆☆";
-      const grid = document.getElementById("pillarsGrid"); 
+      const grid = document.getElementById("pillarsGrid");
       grid.innerHTML = "";
       [
         ["AI Access Readiness", pillars.access],
@@ -280,19 +278,19 @@
         ["LLM Interpretability & Clarity", pillars.clarity],
         ["Prompt-Pattern Alignment", pillars.alignment]
       ].forEach(([label, val]) => {
-        const d = document.createElement("div"); 
-        d.className = "pillar"; 
-        d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`; 
+        const d = document.createElement("div");
+        d.className = "pillar";
+        d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`;
         grid.appendChild(d);
       });
       if (highlights && highlights.length) {
-        const ul = document.getElementById("highlightsList"); 
-        ul.innerHTML = ""; 
+        const ul = document.getElementById("highlightsList");
+        ul.innerHTML = "";
         highlights.forEach(h => {
-          const li = document.createElement("li"); 
-          li.textContent = h; 
+          const li = document.createElement("li");
+          li.textContent = h;
           ul.appendChild(li);
-        }); 
+        });
         document.getElementById("highlightsBlock").hidden = false;
       }
     }
@@ -321,18 +319,18 @@
       const startTime = Date.now();
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
-      
+
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const ratio = Math.min(elapsed / expectedDuration, 1);
         const progress = ratio * 95;
-        
+
         progressFill.style.width = progress + '%';
         progressPct.textContent = Math.floor(progress) + '%';
-        
+
         if (progress >= 95) clearInterval(interval);
         if (progress > 30) {
-          document.getElementById('progress-eta').innerHTML = 'Processing content structure and AI optimization signals...<br>Almost done!';
+          document.getElementById('progress-eta').innerHTML = 'Processing content structure and AI visibility signals...<br>Almost done!';
         }
       }, 100);
       return interval;
@@ -371,18 +369,18 @@
       const highlights = [...document.querySelectorAll('#highlightsList li')].map(li => li.textContent.trim());
       const txt = [
         `Website: ${targetUrl}`,
-        `SnipeRank Score: ${scoreText}`,
+        `AIVI Score: ${scoreText}`,
         `Pillars:`, ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
         ``, `Highlights/Issues:`, ...highlights.map(h => `- ${h}`)
       ].join("\n");
-      try { 
+      try {
         await navigator.clipboard.writeText(txt);
-        const b = document.getElementById("copyBtn"); 
-        const old = b.textContent; 
-        b.textContent = "Copied!"; 
+        const b = document.getElementById("copyBtn");
+        const old = b.textContent;
+        b.textContent = "Copied!";
         setTimeout(() => b.textContent = old, 1500);
-      } catch { 
-        window.prompt("Copy the summary:", txt); 
+      } catch {
+        window.prompt("Copy the summary:", txt);
       }
     });
 
@@ -406,7 +404,7 @@
 
       const domain = extractDomain(targetUrl);
 
-      // Keep sessionStorage for backup/additional data
+      // Keep sessionStorage for backup/additional data (keys left as-is for compatibility)
       sessionStorage.setItem('sniperank:name', name);
       sessionStorage.setItem('sniperank:email', email);
       sessionStorage.setItem('sniperank:phone', phone);
@@ -416,7 +414,7 @@
       sessionStorage.setItem('sniperank:domain', domain);
 
       // Prevent double-clicks
-      btn.disabled = true; 
+      btn.disabled = true;
       btn.textContent = 'Preparing Full Report...';
 
       // Pass name and email as URL parameters to match full-report.html expectations
@@ -428,7 +426,6 @@
         source: 'analyze'
       }).toString();
 
-      console.log('Redirecting to full report with params:', q);
       window.location.href = `full-report.html?${q}`;
     });
 
@@ -439,9 +436,9 @@
         document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
         return;
       }
-      
+
       document.getElementById("current-url").textContent = targetUrl;
-      
+
       const progressTimer = startProgress();
 
       // Probe for local /api/score; fallback to Render base if needed
@@ -449,8 +446,8 @@
       try {
         const probe = await fetch('/api/score?url=' + encodeURIComponent('https://example.com'), {method:'HEAD'});
         if (!probe.ok) throw 0;
-      } catch { 
-        apiBase = 'https://sniperank-app2.onrender.com'; 
+      } catch {
+        apiBase = 'https://sniperank-app2.onrender.com';
       }
 
       try {
@@ -465,8 +462,8 @@
       try {
         const res = await fetch(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`);
         const html = await res.text();
-        const host = document.getElementById('summary-results'); 
-        host.innerHTML = html; 
+        const host = document.getElementById('summary-results');
+        host.innerHTML = html;
         transformAIInsights(host);
       } catch {
         document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
