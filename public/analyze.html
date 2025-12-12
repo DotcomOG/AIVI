@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2025.12.12-3 (Restore original Analyze + restore customer info + pass to full-report; keep /api/full)
+  Version: v2025.12.12-2 (Fix: API fallback + retry, no design changes)
   Last updated: 2025-12-12
   Timestamp: 2025-12-12T00:00 America/New_York
 
   CHANGES IN THIS VERSION:
-  - Restored original design + behavior (no new UI invented)
-  - Restored customer info handling (name/email/domain) via query params + sessionStorage
-  - Passes name/email/domain to Full Report link
-  - Includes name/email/domain in Copy Summary + Email actions
-  - Uses /api/full only (removes /api/score usage that caused 404)
+  - Adds backend fallback: if /api/full fails on Vercel, try Render /api/full
+  - Adds robust error messaging and a working Retry action
+  - No layout/styling changes, no feature additions beyond reliability
+
+  HOW IT WORKS:
+  - Page reads ?url=https://example.com
+  - Calls: /api/full?url=<encoded target url>
+  - If that fails (404/500/network), calls Render: https://sniperank-v2-dev.onrender.com/api/full?url=<encoded>
 -->
 <html lang="en">
 <head>
@@ -40,31 +43,10 @@
     h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
     p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
 
-    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 .6rem}
+    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
     .powered-by,.for-url{color:var(--muted);font-size:.95rem}
     .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
     .for-url strong{color:#000}
-
-    /* Customer row (minimal, no layout shift) */
-    .customer-row{
-      width:100%;
-      display:flex;
-      gap:1rem;
-      align-items:center;
-      justify-content:space-between;
-      margin:0 0 1rem;
-      color:var(--muted);
-      font-size:.92rem;
-      flex-wrap:wrap;
-    }
-    .customer-row strong{color:#000}
-    .customer-chip{
-      border:1px solid var(--border);
-      background:#fafafa;
-      border-radius:999px;
-      padding:.25rem .6rem;
-      font-weight:600;
-    }
 
     .card{width:100%;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
     .score-card{padding:1rem;margin-bottom:2.25rem}
@@ -117,16 +99,6 @@
     <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
   </div>
 
-  <!-- Customer info (hidden unless present) -->
-  <div class="customer-row" id="customerRow" style="display:none;">
-    <div>
-      <span class="customer-chip">Customer</span>
-      <span id="custNameWrap" style="display:none;"> <strong id="custName"></strong></span>
-      <span id="custEmailWrap" style="display:none;"> · <span id="custEmail"></span></span>
-      <span id="custDomainWrap" style="display:none;"> · <span id="custDomain"></span></span>
-    </div>
-  </div>
-
   <section class="card score-card" id="scoreCard" aria-live="polite">
     <div class="score-top">
       <div class="score-main">
@@ -139,6 +111,7 @@
         <button class="btn-ghost" id="fullBtn" type="button">View Full Report</button>
         <button class="btn-ghost" onclick="window.print()" type="button">📄 Print</button>
         <button class="btn-ghost" id="emailBtn" type="button">📧 Email</button>
+        <button class="btn-ghost" id="retryBtn" type="button" style="display:none">↻ Retry</button>
       </div>
     </div>
     <div class="pillars" id="pillarsGrid"></div>
@@ -176,65 +149,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
 
-    // Customer info (query params override; fallback to sessionStorage)
-    const customerName =
-      urlParams.get("name") ||
-      sessionStorage.getItem("aivi:name") ||
-      sessionStorage.getItem("sniperank:name") ||
-      "";
-
-    const customerEmail =
-      urlParams.get("email") ||
-      sessionStorage.getItem("aivi:email") ||
-      sessionStorage.getItem("sniperank:email") ||
-      "";
-
-    const customerDomain =
-      urlParams.get("domain") ||
-      sessionStorage.getItem("aivi:domain") ||
-      sessionStorage.getItem("sniperank:domain") ||
-      "";
-
-    // Persist for next pages
-    if (customerName) sessionStorage.setItem("aivi:name", customerName);
-    if (customerEmail) sessionStorage.setItem("aivi:email", customerEmail);
-    if (customerDomain) sessionStorage.setItem("aivi:domain", customerDomain);
-
-    function showCustomerRow(){
-      const row = document.getElementById("customerRow");
-      const nameWrap = document.getElementById("custNameWrap");
-      const emailWrap = document.getElementById("custEmailWrap");
-      const domainWrap = document.getElementById("custDomainWrap");
-
-      let any = false;
-
-      if (customerName) {
-        document.getElementById("custName").textContent = customerName;
-        nameWrap.style.display = "inline";
-        any = true;
-      }
-      if (customerEmail) {
-        document.getElementById("custEmail").textContent = customerEmail;
-        emailWrap.style.display = "inline";
-        any = true;
-      }
-      if (customerDomain) {
-        document.getElementById("custDomain").textContent = customerDomain;
-        domainWrap.style.display = "inline";
-        any = true;
-      }
-
-      if (any) row.style.display = "flex";
-    }
-
-    function buildPassThroughParams(){
-      const p = new URLSearchParams();
-      if (targetUrl) p.set("url", targetUrl);
-      if (customerName) p.set("name", customerName);
-      if (customerEmail) p.set("email", customerEmail);
-      if (customerDomain) p.set("domain", customerDomain);
-      return p.toString();
-    }
+    const RENDER_FULL_ENDPOINT = "https://sniperank-v2-dev.onrender.com/api/full";
 
     // Modal handlers
     document.getElementById('breakdownBtn')?.addEventListener('click', () => {
@@ -257,18 +172,14 @@
     // Email
     document.getElementById('emailBtn')?.addEventListener('click', () => {
       const subject = encodeURIComponent(`AiVi Report for ${targetUrl || ''}`);
-      const who = customerName ? `Customer: ${customerName}${customerEmail ? ' ('+customerEmail+')' : ''}\n` : '';
-      const dom = customerDomain ? `Domain: ${customerDomain}\n` : '';
-      const body = encodeURIComponent(`${who}${dom}\nView analysis: ${window.location.href}`);
+      const body = encodeURIComponent(`View analysis: ${window.location.href}`);
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
     });
 
     // Copy summary
     document.getElementById("copyBtn")?.addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
-      const who = customerName ? `Customer: ${customerName}${customerEmail ? ' ('+customerEmail+')' : ''}\n` : '';
-      const dom = customerDomain ? `Domain: ${customerDomain}\n` : '';
-      const txt = `${who}${dom}Website: ${targetUrl}\nAiVi Score: ${scoreText}\n\nAnalysis: ${window.location.href}`;
+      const txt = `Website: ${targetUrl}\nAiVi Score: ${scoreText}\n\nAnalysis: ${window.location.href}`;
       try {
         await navigator.clipboard.writeText(txt);
         const b = document.getElementById("copyBtn");
@@ -280,11 +191,10 @@
       }
     });
 
-    // Full report button (now carries customer info too)
+    // Full report button
     document.getElementById("fullBtn")?.addEventListener("click", () => {
       if (!targetUrl) return;
-      const qs = buildPassThroughParams();
-      window.location.href = `/full-report.html?${qs}`;
+      window.location.href = `/full-report.html?url=${encodeURIComponent(targetUrl)}`;
     });
 
     function safeArr(x){ return Array.isArray(x) ? x : []; }
@@ -292,7 +202,6 @@
     function toPillarPoints(val){
       const n = Number(val);
       if (!isFinite(n)) return 0;
-      // If backend sends >25, normalize to /25
       const normalized = n > 25 ? (n / 2) : n;
       return Math.max(0, Math.min(25, Math.round(normalized)));
     }
@@ -354,7 +263,7 @@
       const opportunities = safeArr(fullData.opportunities);
 
       if (whatsWorking.length) {
-html += "<h3 class='section-title'>✅ What's Working</h3><ul>";
+        html += '<h3 class="section-title">✅ What\\'s Working</h3><ul>';
         whatsWorking.forEach(item => html += `<li>${item}</li>`);
         html += '</ul>';
       }
@@ -388,29 +297,40 @@ html += "<h3 class='section-title'>✅ What's Working</h3><ul>";
       host.innerHTML = html;
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      showCustomerRow();
+    function showRetry(){
+      const rb = document.getElementById("retryBtn");
+      if (rb) rb.style.display = "inline-block";
+    }
 
-      if (!targetUrl) {
-        document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>No URL provided. Please return to the <a href='/'>homepage</a> and enter a site to analyze.</p>";
-        return;
+    async function fetchJsonOrThrow(url){
+      const res = await fetch(url);
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        const msg = (data && data.error) ? String(data.error) : `Server returned ${res.status}`;
+        const err = new Error(msg);
+        err.status = res.status;
+        throw err;
       }
+      return data;
+    }
 
-      document.getElementById("current-url").textContent = targetUrl;
+    async function runAnalysis(){
+      document.getElementById("retryBtn").style.display = "none";
+      document.getElementById("scoreBand").textContent = "Loading AIV Score...";
+      document.getElementById("scoreNumber").textContent = "—";
+      document.getElementById('summary-results').innerHTML =
+        "<p style='text-align:center;color:gray;'>Loading AI Visibility analysis...</p>";
+
+      const primaryUrl = `/api/full?url=${encodeURIComponent(targetUrl)}`;
+      const fallbackUrl = `${RENDER_FULL_ENDPOINT}?url=${encodeURIComponent(targetUrl)}`;
 
       try {
-        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`);
-        const data = await res.json();
-
+        // 1) Try Vercel same-origin endpoint
+        const data = await fetchJsonOrThrow(primaryUrl);
         if (!data || data.success !== true) {
           const msg = data?.error ? String(data.error) : "Analysis unavailable.";
-          document.getElementById('summary-results').innerHTML =
-            `<p style="text-align:center;color:#666">${msg}</p>`;
-          document.getElementById("scoreBand").textContent = "Score unavailable";
-          document.getElementById("scoreNumber").textContent = "—";
-          return;
+          throw new Error(msg);
         }
 
         renderScoreCard(data);
@@ -428,14 +348,69 @@ html += "<h3 class='section-title'>✅ What's Working</h3><ul>";
         }
 
         renderSections(data);
+        return;
 
-      } catch (e) {
-        console.error("Analyze error:", e);
+      } catch (e1) {
+        // 2) Fallback to Render if Vercel fails
+        try {
+          const data2 = await fetchJsonOrThrow(fallbackUrl);
+          if (!data2 || data2.success !== true) {
+            const msg2 = data2?.error ? String(data2.error) : "Analysis unavailable.";
+            throw new Error(msg2);
+          }
+
+          renderScoreCard(data2);
+
+          const kf2 = buildKeyFindings(data2);
+          if (kf2.length) {
+            document.getElementById("keyFindingsCard").style.display = "block";
+            const ul2 = document.getElementById("keyFindingsList");
+            ul2.innerHTML = "";
+            kf2.forEach(t => {
+              const li = document.createElement("li");
+              li.textContent = t;
+              ul2.appendChild(li);
+            });
+          }
+
+          renderSections(data2);
+          return;
+
+        } catch (e2) {
+          console.error("Analyze error (primary):", e1);
+          console.error("Analyze error (fallback):", e2);
+
+          const msg =
+            (e1 && e1.message ? e1.message : "Analysis failed.") +
+            " — please retry.";
+
+          document.getElementById('summary-results').innerHTML =
+            `<p style="text-align:center;color:#666">${msg}</p>`;
+          document.getElementById("scoreBand").textContent = "Score unavailable";
+          document.getElementById("scoreNumber").textContent = "—";
+          showRetry();
+        }
+      }
+    }
+
+    document.getElementById("retryBtn")?.addEventListener("click", () => {
+      runAnalysis();
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!targetUrl) {
+        document.getElementById("current-url").textContent = "No URL provided";
         document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:#666'>Detailed AI Visibility findings are not available for this run.</p>";
+          "<p style='text-align:center;color:red'>No URL provided. Please return to the <a href='/'>homepage</a> and enter a site to analyze.</p>";
         document.getElementById("scoreBand").textContent = "Score unavailable";
         document.getElementById("scoreNumber").textContent = "—";
+        return;
       }
+
+      document.getElementById("current-url").textContent = targetUrl;
+
+      // Run analysis with fallback
+      await runAnalysis();
     });
   </script>
 </body>
