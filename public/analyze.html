@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <!-- analyze.html - v2025.12.12-2 -->
-  <!-- Free preview report: Shows 5 strengths, 10 issues, LLM insights + score card -->
+  <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
   <!-- Last updated: 2025-12-12 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AIVI - AI Visibility Index</title>
+  <title>AiVi - AI Visibility Analysis</title>
   <style>
     :root{
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
@@ -59,6 +59,8 @@
     .llm-row:last-child{border-bottom:0}
     .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
     .llm-logo img{height:28px;width:auto;display:block;object-fit:contain;max-width:110px}
+    .llm-logo img.engine-copilot{height:26px;max-width:96px} /* Fix Copilot sizing */
+    .llm-logo img.engine-gemini{height:26px;max-width:110px}
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
@@ -103,8 +105,8 @@
   </style>
 </head>
 <body>
-  <h1>AIVI</h1>
-  <h2>AI Visibility Index</h2>
+  <h1>AiVi</h1>
+  <h2>AI Visibility Analysis</h2>
 
   <div class="info-row">
     <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
@@ -157,12 +159,12 @@
     <p>After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
     <a href="https://calendly.com/quontora" class="btn-primary" target="_blank" rel="noopener">Schedule Free Consultation</a>
     <div class="consultation-info">
-      <strong>What we'll cover:</strong> Your AI visibility opportunities, implementation timeline, and how to get found by ChatGPT, Gemini, and other AI platforms.
+      <strong>What we'll cover:</strong> Your AI Visibility opportunities, implementation timeline, and how to get found across major AI assistants.
     </div>
   </section>
 
   <div class="footer">
-    © 2025 AIVI by <a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a>. Last updated December 12.
+    © 2025 AiVi by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.
   </div>
 
   <!-- Progress Overlay -->
@@ -176,8 +178,8 @@
         <div class="progress-fill" id="progress-fill"></div>
       </div>
       <div class="progress-eta" id="progress-eta">
-        Performing comprehensive website analysis.<br>
-        This typically takes <strong>15-45 seconds</strong>.
+        Performing website analysis.<br>
+        This typically takes <strong>15–90 seconds</strong>.
       </div>
     </div>
   </div>
@@ -186,34 +188,32 @@
   <div id="breakdown-modal" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <h3 class="modal-title">What goes into your AIVI score?</h3>
+        <h3 class="modal-title">What goes into your AiVi score?</h3>
         <button class="modal-close" id="modal-close">×</button>
       </div>
       <div class="modal-content">
-        <p>Your AIVI score is calculated based on signals optimized for AI discovery engines. Our analysis evaluates how well your website performs across four critical pillars:</p>
+        <p>Your AiVi score is calculated across four core pillars:</p>
 
-        <p><strong>🎯 AI Access Readiness (25 points)</strong><br>
+        <p><strong>AI Access Readiness (25 points)</strong><br>
         How easily AI systems can discover, crawl, and understand your site structure.</p>
 
-        <p><strong>🔒 Trust & Verification Signals (25 points)</strong><br>
+        <p><strong>Trust & Verification Signals (25 points)</strong><br>
         Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
 
-        <p><strong>📝 LLM Interpretability & Clarity (25 points)</strong><br>
+        <p><strong>LLM Interpretability & Clarity (25 points)</strong><br>
         Content organization, semantic markup, and clarity for AI language models.</p>
 
-        <p><strong>🔍 Prompt-Pattern Alignment (25 points)</strong><br>
-        How well your content matches common query patterns and question formats.</p>
+        <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>
+        How well your content matches common query patterns and question-based discovery.</p>
 
         <p style="margin-top:16px;font-style:italic;color:#666;">
-          Each signal is weighted based on its impact on AI visibility and citation likelihood.
+          Each factor is weighted based on its impact on AI discovery and visibility.
         </p>
       </div>
     </div>
   </div>
 
   <script>
-    // v3.1.7 JS — Logos above text, updated Gemini filename
-
     const LOGO_SOURCES = {
       ChatGPT: '/img/chatgpt-logo.png',
       Claude: '/img/claude.jpeg',
@@ -233,8 +233,9 @@
       const img = document.createElement('img');
       img.alt = `${engine} logo`;
       img.src = p;
-      img.onload = () => {wrap.innerHTML = ''; wrap.appendChild(img)};
-      img.onerror = () => {wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`};
+      img.className = `engine-${String(engine).toLowerCase()}`;
+      img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
+      img.onerror = () => { wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`; };
       return wrap;
     }
 
@@ -270,6 +271,7 @@
         total >= 55 ? "Rank: Partially Visible ★★★☆☆" :
         total >= 40 ? "Rank: Needs Work ★★☆☆☆" :
         "Rank: Low Visibility ★☆☆☆☆";
+
       const grid = document.getElementById("pillarsGrid");
       grid.innerHTML = "";
       [
@@ -283,6 +285,7 @@
         d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`;
         grid.appendChild(d);
       });
+
       if (highlights && highlights.length) {
         const ul = document.getElementById("highlightsList");
         ul.innerHTML = "";
@@ -295,11 +298,9 @@
       }
     }
 
-    // Extract target URL from query params
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
 
-    // Robust domain extractor
     function extractDomain(u){
       if (!u) return '';
       try {
@@ -312,27 +313,42 @@
       }
     }
 
-    // Progress simulation
+    // Progress simulation (fixed: no “stuck at 95%”)
     function startProgress() {
       document.getElementById('progress-overlay').style.display = 'flex';
-      const expectedDuration = 30000; // ~95%
       const startTime = Date.now();
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
 
+      let hardCap = 99;      // keep moving up to 99 while waiting
+      let fastWindow = 35000; // get to ~92% in ~35s
+      let lastShown = 0;
+
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
-        const ratio = Math.min(elapsed / expectedDuration, 1);
-        const progress = ratio * 95;
+
+        let progress;
+        if (elapsed <= fastWindow) {
+          const ratio = elapsed / fastWindow;         // 0..1
+          progress = Math.min(92, Math.floor(ratio * 92));
+        } else {
+          // creep from 92 -> 99 slowly (never “stuck”)
+          const extra = elapsed - fastWindow;
+          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500)); // +1 every 2.5s
+        }
+
+        if (progress < lastShown) progress = lastShown;
+        lastShown = progress;
 
         progressFill.style.width = progress + '%';
-        progressPct.textContent = Math.floor(progress) + '%';
+        progressPct.textContent = progress + '%';
 
-        if (progress >= 95) clearInterval(interval);
-        if (progress > 30) {
-          document.getElementById('progress-eta').innerHTML = 'Processing content structure and AI visibility signals...<br>Almost done!';
+        if (progress >= 60) {
+          document.getElementById('progress-eta').innerHTML =
+            'Processing content structure and visibility signals...<br>Almost done!';
         }
-      }, 100);
+      }, 120);
+
       return interval;
     }
 
@@ -369,7 +385,7 @@
       const highlights = [...document.querySelectorAll('#highlightsList li')].map(li => li.textContent.trim());
       const txt = [
         `Website: ${targetUrl}`,
-        `AIVI Score: ${scoreText}`,
+        `AiVi Score: ${scoreText}`,
         `Pillars:`, ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
         ``, `Highlights/Issues:`, ...highlights.map(h => `- ${h}`)
       ].join("\n");
@@ -404,7 +420,6 @@
 
       const domain = extractDomain(targetUrl);
 
-      // Keep sessionStorage for backup/additional data (keys left as-is for compatibility)
       sessionStorage.setItem('sniperank:name', name);
       sessionStorage.setItem('sniperank:email', email);
       sessionStorage.setItem('sniperank:phone', phone);
@@ -413,11 +428,9 @@
       sessionStorage.setItem('sniperank:url', targetUrl);
       sessionStorage.setItem('sniperank:domain', domain);
 
-      // Prevent double-clicks
       btn.disabled = true;
       btn.textContent = 'Preparing Full Report...';
 
-      // Pass name and email as URL parameters to match full-report.html expectations
       const q = new URLSearchParams({
         url: targetUrl,
         name: encodeURIComponent(name),
@@ -429,7 +442,6 @@
       window.location.href = `full-report.html?${q}`;
     });
 
-    // Load analysis on page load
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
@@ -441,7 +453,6 @@
 
       const progressTimer = startProgress();
 
-      // Probe for local /api/score; fallback to Render base if needed
       let apiBase = '';
       try {
         const probe = await fetch('/api/score?url=' + encodeURIComponent('https://example.com'), {method:'HEAD'});
