@@ -1,32 +1,57 @@
 <!DOCTYPE html>
+<!--
+  analyze.html
+  Version: v2025.12.12-2 (AIVI rebrand + improved loading behavior + fetch timeout)
+  Last updated: 2025-12-12
+  Timestamp: 2025-12-12T00:30 America/New_York
+
+  CHANGES IN THIS VERSION:
+  - Rebranded UI copy to: AIVI / AI Visibility Index (replacing AiVi)
+  - Improved loading UX so it won’t “feel stuck” at 95%:
+      - Adds a lightweight progress modal + status lines
+      - Progress caps at 95% until API returns, then completes to 100%
+      - Shows elapsed time + “still working” messaging after 30s
+      - Adds Cancel + Retry actions
+  - Adds fetch timeout via AbortController (default 120s) with graceful fallback
+  - Keeps /api/full as the data source (no endpoint changes)
+
+  HOW IT WORKS:
+  - Page reads ?url=https://example.com
+  - Calls: /api/full?url=<encoded target url>
+  - Uses response fields: success, rawScore/score, breakdown, technical, answerability,
+    whatsWorking, needsAttention, engineInsights, opportunities
+-->
 <html lang="en">
 <head>
-  <!-- analyze.html - v3.1.7 - Logos above text, updated Gemini filename -->
-  <!-- Free preview report: Shows 5 strengths, 10 issues, LLM insights + score card -->
-  <!-- Lead generation page - Full 25-page report available via form submission -->
-  <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: October 30, 2025 -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnipeRank - AI SEO Analysis</title>
+  <title>AIVI — AI Visibility Index</title>
   <style>
     :root{
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
       --muted:#666; --border:#e5e5e5;
-      --sr-radius:16px; --sr-border:#e6e6e9; --sr-shadow:0 10px 30px rgba(0,0,0,.12);
-      --sr-text:#111; --sr-muted:#5b5b66; --sr-bg:#fff; --sr-pill-bg:#fafafb; --sr-gap:16px;
-      --btn-red:#dc3545; --btn-red-hover:#c82333;
+      --primary:#3182CE; --primary-hover:#2563EB;
     }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
-    h1{font-size:4rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px;background:linear-gradient(135deg,#000 0%,#3182CE 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+      background:#fff;color:#000;margin:0;
+      padding:var(--pad-v) var(--pad-h);
+      max-width:var(--max-width);
+      margin-inline:auto;
+      display:flex;flex-direction:column;align-items:flex-start
+    }
+    h1{
+      font-size:4rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px;
+      background:linear-gradient(135deg,#000 0%,var(--primary) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+    }
     h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
     p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
 
     .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
     .powered-by,.for-url{color:var(--muted);font-size:.95rem}
-    .powered-by a{color:#3182CE;text-decoration:none;font-weight:600}
+    .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
     .for-url strong{color:#000}
 
     .card{width:100%;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
@@ -35,79 +60,63 @@
     .score-main{display:flex;align-items:baseline;gap:.5rem}
     .score-number{font-size:2.25rem;font-weight:800}
     .score-band{color:var(--muted);font-size:.95rem}
-    .btn-row{display:flex;gap:.5rem;align-items:center}
-    .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.55rem .9rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;transition:.2s}
+
+    .btn-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+    .btn-ghost{
+      border:1px solid #111;background:#fff;color:#111;
+      padding:.55rem .9rem;border-radius:8px;cursor:pointer;
+      font-weight:700;font-size:.95rem;transition:.2s;white-space:nowrap
+    }
     .btn-ghost:hover{background:#f2f2f2}
-    .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.85rem 2rem;border-radius:999px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
-    .btn-primary:hover{background:var(--btn-red-hover)}
+    .btn-ghost.primary{
+      border-color:var(--primary);
+      color:#fff;background:var(--primary);
+    }
+    .btn-ghost.primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+
     .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
     .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
     .pillar .label{font-weight:600}
     .badge{font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem;background:#fafafa}
-    .highlights{margin-top:.9rem;padding-top:.9rem;border-top:1px dashed var(--border)}
-    .highlights h4{margin:0 0 .55rem;font-size:1.2rem;font-weight:800}
-    .highlights ul{margin:0;padding-left:1rem}
-    .highlights li{margin:.45rem 0;line-height:1.5}
 
     #summary-results .section-title{font-size:1.25rem!important;font-weight:700!important;margin:2rem 0 .6rem!important}
     #summary-results p{line-height:1.68!important;margin:0 0 .9rem!important;font-size:1.05rem!important;white-space:pre-line}
     #summary-results ul{margin:0 0 1.1rem 1.1rem!important;padding-left:.2rem!important;list-style:disc!important}
     #summary-results li{line-height:1.7!important;margin:.6rem 0!important;font-size:1.05rem!important}
 
-    .llm-insights{margin:.4rem 0 1.2rem}
-    .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
-    .llm-row:last-child{border-bottom:0}
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
-    .llm-logo img{height:28px;width:auto;display:block;object-fit:contain;max-width:110px}
-    .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
-    .llm-row p{margin:0;line-height:1.6}
+    .key-card{padding:1rem;margin-top:.75rem}
+    .key-card h3{margin:.25rem 0 .75rem;font-size:1.1rem}
+    .key-card ul{margin:.25rem 0 0 1.1rem;padding-left:.2rem}
 
-    .form-section{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);margin-top:3rem;width:100%}
-    .form-section h3{margin:0 0 2rem;font-size:1.8rem;font-weight:700}
-    .form-container{max-width:100%;margin:0 auto}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:0 auto 1rem}
-    .form-full{grid-column:1/-1}
-    .form-section input, .form-section textarea{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:4px;font-size:16px;font-family:inherit}
-    .form-section textarea{min-height:100px;resize:vertical}
-    .form-section input:focus, .form-section textarea:focus{outline:none;border-color:#3182CE}
-    .form-btn{margin-top:1rem;max-width:300px}
-
-    .consultation-section{text-align:center;padding:3rem 2rem;margin-top:3rem}
-    .consultation-section h3{margin:0 0 1rem;font-size:1.8rem;font-weight:700}
-    .consultation-section p{margin:0 0 2rem;color:var(--muted)}
-    .consultation-info{color:var(--muted);font-size:.95rem;margin-top:1rem}
-    .consultation-info strong{color:#000}
-
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
-    .progress-pct{color:#666;font-size:16px;font-weight:600}
-    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
-
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
-    .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .modal-title{font-size:20px;font-weight:700;margin:0}
-    .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer;padding:4px;color:#666}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000}
+    .modal{background:#fff;border-radius:12px;padding:1.5rem;width:min(580px,90vw);max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid #e5e5e5;padding-bottom:.75rem}
+    .modal-title{font-size:1.25rem;font-weight:700;margin:0}
+    .modal-close{background:transparent;border:0;font-size:1.5rem;cursor:pointer;padding:.25rem;color:#666;line-height:1}
     .modal-close:hover{color:#000}
-    .modal-content{line-height:1.6}
-    .modal-content p{margin:12px 0;color:#333}
-    .modal-content strong{color:#111}
+    .modal-content p{font-size:.95rem;line-height:1.55;color:#333;margin:.75rem 0}
+    .modal-content p strong{color:#111}
 
-    .footer{width:100%;text-align:center;padding:2rem 0 1rem;margin-top:3rem;color:#666;font-size:.9rem}
-    .footer a{color:#3182CE;text-decoration:none}
-    .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem}
+    /* Loading modal */
+    .load-title{font-size:1.05rem;font-weight:800;margin:0 0 .65rem}
+    .load-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .load-pct{font-weight:800;color:#111}
+    .progress-wrap{width:100%;height:10px;border-radius:999px;background:#edf2f7;overflow:hidden;border:1px solid #e2e8f0}
+    .progress-bar{height:100%;width:0%;background:var(--primary);transition:width .35s ease}
+    .load-lines{margin:.75rem 0 0;color:#444;font-size:.95rem;line-height:1.45}
+    .load-lines .muted{color:var(--muted)}
+    .load-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap}
+
+    .footer{width:100%;text-align:center;padding:2rem 0 1rem;margin-top:3rem;color:#666;font-size:.85rem}
+    .footer a{color:var(--primary);text-decoration:none}
   </style>
 </head>
 <body>
-  <h1>SnipeRank</h1>
-  <h2>AI SEO Analysis</h2>
+  <h1>AIVI</h1>
+  <h2>AI Visibility Index</h2>
 
   <div class="info-row">
-    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">quontora</a></div>
+    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noreferrer">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
   </div>
 
@@ -115,363 +124,476 @@
     <div class="score-top">
       <div class="score-main">
         <div class="score-number" id="scoreNumber">-</div>
-        <div class="score-band" id="scoreBand">Calculating...</div>
+        <div class="score-band" id="scoreBand">Loading AIVI score...</div>
       </div>
       <div class="btn-row">
         <button class="btn-ghost" id="breakdownBtn" type="button">What goes into this score?</button>
-        <button class="btn-ghost" id="copyBtn" type="button">Copy Shareable Summary</button>
+        <button class="btn-ghost" id="copyBtn" type="button">Copy Summary</button>
+        <button class="btn-ghost primary" id="fullBtn" type="button">View Full Report</button>
+        <button class="btn-ghost" onclick="window.print()" type="button">📄 Print</button>
+        <button class="btn-ghost" id="emailBtn" type="button">📧 Email</button>
       </div>
     </div>
     <div class="pillars" id="pillarsGrid"></div>
-    <div class="highlights" id="highlightsBlock" hidden>
-      <h4>Highlights</h4>
-      <ul id="highlightsList"></ul>
+
+    <div class="card key-card" id="keyFindingsCard" style="display:none;">
+      <h3>Key Findings</h3>
+      <ul id="keyFindingsList"></ul>
     </div>
   </section>
 
   <section id="summary-results">
-    <p style="text-align:center;color:gray;">Loading analysis...</p>
-  </section>
-
-  <!-- Get Full Report Form -->
-  <section class="form-section">
-    <h3>Get Your Full Report</h3>
-    <div class="form-container">
-      <form id="full-report-form" novalidate>
-        <div class="form-grid">
-          <input type="text" id="name-input" placeholder="Your Name" required />
-          <input type="email" id="email-input" placeholder="Your Email" required />
-          <input type="tel" id="phone-input" placeholder="Your Phone (optional)" />
-          <input type="text" id="company-input" placeholder="Your Company (optional)" />
-          <textarea class="form-full" id="context-input" placeholder="Share context or ask a specific question — we'll address at your free consult."></textarea>
-        </div>
-        <button type="submit" class="btn-primary form-btn" id="full-report-btn">Get My Full Report</button>
-        <div id="form-error" class="error-note" style="display:none;"></div>
-      </form>
-    </div>
-  </section>
-
-  <!-- Consultation Section -->
-  <section class="consultation-section">
-    <h3>Ready to Improve Your AI Visibility?</h3>
-    <p>After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
-    <a href="https://calendly.com/quontora" class="btn-primary" target="_blank" rel="noopener">Schedule Free Consultation</a>
-    <div class="consultation-info">
-      <strong>What we'll cover:</strong> Your AI SEO opportunities, implementation timeline, and how to get found by ChatGPT, Gemini, and other AI platforms.
-    </div>
+    <p style="text-align:center;color:gray;">Loading AI Visibility analysis...</p>
   </section>
 
   <div class="footer">
-    © 2025 SnipeRank by <a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a>. Last updated October 30.
+    © 2025 AIVI by <a href="https://quontora.com" target="_blank" rel="noreferrer">Quontora</a>. Last updated <span id="footer-date"></span>.
   </div>
 
-  <!-- Progress Overlay -->
-  <div id="progress-overlay" class="overlay">
-    <div class="progress-panel">
-      <div class="progress-header">
-        <div class="progress-title">Analyzing your website...</div>
-        <div class="progress-pct" id="progress-pct">0%</div>
+  <!-- Score breakdown modal -->
+  <div id="breakdown-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 class="modal-title">What goes into this score?</h3>
+        <button class="modal-close" id="modal-close" aria-label="Close">×</button>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div class="progress-eta" id="progress-eta">
-        Performing comprehensive website analysis.<br>
-        This typically takes <strong>15-45 seconds</strong>.
+      <div class="modal-content">
+        <p><strong>AI Access Readiness</strong><br>How easily AI systems can discover and access your content.</p>
+        <p><strong>Trust & Verification Signals</strong><br>Authority signals AI uses to assess credibility.</p>
+        <p><strong>LLM Interpretability & Clarity</strong><br>How clearly your content can be parsed and summarized.</p>
+        <p><strong>Technical & Retrieval Alignment</strong><br>Technical factors that influence crawl, extraction, and answerability.</p>
       </div>
     </div>
   </div>
 
-  <!-- Score Breakdown Modal -->
-  <div id="breakdown-modal" class="modal-backdrop">
-    <div class="modal">
+  <!-- Loading modal -->
+  <div id="loading-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
       <div class="modal-header">
-        <h3 class="modal-title">What goes into your SnipeRank score?</h3>
-        <button class="modal-close" id="modal-close">×</button>
+        <h3 class="modal-title" style="margin:0">Analyzing your website…</h3>
+        <button class="modal-close" id="loading-close" aria-label="Close">×</button>
       </div>
-      <div class="modal-content">
-        <p>Your SnipeRank score is calculated based on <strong>50+ SEO factors</strong> optimized for AI search engines. Our analysis evaluates how well your website performs across four critical pillars:</p>
-        
-        <p><strong>🎯 AI Access Readiness (25 points)</strong><br>
-        How easily AI systems can discover, crawl, and understand your site structure.</p>
-        
-        <p><strong>🔒 Trust & Verification Signals (25 points)</strong><br>
-        Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
-        
-        <p><strong>📝 LLM Interpretability & Clarity (25 points)</strong><br>
-        Content organization, semantic markup, and clarity for AI language models.</p>
-        
-        <p><strong>🔍 Prompt-Pattern Alignment (25 points)</strong><br>
-        How well your content matches common search patterns and query structures.</p>
-        
-        <p style="margin-top:16px;font-style:italic;color:#666;">
-          Each factor is weighted based on its impact on AI search visibility and ranking potential.
-        </p>
+
+      <div class="load-row">
+        <div class="load-title" id="loadStatus">Starting…</div>
+        <div class="load-pct" id="loadPct">0%</div>
+      </div>
+      <div class="progress-wrap" aria-label="Loading progress">
+        <div class="progress-bar" id="loadBar"></div>
+      </div>
+
+      <div class="load-lines" id="loadLines">
+        <div>Fetching site signals…</div>
+        <div class="muted" id="loadElapsed">Elapsed: 0s</div>
+      </div>
+
+      <div class="load-actions">
+        <button class="btn-ghost" id="retryBtn" type="button" style="display:none;">Retry</button>
+        <button class="btn-ghost" id="cancelBtn" type="button">Cancel</button>
       </div>
     </div>
   </div>
 
   <script>
-    // v3.1.7 JS — Logos above text, updated Gemini filename
+    // Footer date
+    (function(){
+      const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const d=new Date();
+      document.getElementById("footer-date").textContent = `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    })();
 
-    const LOGO_SOURCES = {
-      ChatGPT: '/img/chatgpt-logo.png',
-      Claude: '/img/claude.jpeg',
-      Gemini: '/img/gemini-icon.svg',
-      Copilot: '/img/copilot.jpeg',
-      Perplexity: '/img/perplexity-logo.png',
-    };
-
-    function logoDivFor(engine){
-      const wrap = document.createElement('div'); 
-      wrap.className = 'llm-logo';
-      const p = LOGO_SOURCES[engine];
-      if (!p) {
-        wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`;
-        return wrap;
-      }
-      const img = document.createElement('img'); 
-      img.alt = `${engine} logo`; 
-      img.src = p;
-      img.onload = () => {wrap.innerHTML = ''; wrap.appendChild(img)};
-      img.onerror = () => {wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`};
-      return wrap;
-    }
-    
-    function transformAIInsights(root){
-      const title = [...root.querySelectorAll('h2,h3,h4,.section-title')].find(n => /ai\s*engine\s*insights?/i.test((n.textContent || '').trim()));
-      if (!title) return;
-      let ul = title.nextElementSibling;
-      while (ul && ul.tagName && ul.tagName.toLowerCase() !== 'ul') ul = ul.nextElementSibling;
-      if (!ul) return;
-      const bullets = [...ul.querySelectorAll('li')].map(li => (li.textContent || '').trim());
-      if (!bullets.length) return;
-      const engines = ['ChatGPT','Claude','Gemini','Copilot','Perplexity'];
-      const box = document.createElement('div'); 
-      box.className = 'llm-insights';
-      engines.forEach((e, i) => {
-        const t = bullets[i]; 
-        if (!t) return; 
-        const row = document.createElement('div'); 
-        row.className = 'llm-row'; 
-        row.appendChild(logoDivFor(e)); 
-        const p = document.createElement('p'); 
-        p.textContent = t; 
-        row.appendChild(p); 
-        box.appendChild(row);
-      });
-      ul.replaceWith(box);
-    }
-    
-    function renderScoreCard(total, pillars, highlights){
-      document.getElementById("scoreNumber").textContent = `${total}/100`;
-      document.getElementById("scoreBand").textContent =
-        total >= 70 ? "Rank: Highly Visible ★★★★☆" : 
-        total >= 55 ? "Rank: Partially Visible ★★★☆☆" : 
-        total >= 40 ? "Rank: Needs Work ★★☆☆☆" : 
-        "Rank: Low Visibility ★☆☆☆☆";
-      const grid = document.getElementById("pillarsGrid"); 
-      grid.innerHTML = "";
-      [
-        ["AI Access Readiness", pillars.access],
-        ["Trust & Verification Signals", pillars.trust],
-        ["LLM Interpretability & Clarity", pillars.clarity],
-        ["Prompt-Pattern Alignment", pillars.alignment]
-      ].forEach(([label, val]) => {
-        const d = document.createElement("div"); 
-        d.className = "pillar"; 
-        d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`; 
-        grid.appendChild(d);
-      });
-      if (highlights && highlights.length) {
-        const ul = document.getElementById("highlightsList"); 
-        ul.innerHTML = ""; 
-        highlights.forEach(h => {
-          const li = document.createElement("li"); 
-          li.textContent = h; 
-          ul.appendChild(li);
-        }); 
-        document.getElementById("highlightsBlock").hidden = false;
-      }
-    }
-
-    // Extract target URL from query params
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
 
-    // Robust domain extractor
-    function extractDomain(u){
-      if (!u) return '';
-      try {
-        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
-        const { hostname } = new URL(withProto);
-        return hostname.replace(/^www\./i,'');
-      } catch {
-        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
-        return (m ? m[1] : '').replace(/^www\./i,'');
-      }
+    // Modal handlers (score breakdown)
+    document.getElementById('breakdownBtn')?.addEventListener('click', () => {
+      const bd = document.getElementById('breakdown-modal');
+      bd.style.display = 'flex';
+      bd.setAttribute('aria-hidden', 'false');
+    });
+
+    function closeBreakdown(){
+      const bd = document.getElementById('breakdown-modal');
+      bd.style.display = 'none';
+      bd.setAttribute('aria-hidden', 'true');
     }
 
-    // Progress simulation
-    function startProgress() {
-      document.getElementById('progress-overlay').style.display = 'flex';
-      const expectedDuration = 30000; // ~95%
-      const startTime = Date.now();
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      
-      const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const ratio = Math.min(elapsed / expectedDuration, 1);
-        const progress = ratio * 95;
-        
-        progressFill.style.width = progress + '%';
-        progressPct.textContent = Math.floor(progress) + '%';
-        
-        if (progress >= 95) clearInterval(interval);
-        if (progress > 30) {
-          document.getElementById('progress-eta').innerHTML = 'Processing content structure and AI optimization signals...<br>Almost done!';
+    document.getElementById('modal-close')?.addEventListener('click', closeBreakdown);
+    document.getElementById('breakdown-modal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('breakdown-modal')) closeBreakdown();
+    });
+
+    // Loading modal helpers
+    const loadingModal = document.getElementById('loading-modal');
+    const loadPctEl = document.getElementById('loadPct');
+    const loadBarEl = document.getElementById('loadBar');
+    const loadStatusEl = document.getElementById('loadStatus');
+    const loadElapsedEl = document.getElementById('loadElapsed');
+    const retryBtn = document.getElementById('retryBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const loadingCloseBtn = document.getElementById('loading-close');
+
+    let progressTimer = null;
+    let elapsedTimer = null;
+    let progressValue = 0;
+    let startedAt = 0;
+    let currentAbort = null;
+    let lastFetchUrl = null;
+
+    function showLoading(){
+      loadingModal.style.display = 'flex';
+      loadingModal.setAttribute('aria-hidden','false');
+    }
+    function hideLoading(){
+      loadingModal.style.display = 'none';
+      loadingModal.setAttribute('aria-hidden','true');
+    }
+    function setProgress(pct){
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      progressValue = clamped;
+      loadPctEl.textContent = `${clamped}%`;
+      loadBarEl.style.width = `${clamped}%`;
+    }
+    function setStatus(txt){
+      loadStatusEl.textContent = txt;
+    }
+    function setLines(lines){
+      const host = document.getElementById('loadLines');
+      host.innerHTML = lines.map((l,i)=> i===lines.length-1 ? `<div class="muted">${l}</div>` : `<div>${l}</div>`).join('');
+    }
+    function startProgress(){
+      stopProgress();
+
+      retryBtn.style.display = 'none';
+      setProgress(0);
+      setStatus("Starting…");
+      startedAt = Date.now();
+
+      showLoading();
+
+      // Progress logic: ramps up to 90, then to 95, then waits.
+      progressTimer = setInterval(() => {
+        // If already waiting at 95, do nothing.
+        if (progressValue >= 95) return;
+
+        // Smooth-ish increments
+        if (progressValue < 65) progressValue += 4;
+        else if (progressValue < 85) progressValue += 2;
+        else progressValue += 1;
+
+        // Cap at 95 while waiting
+        if (progressValue > 95) progressValue = 95;
+
+        setProgress(progressValue);
+
+        // Status messaging by phase
+        if (progressValue < 25) {
+          setStatus("Fetching site signals…");
+        } else if (progressValue < 55) {
+          setStatus("Parsing structure and metadata…");
+        } else if (progressValue < 80) {
+          setStatus("Evaluating AI interpretability…");
+        } else {
+          setStatus("Finalizing AIVI scoring…");
         }
-      }, 100);
-      return interval;
+      }, 550);
+
+      elapsedTimer = setInterval(() => {
+        const secs = Math.floor((Date.now() - startedAt) / 1000);
+        const elapsedText = `Elapsed: ${secs}s`;
+        const host = document.getElementById('loadLines');
+
+        // Keep the last line as elapsed
+        const base = [
+          "Fetching site signals…",
+          "Processing content structure and AI visibility signals…",
+          secs >= 30 ? "Still working — some sites take longer (heavy pages, bot rules, network latency)." : "Almost done!",
+          elapsedText
+        ];
+        setLines(base);
+
+        // If it’s taking a while, ensure we’re not “stuck-looking”
+        if (secs >= 25 && progressValue < 95) setProgress(95);
+      }, 1000);
+    }
+    function stopProgress(){
+      if (progressTimer) clearInterval(progressTimer);
+      if (elapsedTimer) clearInterval(elapsedTimer);
+      progressTimer = null;
+      elapsedTimer = null;
+    }
+    function finishProgress(){
+      stopProgress();
+      setStatus("Complete");
+      setProgress(100);
+      // brief pause so user sees completion
+      setTimeout(() => hideLoading(), 350);
+    }
+    function failProgress(message){
+      stopProgress();
+      setStatus("Couldn’t complete analysis");
+      setProgress(95);
+      const secs = Math.floor((Date.now() - startedAt) / 1000);
+      setLines([
+        "We couldn’t finish this run.",
+        message || "Please retry. If this persists, the site may be blocking crawlers or timing out.",
+        `Elapsed: ${secs}s`
+      ]);
+      retryBtn.style.display = 'inline-block';
     }
 
-    function stopProgress() {
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
-      progressFill.style.width = '100%';
-      progressPct.textContent = '100%';
-      setTimeout(() => {
-        document.getElementById('progress-overlay').style.display = 'none';
-      }, 800);
-    }
-
-    // Modal controls
-    document.getElementById('breakdownBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('breakdown-modal').style.display = 'flex';
-    });
-    document.getElementById('modal-close').addEventListener('click', () => {
-      document.getElementById('breakdown-modal').style.display = 'none';
-    });
-    document.getElementById('breakdown-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('breakdown-modal')) {
-        document.getElementById('breakdown-modal').style.display = 'none';
-      }
+    loadingCloseBtn?.addEventListener('click', () => {
+      // Close just hides UI; does not cancel unless user hits Cancel
+      hideLoading();
     });
 
-    // Copy button
-    document.getElementById("copyBtn").addEventListener("click", async () => {
+    cancelBtn?.addEventListener('click', () => {
+      if (currentAbort) currentAbort.abort();
+      hideLoading();
+    });
+
+    retryBtn?.addEventListener('click', () => {
+      if (lastFetchUrl) runAnalysis(lastFetchUrl);
+    });
+
+    // Email
+    document.getElementById('emailBtn')?.addEventListener('click', () => {
+      const subject = encodeURIComponent(`AIVI Report for ${targetUrl || ''}`);
+      const body = encodeURIComponent(`View analysis: ${window.location.href}`);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    });
+
+    // Copy summary
+    document.getElementById("copyBtn")?.addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
-      const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
-      const vals = [...document.querySelectorAll('.pillar .badge')].map(el => el.textContent.trim());
-      const highlights = [...document.querySelectorAll('#highlightsList li')].map(li => li.textContent.trim());
-      const txt = [
-        `Website: ${targetUrl}`,
-        `SnipeRank Score: ${scoreText}`,
-        `Pillars:`, ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
-        ``, `Highlights/Issues:`, ...highlights.map(h => `- ${h}`)
-      ].join("\n");
-      try { 
+      const txt = `Website: ${targetUrl}\nAIVI Score: ${scoreText}\n\nAnalysis: ${window.location.href}`;
+      try {
         await navigator.clipboard.writeText(txt);
-        const b = document.getElementById("copyBtn"); 
-        const old = b.textContent; 
-        b.textContent = "Copied!"; 
+        const b = document.getElementById("copyBtn");
+        const old = b.textContent;
+        b.textContent = "✓ Copied!";
         setTimeout(() => b.textContent = old, 1500);
-      } catch { 
-        window.prompt("Copy the summary:", txt); 
+      } catch {
+        window.prompt("Copy the summary:", txt);
       }
     });
 
-    // Form submission handler
-    document.getElementById('full-report-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name-input').value.trim();
-      const email = document.getElementById('email-input').value.trim();
-      const phone = document.getElementById('phone-input').value.trim();
-      const company = document.getElementById('company-input').value.trim();
-      const context = document.getElementById('context-input').value.trim();
-      const errorEl = document.getElementById('form-error');
-      const btn = document.getElementById('full-report-btn');
-
-      errorEl.style.display = 'none';
-      if (!name || !email || !targetUrl) {
-        errorEl.textContent = 'Please provide your name and email.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const domain = extractDomain(targetUrl);
-
-      // Keep sessionStorage for backup/additional data
-      sessionStorage.setItem('sniperank:name', name);
-      sessionStorage.setItem('sniperank:email', email);
-      sessionStorage.setItem('sniperank:phone', phone);
-      sessionStorage.setItem('sniperank:company', company);
-      sessionStorage.setItem('sniperank:context', context);
-      sessionStorage.setItem('sniperank:url', targetUrl);
-      sessionStorage.setItem('sniperank:domain', domain);
-
-      // Prevent double-clicks
-      btn.disabled = true; 
-      btn.textContent = 'Preparing Full Report...';
-
-      // Pass name and email as URL parameters to match full-report.html expectations
-      const q = new URLSearchParams({
-        url: targetUrl,
-        name: encodeURIComponent(name),
-        email: encodeURIComponent(email),
-        domain,
-        source: 'analyze'
-      }).toString();
-
-      console.log('Redirecting to full report with params:', q);
-      window.location.href = `full-report.html?${q}`;
+    // Full report button
+    document.getElementById("fullBtn")?.addEventListener("click", () => {
+      if (!targetUrl) return;
+      window.location.href = `/full-report.html?url=${encodeURIComponent(targetUrl)}`;
     });
 
-    // Load analysis on page load
+    function safeArr(x){ return Array.isArray(x) ? x : []; }
+
+    function toPillarPoints(val){
+      const n = Number(val);
+      if (!isFinite(n)) return 0;
+      // If backend sends >25 (e.g., presence ~49), normalize to /25
+      const normalized = n > 25 ? (n / 2) : n;
+      return Math.max(0, Math.min(25, Math.round(normalized)));
+    }
+
+    function renderScoreCard(fullData){
+      const raw = Number(fullData.rawScore ?? fullData.score?.rawScore ?? fullData.score ?? 0) || 0;
+      const breakdown = fullData.breakdown || fullData.score?.breakdown || {};
+
+      document.getElementById("scoreNumber").textContent = `${Math.round(raw)}/100`;
+      document.getElementById("scoreBand").textContent =
+        raw >= 80 ? "Rank: Excellent ★★★★★" :
+        raw >= 60 ? "Rank: Strong ★★★★☆" :
+        raw >= 40 ? "Rank: Developing ★★★☆☆" :
+        "Rank: At Risk ★★☆☆☆";
+
+      const grid = document.getElementById("pillarsGrid");
+      grid.innerHTML = "";
+
+      const pillars = [
+        ["AI Access Readiness", toPillarPoints(breakdown.presence)],
+        ["Trust & Verification Signals", toPillarPoints(breakdown.citations)],
+        ["LLM Interpretability & Clarity", toPillarPoints(breakdown.answerability)],
+        ["Technical & Retrieval Alignment", toPillarPoints(breakdown.technical)]
+      ];
+
+      pillars.forEach(([label, val]) => {
+        const d = document.createElement("div");
+        d.className = "pillar";
+        d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`;
+        grid.appendChild(d);
+      });
+    }
+
+    function buildKeyFindings(fullData){
+      const tech = fullData.technical || {};
+      const ans = fullData.answerability || {};
+
+      const items = [];
+
+      if (tech.indexable === true) items.push("Site appears indexable — supports discoverability.");
+      if (tech.hasCanonical === true) items.push("Canonical tag detected — helps AI understand preferred URLs.");
+      if (tech.hasTitleAndH1 === false) items.push("Missing or weak <title>/<h1> detected — major clarity signal for AI.");
+      if (tech.performanceOk === false) items.push("Performance flags detected — can reduce crawl/parse success.");
+
+      if (ans.hasFAQSchema === false) items.push("No FAQ schema detected — reduces Q&A answerability signals.");
+      if (ans.entitiesInHeadings === true) items.push("Entities appear in headings — helps AI map topics.");
+      if (ans.hasOtherSchema === true) items.push("Some structured data detected — helps AI interpret meaning.");
+
+      return items;
+    }
+
+    function renderSections(fullData){
+      const host = document.getElementById('summary-results');
+      let html = '';
+
+      const whatsWorking = safeArr(fullData.whatsWorking);
+      const needsAttention = safeArr(fullData.needsAttention);
+      const engineInsights = safeArr(fullData.engineInsights);
+      const opportunities = safeArr(fullData.opportunities);
+
+      if (whatsWorking.length) {
+        html += '<h3 class="section-title">✅ What\'s Working</h3><ul>';
+        whatsWorking.forEach(item => html += `<li>${item}</li>`);
+        html += '</ul>';
+      }
+
+      if (needsAttention.length) {
+        html += '<h3 class="section-title">🚨 Needs Attention</h3><ul>';
+        needsAttention.forEach(item => html += `<li>${item}</li>`);
+        html += '</ul>';
+      }
+
+      if (engineInsights.length) {
+        html += '<h3 class="section-title">📡 AI Engine Insights</h3><ul>';
+        engineInsights.forEach(item => html += `<li>${item}</li>`);
+        html += '</ul>';
+      }
+
+      if (opportunities.length) {
+        html += '<h3 class="section-title">🎯 Top Opportunities</h3><ul>';
+        opportunities.slice(0, 10).forEach(opp => {
+          const title = opp?.title ? `<strong>${opp.title}</strong>` : "<strong>Opportunity</strong>";
+          const desc = opp?.description ? ` — ${opp.description}` : "";
+          html += `<li>${title}${desc}</li>`;
+        });
+        html += '</ul>';
+      }
+
+      if (!html) {
+        html = "<p style='text-align:center;color:#666'>No detailed sections were returned for this run.</p>";
+      }
+
+      host.innerHTML = html;
+    }
+
+    async function fetchWithTimeout(url, timeoutMs){
+      const controller = new AbortController();
+      currentAbort = controller;
+
+      const t = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(t);
+        return res;
+      } catch (err) {
+        clearTimeout(t);
+        throw err;
+      } finally {
+        currentAbort = null;
+      }
+    }
+
+    async function runAnalysis(url){
+      lastFetchUrl = url;
+
+      // Reset UI
+      document.getElementById("scoreBand").textContent = "Running AIVI analysis…";
+      document.getElementById("scoreNumber").textContent = "—";
+      document.getElementById("pillarsGrid").innerHTML = "";
+      document.getElementById("keyFindingsCard").style.display = "none";
+      document.getElementById('summary-results').innerHTML =
+        "<p style='text-align:center;color:gray;'>Loading AI Visibility analysis...</p>";
+
+      startProgress();
+
+      try {
+        // 120s default timeout for /api/full (deep crawl / LLM steps may be slow)
+        const res = await fetchWithTimeout(url, 120000);
+
+        let data = null;
+        try {
+          data = await res.json();
+        } catch {
+          data = null;
+        }
+
+        if (!res.ok || !data) {
+          const msg = `Server returned ${res.status || 'an error'} — please retry.`;
+          failProgress(msg);
+          document.getElementById('summary-results').innerHTML =
+            `<p style="text-align:center;color:#666">${msg}</p>`;
+          document.getElementById("scoreBand").textContent = "Score unavailable";
+          document.getElementById("scoreNumber").textContent = "—";
+          return;
+        }
+
+        if (data.success !== true) {
+          const msg = data?.error ? String(data.error) : "Analysis unavailable.";
+          failProgress(msg);
+          document.getElementById('summary-results').innerHTML =
+            `<p style="text-align:center;color:#666">${msg}</p>`;
+          document.getElementById("scoreBand").textContent = "Score unavailable";
+          document.getElementById("scoreNumber").textContent = "—";
+          return;
+        }
+
+        renderScoreCard(data);
+
+        const kf = buildKeyFindings(data);
+        if (kf.length) {
+          document.getElementById("keyFindingsCard").style.display = "block";
+          const ul = document.getElementById("keyFindingsList");
+          ul.innerHTML = "";
+          kf.forEach(t => {
+            const li = document.createElement("li");
+            li.textContent = t;
+            ul.appendChild(li);
+          });
+        }
+
+        renderSections(data);
+
+        finishProgress();
+
+      } catch (e) {
+        const isAbort = (e && (e.name === "AbortError"));
+        const msg = isAbort
+          ? "This run timed out. Some sites take longer (or block crawlers). Please retry."
+          : "Detailed AI Visibility findings are not available for this run.";
+        console.error("Analyze error:", e);
+
+        failProgress(msg);
+
+        document.getElementById('summary-results').innerHTML =
+          `<p style='text-align:center;color:#666'>${msg}</p>`;
+        document.getElementById("scoreBand").textContent = "Score unavailable";
+        document.getElementById("scoreNumber").textContent = "—";
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
+        document.getElementById('summary-results').innerHTML =
+          "<p style='text-align:center;color:red'>No URL provided. Please return to the <a href='/'>homepage</a> and enter a site to analyze.</p>";
         return;
       }
-      
+
       document.getElementById("current-url").textContent = targetUrl;
-      
-      const progressTimer = startProgress();
 
-      // Probe for local /api/score; fallback to Render base if needed
-      let apiBase = '';
-      try {
-        const probe = await fetch('/api/score?url=' + encodeURIComponent('https://example.com'), {method:'HEAD'});
-        if (!probe.ok) throw 0;
-      } catch { 
-        apiBase = 'https://sniperank-app2.onrender.com'; 
-      }
-
-      try {
-        const r = await fetch(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`);
-        const j = await r.json();
-        renderScoreCard(j.score, j.pillars, j.highlights);
-        sessionStorage.setItem('sniperank:data', JSON.stringify(j));
-      } catch (e) {
-        console.error('Score error:', e);
-      }
-
-      try {
-        const res = await fetch(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`);
-        const html = await res.text();
-        const host = document.getElementById('summary-results'); 
-        host.innerHTML = html; 
-        transformAIInsights(host);
-      } catch {
-        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-      } finally {
-        clearInterval(progressTimer);
-        stopProgress();
-      }
+      // Run analysis
+      const endpoint = `/api/full?url=${encodeURIComponent(targetUrl)}`;
+      runAnalysis(endpoint);
     });
   </script>
 </body>
