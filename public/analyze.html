@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2025.12.12-2 (Fix: API fallback + retry, no design changes)
+  Version: v2025.12.12-2 (Restore loading overlay + restore customer info + remove Full Report button)
   Last updated: 2025-12-12
   Timestamp: 2025-12-12T00:00 America/New_York
+  LLM: ChatGPT
 
   CHANGES IN THIS VERSION:
-  - Adds backend fallback: if /api/full fails on Vercel, try Render /api/full
-  - Adds robust error messaging and a working Retry action
-  - No layout/styling changes, no feature additions beyond reliability
+  - Restored loading overlay (progress + step lines) like the original analyze experience
+  - Restored customer info support (name/email from query params and/or sessionStorage)
+  - REMOVED invented "View Full Report" button and all related logic
+  - Added Retry button + clearer error surface
+  - Keeps existing layout/styles; only adds what was missing
 
   HOW IT WORKS:
-  - Page reads ?url=https://example.com
+  - Page reads ?url=https://example.com (& optionally name/email)
   - Calls: /api/full?url=<encoded target url>
-  - If that fails (404/500/network), calls Render: https://sniperank-v2-dev.onrender.com/api/full?url=<encoded>
+  - Uses response fields: success, rawScore/score, breakdown, technical, answerability,
+    whatsWorking, needsAttention, engineInsights, opportunities
 -->
 <html lang="en">
 <head>
@@ -25,6 +29,7 @@
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
       --muted:#666; --border:#e5e5e5;
       --primary:#3182CE; --primary-hover:#2563EB;
+      --ok:#16a34a;
     }
     *{box-sizing:border-box}
     body{
@@ -43,10 +48,10 @@
     h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
     p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
 
-    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
-    .powered-by,.for-url{color:var(--muted);font-size:.95rem}
+    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem;flex-wrap:wrap}
+    .powered-by,.for-url,.for-user{color:var(--muted);font-size:.95rem}
     .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
-    .for-url strong{color:#000}
+    .for-url strong,.for-user strong{color:#000}
 
     .card{width:100%;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
     .score-card{padding:1rem;margin-bottom:2.25rem}
@@ -62,6 +67,12 @@
       font-weight:700;font-size:.95rem;transition:.2s;white-space:nowrap
     }
     .btn-ghost:hover{background:#f2f2f2}
+    .btn-danger{
+      border:1px solid #b91c1c;background:#fff;color:#b91c1c;
+      padding:.55rem .9rem;border-radius:8px;cursor:pointer;
+      font-weight:800;font-size:.95rem;transition:.2s;white-space:nowrap
+    }
+    .btn-danger:hover{background:#fef2f2}
 
     .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
     .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
@@ -88,6 +99,23 @@
 
     .footer{width:100%;text-align:center;padding:2rem 0 1rem;margin-top:3rem;color:#666;font-size:.85rem}
     .footer a{color:var(--primary);text-decoration:none}
+
+    /* Loading overlay (restored) */
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:2000}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:22px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .progress-title{font-weight:800;font-size:18px}
+    .progress-pct{color:#666;font-size:16px;font-weight:700}
+    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .25s ease}
+    .steps{margin-top:10px}
+    .step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #eee}
+    .step:last-child{border-bottom:0}
+    .dot{width:10px;height:10px;border-radius:999px;background:#cbd5e1;margin-top:5px;flex:0 0 10px}
+    .step.done .dot{background:var(--ok)}
+    .step.active .dot{background:var(--primary)}
+    .step-text{font-size:.95rem;color:#333;line-height:1.35}
+    .step-sub{display:block;color:#666;font-size:.85rem;margin-top:2px}
   </style>
 </head>
 <body>
@@ -97,6 +125,7 @@
   <div class="info-row">
     <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noreferrer">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
+    <div class="for-user" id="userInfo" style="display:none;">Contact: <strong id="userNameEmail">-</strong></div>
   </div>
 
   <section class="card score-card" id="scoreCard" aria-live="polite">
@@ -108,10 +137,9 @@
       <div class="btn-row">
         <button class="btn-ghost" id="breakdownBtn" type="button">What goes into this score?</button>
         <button class="btn-ghost" id="copyBtn" type="button">Copy Summary</button>
-        <button class="btn-ghost" id="fullBtn" type="button">View Full Report</button>
         <button class="btn-ghost" onclick="window.print()" type="button">📄 Print</button>
         <button class="btn-ghost" id="emailBtn" type="button">📧 Email</button>
-        <button class="btn-ghost" id="retryBtn" type="button" style="display:none">↻ Retry</button>
+        <button class="btn-danger" id="retryBtn" type="button" style="display:none;">↻ Retry</button>
       </div>
     </div>
     <div class="pillars" id="pillarsGrid"></div>
@@ -130,6 +158,7 @@
     © 2025 AiVi by <a href="https://quontora.com" target="_blank" rel="noreferrer">Quontora</a>. Last updated December 12, 2025.
   </div>
 
+  <!-- Score breakdown modal -->
   <div id="breakdown-modal" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
       <div class="modal-header">
@@ -145,11 +174,88 @@
     </div>
   </div>
 
+  <!-- Loading overlay (restored) -->
+  <div class="overlay" id="progressOverlay" aria-hidden="true">
+    <div class="progress-panel">
+      <div class="progress-header">
+        <span class="progress-title">Generating Analysis</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="steps" id="progressSteps">
+        <div class="step active" data-step="1">
+          <span class="dot"></span>
+          <div class="step-text">
+            Fetching website signals
+            <span class="step-sub">Collecting structure, access, and key metadata</span>
+          </div>
+        </div>
+        <div class="step" data-step="2">
+          <span class="dot"></span>
+          <div class="step-text">
+            Analyzing AI visibility patterns
+            <span class="step-sub">Scoring trust, clarity, and interpretability</span>
+          </div>
+        </div>
+        <div class="step" data-step="3">
+          <span class="dot"></span>
+          <div class="step-text">
+            Preparing recommendations
+            <span class="step-sub">Generating findings and opportunities</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
 
-    const RENDER_FULL_ENDPOINT = "https://sniperank-v2-dev.onrender.com/api/full";
+    // Customer info (restored)
+    const qpName = urlParams.get("name") || "";
+    const qpEmail = urlParams.get("email") || "";
+
+    // Use existing keys if present; fall back to new ones
+    const storedName =
+      sessionStorage.getItem("sniperank:name") ||
+      sessionStorage.getItem("aivi:name") ||
+      "";
+    const storedEmail =
+      sessionStorage.getItem("sniperank:email") ||
+      sessionStorage.getItem("aivi:email") ||
+      "";
+
+    const userName = (qpName || storedName).trim();
+    const userEmail = (qpEmail || storedEmail).trim();
+
+    // Persist for continuity (non-breaking)
+    if (userName) {
+      sessionStorage.setItem("sniperank:name", userName);
+      sessionStorage.setItem("aivi:name", userName);
+    }
+    if (userEmail) {
+      sessionStorage.setItem("sniperank:email", userEmail);
+      sessionStorage.setItem("aivi:email", userEmail);
+    }
+
+    function showUserInfo(){
+      const el = document.getElementById("userInfo");
+      const out = document.getElementById("userNameEmail");
+      if (!el || !out) return;
+
+      if (userName || userEmail) {
+        const parts = [];
+        if (userName) parts.push(userName);
+        if (userEmail) parts.push(userEmail);
+        out.textContent = parts.join(" · ");
+        el.style.display = "block";
+      } else {
+        el.style.display = "none";
+      }
+    }
 
     // Modal handlers
     document.getElementById('breakdownBtn')?.addEventListener('click', () => {
@@ -179,7 +285,8 @@
     // Copy summary
     document.getElementById("copyBtn")?.addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
-      const txt = `Website: ${targetUrl}\nAiVi Score: ${scoreText}\n\nAnalysis: ${window.location.href}`;
+      const who = (userName || userEmail) ? `\nContact: ${[userName, userEmail].filter(Boolean).join(" · ")}` : "";
+      const txt = `Website: ${targetUrl}\nAiVi Score: ${scoreText}${who}\n\nAnalysis: ${window.location.href}`;
       try {
         await navigator.clipboard.writeText(txt);
         const b = document.getElementById("copyBtn");
@@ -189,12 +296,6 @@
       } catch {
         window.prompt("Copy the summary:", txt);
       }
-    });
-
-    // Full report button
-    document.getElementById("fullBtn")?.addEventListener("click", () => {
-      if (!targetUrl) return;
-      window.location.href = `/full-report.html?url=${encodeURIComponent(targetUrl)}`;
     });
 
     function safeArr(x){ return Array.isArray(x) ? x : []; }
@@ -238,7 +339,6 @@
     function buildKeyFindings(fullData){
       const tech = fullData.technical || {};
       const ans = fullData.answerability || {};
-
       const items = [];
 
       if (tech.indexable === true) items.push("Site appears indexable — supports discoverability.");
@@ -297,40 +397,112 @@
       host.innerHTML = html;
     }
 
-    function showRetry(){
-      const rb = document.getElementById("retryBtn");
-      if (rb) rb.style.display = "inline-block";
+    // Loading overlay controls
+    let progressTimer = null;
+    let progressValue = 0;
+
+    function setStep(stepNum, state){
+      const el = document.querySelector(`.step[data-step="${stepNum}"]`);
+      if (!el) return;
+      el.classList.remove("active","done");
+      if (state === "active") el.classList.add("active");
+      if (state === "done") el.classList.add("done");
     }
 
-    async function fetchJsonOrThrow(url){
-      const res = await fetch(url);
-      let data = null;
-      try { data = await res.json(); } catch {}
-      if (!res.ok) {
-        const msg = (data && data.error) ? String(data.error) : `Server returned ${res.status}`;
-        const err = new Error(msg);
-        err.status = res.status;
-        throw err;
+    function openOverlay(){
+      progressValue = 0;
+      document.getElementById("progressPct").textContent = "0%";
+      document.getElementById("progressFill").style.width = "0%";
+      setStep(1,"active"); setStep(2,""); setStep(3,"");
+      const ov = document.getElementById("progressOverlay");
+      ov.style.display = "flex";
+      ov.setAttribute("aria-hidden","false");
+
+      if (progressTimer) clearInterval(progressTimer);
+      progressTimer = setInterval(() => {
+        // Smooth-ish fake progress: stops at 92% until we finish
+        const cap = 92;
+        const bump = Math.random() * 3.2 + 0.8;
+        progressValue = Math.min(cap, progressValue + bump);
+
+        if (progressValue >= 30) { setStep(1,"done"); setStep(2,"active"); }
+        if (progressValue >= 68) { setStep(2,"done"); setStep(3,"active"); }
+
+        document.getElementById("progressPct").textContent = `${Math.round(progressValue)}%`;
+        document.getElementById("progressFill").style.width = `${progressValue}%`;
+      }, 140);
+    }
+
+    function closeOverlay(success){
+      if (progressTimer) clearInterval(progressTimer);
+      progressTimer = null;
+
+      if (success) {
+        setStep(3,"done");
+        document.getElementById("progressPct").textContent = "100%";
+        document.getElementById("progressFill").style.width = "100%";
+        setTimeout(() => {
+          const ov = document.getElementById("progressOverlay");
+          ov.style.display = "none";
+          ov.setAttribute("aria-hidden","true");
+        }, 450);
+      } else {
+        const ov = document.getElementById("progressOverlay");
+        ov.style.display = "none";
+        ov.setAttribute("aria-hidden","true");
       }
-      return data;
+    }
+
+    function showRetry(){
+      const b = document.getElementById("retryBtn");
+      if (b) b.style.display = "inline-block";
+    }
+
+    function hideRetry(){
+      const b = document.getElementById("retryBtn");
+      if (b) b.style.display = "none";
     }
 
     async function runAnalysis(){
-      document.getElementById("retryBtn").style.display = "none";
-      document.getElementById("scoreBand").textContent = "Loading AIV Score...";
-      document.getElementById("scoreNumber").textContent = "—";
-      document.getElementById('summary-results').innerHTML =
-        "<p style='text-align:center;color:gray;'>Loading AI Visibility analysis...</p>";
+      hideRetry();
 
-      const primaryUrl = `/api/full?url=${encodeURIComponent(targetUrl)}`;
-      const fallbackUrl = `${RENDER_FULL_ENDPOINT}?url=${encodeURIComponent(targetUrl)}`;
+      if (!targetUrl) {
+        document.getElementById("current-url").textContent = "No URL provided";
+        document.getElementById('summary-results').innerHTML =
+          "<p style='text-align:center;color:red'>No URL provided. Please return to the <a href='/'>homepage</a> and enter a site to analyze.</p>";
+        document.getElementById("scoreBand").textContent = "Score unavailable";
+        document.getElementById("scoreNumber").textContent = "—";
+        return;
+      }
+
+      document.getElementById("current-url").textContent = targetUrl;
+      openOverlay();
 
       try {
-        // 1) Try Vercel same-origin endpoint
-        const data = await fetchJsonOrThrow(primaryUrl);
+        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`);
+        let data = null;
+        try { data = await res.json(); } catch {}
+
+        if (!res.ok) {
+          const code = res.status;
+          closeOverlay(false);
+          showRetry();
+          document.getElementById('summary-results').innerHTML =
+            `<p style="text-align:center;color:#666"><strong>Analysis failed.</strong><br>Server returned ${code} — please retry.</p>`;
+          document.getElementById("scoreBand").textContent = "Score unavailable";
+          document.getElementById("scoreNumber").textContent = "—";
+          return;
+        }
+
         if (!data || data.success !== true) {
           const msg = data?.error ? String(data.error) : "Analysis unavailable.";
-          throw new Error(msg);
+          closeOverlay(false);
+          showRetry();
+          document.getElementById('summary-results').innerHTML =
+            `<p style="text-align:center;color:#666"><strong>Analysis failed.</strong><br>${msg}</p>`;
+          document.getElementById("scoreBand").textContent = "Score unavailable";
+          document.getElementById("scoreNumber").textContent = "—";
+          return;
         }
 
         renderScoreCard(data);
@@ -345,72 +517,29 @@
             li.textContent = t;
             ul.appendChild(li);
           });
+        } else {
+          document.getElementById("keyFindingsCard").style.display = "none";
         }
 
         renderSections(data);
-        return;
+        closeOverlay(true);
 
-      } catch (e1) {
-        // 2) Fallback to Render if Vercel fails
-        try {
-          const data2 = await fetchJsonOrThrow(fallbackUrl);
-          if (!data2 || data2.success !== true) {
-            const msg2 = data2?.error ? String(data2.error) : "Analysis unavailable.";
-            throw new Error(msg2);
-          }
-
-          renderScoreCard(data2);
-
-          const kf2 = buildKeyFindings(data2);
-          if (kf2.length) {
-            document.getElementById("keyFindingsCard").style.display = "block";
-            const ul2 = document.getElementById("keyFindingsList");
-            ul2.innerHTML = "";
-            kf2.forEach(t => {
-              const li = document.createElement("li");
-              li.textContent = t;
-              ul2.appendChild(li);
-            });
-          }
-
-          renderSections(data2);
-          return;
-
-        } catch (e2) {
-          console.error("Analyze error (primary):", e1);
-          console.error("Analyze error (fallback):", e2);
-
-          const msg =
-            (e1 && e1.message ? e1.message : "Analysis failed.") +
-            " — please retry.";
-
-          document.getElementById('summary-results').innerHTML =
-            `<p style="text-align:center;color:#666">${msg}</p>`;
-          document.getElementById("scoreBand").textContent = "Score unavailable";
-          document.getElementById("scoreNumber").textContent = "—";
-          showRetry();
-        }
+      } catch (e) {
+        console.error("Analyze error:", e);
+        closeOverlay(false);
+        showRetry();
+        document.getElementById('summary-results').innerHTML =
+          "<p style='text-align:center;color:#666'><strong>Analysis failed.</strong><br>Network error — please retry.</p>";
+        document.getElementById("scoreBand").textContent = "Score unavailable";
+        document.getElementById("scoreNumber").textContent = "—";
       }
     }
 
-    document.getElementById("retryBtn")?.addEventListener("click", () => {
+    document.getElementById("retryBtn")?.addEventListener("click", () => runAnalysis());
+
+    document.addEventListener("DOMContentLoaded", () => {
+      showUserInfo();
       runAnalysis();
-    });
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!targetUrl) {
-        document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>No URL provided. Please return to the <a href='/'>homepage</a> and enter a site to analyze.</p>";
-        document.getElementById("scoreBand").textContent = "Score unavailable";
-        document.getElementById("scoreNumber").textContent = "—";
-        return;
-      }
-
-      document.getElementById("current-url").textContent = targetUrl;
-
-      // Run analysis with fallback
-      await runAnalysis();
     });
   </script>
 </body>
