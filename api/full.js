@@ -6,7 +6,7 @@
 */
 
 import OpenAI from "openai";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import axios from "axios";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
