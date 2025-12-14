@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.14-1 (Brand + functional fixes)
+  Version: v2025.12.14-1 (Remove Beta banner + apply purple styling to Contact box)
   Built by ChatGPT - 2025-12-14
 
   NOTES:
-  - No layout/design changes intended.
-  - Text + branding updates only (AI Visibility Index (AIVI) / Quontora).
-  - Functional fixes:
-    1) “Try Free AIVI Beta” now returns to the top input (so users can enter a URL).
-    2) “Email Us” now uses a mailto link.
-    3) Back-to-top button positioning calc made CSS-safe (same position intent).
+  - No layout/design changes beyond the requested swap.
+  - Removed the purple Early Access Beta section.
+  - Reused the purple box styling for the Contact box (as requested).
   - Flow remains: index.html → analyze.html?url=...
 -->
 <html lang="en">
@@ -147,7 +144,7 @@
     details.sr-accordion[open]>summary span.chev{transform:rotate(180deg)}
     details.sr-accordion .accordion-body{padding:0 1.1rem 1.1rem}
 
-    /* Beta Notice — bottom */
+    /* Purple box styling (reused for Contact box) */
     .beta-notice{background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);color:#fff;border-radius:12px;padding:2rem;margin:2rem 0}
     .beta-notice h3{font-size:1.3rem;margin-bottom:1rem}
     .beta-notice p{font-size:.95rem;line-height:1.6;opacity:.95;margin-bottom:.75rem}
@@ -175,7 +172,7 @@
       position:fixed;
       top:50%;
       transform:translateY(-50%);
-      right:calc(50% - (var(--content-width) * 0.5) + 1rem);
+      right:calc(50% - var(--content-width)/2 + 1rem);
       background:var(--primary);
       color:#fff;
       width:64px;
@@ -216,7 +213,6 @@
       .analyze-btn{width:100%}
       .feature-grid{grid-template-columns:1fr}
       .section{padding:0 1rem}
-      .beta-notice{padding:1.5rem 1rem}
       .quick-links{gap:1rem}
       .back-to-top-float{right:1rem;width:56px;height:56px;font-size:1.75rem}
     }
@@ -604,15 +600,7 @@
     <!-- URL Analyze Form -->
     <form id="analyze-form" class="analyze-form" novalidate>
       <div class="url-input-wrapper">
-        <input
-          id="url"
-          type="text"
-          class="url-input"
-          placeholder="example.com"
-          aria-label="Website URL"
-          autocomplete="url"
-          required
-        />
+        <input id="url" type="text" class="url-input" placeholder="example.com" aria-label="Website URL" />
         <button type="submit" class="analyze-btn">Analyze Website</button>
       </div>
       <div id="error-message" class="error" role="alert"></div>
@@ -734,7 +722,7 @@
           </div>
 
           <div class="cta-section">
-            <a href="#top" class="cta-button">Try Free AIVI Beta</a>
+            <a href="/analyze.html" class="cta-button">Try Free AIVI Beta</a>
           </div>
 
           <div class="features-content">
@@ -1248,25 +1236,16 @@
       </details>
     </section>
 
-    <!-- Beta -->
-    <div class="beta-notice">
-      <h3>🚀 Early Access Beta — AI Visibility Index (AIVI)</h3>
-      <p>
-        You're experiencing the next evolution of visibility: <strong>AI Visibility Analysis</strong>.
-        We’re refining the AIVI scoring model weekly based on real user feedback.
-      </p>
-      <p><strong>Note:</strong> Some corporate networks block crawlers. If results seem incomplete, try a personal connection for the most accurate scan.</p>
-    </div>
-
     <!-- Contact -->
     <section class="section" id="contact">
-      <div class="contact-pop">
+      <!-- Reuse purple styling here -->
+      <div class="contact-pop beta-notice">
         <div>
           <h3>Have a tricky site or big AI Visibility challenge?</h3>
           <p>We love edge cases, complex stacks, and ambitious goals. Let’s make your brand visible to AI.</p>
         </div>
         <div class="contact-actions">
-          <a class="btn-primary" href="mailto:sales@quontora.com?subject=AI%20Visibility%20Index%20Inquiry">Email Us</a>
+          <a class="btn-primary" href="#">Email Us</a>
           <a class="btn-secondary" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a>
         </div>
       </div>
@@ -1279,59 +1258,119 @@
 
   <!-- Footer -->
   <footer>
-    <div class="footer-content">
-      <p>&copy; 2025 AI Visibility Index (AIVI). All rights reserved. Last updated <span id="update-date"></span>.</p>
-      <p>A product of <strong>Quontora</strong>. Learn more at <a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a>.</p>
+    <div class="footer-content footer-grid">
+      
+      <!-- Brand -->
+      <div class="footer-col">
+        <p class="footer-brand"><strong>AI Visibility Index (AIVI)</strong></p>
+        <p class="footer-muted">Visibility diagnostics for the age of AI.</p>
+        <p class="footer-muted">A product of <strong>Quontora</strong>.</p>
+      </div>
+
+      <!-- Product -->
+      <div class="footer-col">
+        <p class="footer-head">Product</p>
+        <p><a href="#how-it-works">How it works</a></p>
+        <p><a href="#pricing">Pricing &amp; Access</a></p>
+        <p><a href="#whitepaper">Technical whitepaper</a></p>
+        <p><a href="#technology">Architecture &amp; stack</a></p>
+      </div>
+
+      <!-- Legal -->
+      <div class="footer-col">
+        <p class="footer-head">Legal</p>
+        <p><a href="/privacy.html">Privacy Policy</a></p>
+        <p><a href="/terms.html">Terms of Service</a></p>
+        <p><a href="/cookies.html">Cookie Policy</a></p>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-col">
+        <p class="footer-head">Contact</p>
+        <p><a href="mailto:hello@quontora.com">hello@quontora.com</a></p>
+        <p><a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a></p>
+        <p><a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a></p>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="footer-wide">
+        <p class="footer-disclaimer">
+          <strong>Disclaimer:</strong> The AI Visibility Index (AIVI) provides diagnostic insights into how AI systems may interpret website content and structure.
+          AIVI does not guarantee rankings, traffic, citations, or outcomes. AI model behavior varies by system and may change over time.
+        </p>
+        <p class="footer-fine">
+          &copy; 2025 AI Visibility Index (AIVI). All rights reserved.
+        </p>
+      </div>
+
     </div>
   </footer>
 
-  <!-- JavaScript -->
-  <script>
-    // Update date
-    const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-    document.getElementById("update-date").textContent = months[new Date().getMonth()] + " " + new Date().getFullYear();
-
-    function isValidURL(input){
-      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
+  <!-- Footer Styles -->
+  <style>
+    footer{
+      margin-top:3rem;
+      border-top:1px solid var(--border);
+      background:var(--bg-light);
+      padding:2rem var(--pad-h) 1.5rem;
     }
-
-    document.addEventListener("DOMContentLoaded",()=>{
-      const f=document.getElementById("analyze-form");
-      const i=document.getElementById("url");
-      const e=document.getElementById("error-message");
-
-      if(f&&i&&e){
-        f.addEventListener("submit",ev=>{
-          ev.preventDefault();ev.stopPropagation();
-          let url=(i.value||"").trim();e.classList.remove("show");
-
-          if(!url){e.textContent="Please enter a website URL";e.classList.add("show");return;}
-          if(!isValidURL(url)){e.textContent="Please enter a valid domain (e.g., example.com)";e.classList.add("show");return;}
-          if(!/^https?:\/\//i.test(url)) url="https://"+url;
-
-          window.location.href="analyze.html?url="+encodeURIComponent(url);
-        });
-      }
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener("click",ev=>{
-        const id=a.getAttribute("href").substring(1);
-        const t=document.getElementById(id);
-        if(t){ev.preventDefault();t.scrollIntoView({behavior:"smooth"});}
-      });
-    });
-
-    // Floating back-to-top button visibility
-    const backToTopBtn = document.getElementById('backToTopFloat');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
-        backToTopBtn.classList.add('visible');
-      } else {
-        backToTopBtn.classList.remove('visible');
-      }
-    });
-  </script>
+    .footer-content{
+      max-width:var(--max-width);
+      margin:0 auto;
+      color:var(--text-light);
+      font-size:.85rem;
+    }
+    .footer-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(160px,1fr));
+      gap:1.5rem;
+      text-align:left;
+    }
+    .footer-col p{margin:.25rem 0}
+    .footer-head{
+      font-weight:800;
+      color:#111;
+      margin-bottom:.4rem;
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .footer-brand{
+      font-size:1rem;
+      color:#111;
+      margin:0 0 .35rem 0;
+    }
+    .footer-muted{color:var(--text-light)}
+    .footer-content a{
+      color:var(--primary);
+      text-decoration:none;
+      font-weight:600;
+    }
+    .footer-content a:hover{text-decoration:underline}
+    .footer-wide{
+      grid-column:1 / -1;
+      border-top:1px solid rgba(0,0,0,.08);
+      padding-top:1.25rem;
+      margin-top:.5rem;
+    }
+    .footer-disclaimer{
+      color:#475569;
+      line-height:1.6;
+      margin:0 0 .5rem 0;
+      font-size:.85rem;
+    }
+    .footer-fine{
+      margin:0;
+      color:var(--text-light);
+      font-size:.8rem;
+    }
+    @media (max-width:900px){
+      .footer-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:560px){
+      .footer-grid{grid-template-columns:1fr}
+    }
+  </style>
 
 </body>
 </html>
