@@ -1,242 +1,1443 @@
 <!DOCTYPE html>
-<!--
-  AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.14-1 (Restore public index; remove access gate)
-  Built: 2025-12-14
+<!-- 
+AI Visibility Index (AIVI) Homepage v2025.12.14-1
+Built by ChatGPT - 2025-12-14
 
-  NOTES:
-  - No access code on the index page.
-  - Public entry point only: URL → analyze.html?url=...
-  - Text/branding aligned to AI Visibility Index (AIVI) / Quontora.
+Source base: SnipeRank Homepage v2.19 (Education-First Layout)
+Change intent: BRAND + MARKETING UPDATE ONLY (SnipeRank → AI Visibility Index (AIVI), AI SEO → AI Visibility)
+No layout/design changes.
+Flow remains: index.html → analyze.html?url=...
 -->
-
+<!-- AI Visibility Index (AIVI) Index Page - Education-First Layout -->
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Visibility Index</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Visibility Index (AIVI) — Is Your Website Ready for the Age of AI?</title>
+    <style>
+        :root {
+            --max-width: 1200px;
+            --content-width: 760px;
+            --pad-v: 3vh;
+            --pad-h: 2rem;
+            --primary: #3182CE;
+            --primary-dark: #2563EB;
+            --accent: #E53E3E;
+            --accent-green: #10B981;
+            --accent-purple: #8B5CF6;
+            --accent-orange: #F59E0B;
+            --accent-red: #EF4444;
+            --text-dark: #000;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --bg-light: #f7fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Helvetica, sans-serif;
+            background: #fff;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        /* Stats Ticker - Repositioned */
+        .form-ticker {
+            background: white;
+            color: #333;
+            padding: 0.75rem 0;
+            overflow: hidden;
+            position: relative;
+            white-space: nowrap;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px 12px 0 0;
+            margin: 2rem 0 0 0;
+        }
+        
+        .form-ticker-content {
+            display: inline-block;
+            animation: scroll-left 120s linear infinite;
+            white-space: nowrap;
+        }
+        
+        .form-ticker-item {
+            display: inline-block;
+            margin-right: 3rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .form-ticker-number {
+            color: #3182CE;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        
+        @keyframes scroll-left {
+            0% { transform: translate3d(0%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        
+        /* Header */
+        header {
+            padding: var(--pad-v) var(--pad-h) 0;
+            max-width: var(--content-width);
+            margin: 0 auto;
+        }
+        
+        h1.logo {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0 0 0.25em 0;
+            line-height: 1;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #000 0%, #3182CE 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        h2.tagline {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0 0 0 0;
+            color: #000;
+        }
+        
+        .powered-by {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .powered-by a {
+            color: #3182CE;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Hero Section */
+        .hero {
+            max-width: var(--content-width);
+            margin: 0 auto;
+            padding: 2rem var(--pad-h) 3rem;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            line-height: 1.75;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-description p {
+            margin: 0;
+        }
 
-  <style>
-    :root{
-      --primary:#3182CE;
-      --max-width:760px;
-      --border:#e6e6e9;
-      --muted:#666;
-      --bg:#ffffff;
-      --soft:#f6f7f9;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-      color:#111;
-      background:var(--bg);
-    }
-    .wrap{
-      max-width:var(--max-width);
-      margin:0 auto;
-      padding:5vh 1.25rem 4vh;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:.75rem;
-      margin-bottom:1.25rem;
-    }
-    .logo{
-      width:42px;height:42px;border-radius:12px;
-      background:linear-gradient(135deg, rgba(49,130,206,.20), rgba(49,130,206,.04));
-      border:1px solid var(--border);
-      display:flex;align-items:center;justify-content:center;
-      font-weight:800;color:var(--primary);
-      letter-spacing:.5px;
-      user-select:none;
-    }
-    .brand h1{
-      margin:0;
-      font-size:1.05rem;
-      line-height:1.25rem;
-      font-weight:700;
-    }
-    .brand .sub{
-      margin:0;
-      font-size:.92rem;
-      color:var(--muted);
-    }
-
-    .hero{
-      margin:1.25rem 0 1.25rem;
-      padding:1.25rem;
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      background:var(--soft);
-    }
-    .hero .big{
-      margin:0 0 .45rem 0;
-      font-size:1.55rem;
-      line-height:1.95rem;
-      font-weight:800;
-      letter-spacing:-.2px;
-    }
-    .hero .small{
-      margin:0;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.45rem;
-    }
-
-    .card{
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:1.25rem;
-      background:#fff;
-    }
-    .card h2{
-      margin:0 0 .35rem 0;
-      font-size:1.05rem;
-      font-weight:800;
-    }
-    .card p{
-      margin:.25rem 0 1rem 0;
-      color:var(--muted);
-      line-height:1.45rem;
-    }
-
-    .row{
-      display:flex;
-      gap:.65rem;
-      flex-wrap:wrap;
-    }
-    .row.tight{ flex-wrap:wrap; }
-    input[type="url"]{
-      width:100%;
-      padding:.85rem .9rem;
-      border:1px solid var(--border);
-      border-radius:12px;
-      font-size:1rem;
-      outline:none;
-      background:#fff;
-    }
-    input[type="url"]:focus{
-      border-color:rgba(49,130,206,.65);
-      box-shadow:0 0 0 4px rgba(49,130,206,.12);
-    }
-
-    .btn{
-      appearance:none;
-      border:1px solid rgba(49,130,206,.35);
-      background:var(--primary);
-      color:#fff;
-      padding:.85rem 1rem;
-      border-radius:12px;
-      font-size:1rem;
-      font-weight:700;
-      cursor:pointer;
-      transition:transform .04s ease;
-      min-width:160px;
-    }
-    .btn:active{ transform:translateY(1px); }
-
-    .error{
-      margin-top:.75rem;
-      color:#b00020;
-      font-weight:600;
-      display:none;
-    }
-    .note{
-      margin-top:.85rem;
-      font-size:.92rem;
-      color:var(--muted);
-      line-height:1.35rem;
-    }
-    .foot{
-      margin-top:1.75rem;
-      color:var(--muted);
-      font-size:.9rem;
-      line-height:1.35rem;
-    }
-
-    @media (min-width:640px){
-      .row.tight{ flex-wrap:nowrap; }
-      .row.tight input{ flex:1; }
-    }
-  </style>
+        /* PROMINENT URL INPUT FORM - SHORTER HEIGHT */
+        .analyze-form {
+            background: linear-gradient(135deg, #3182CE 0%, #2563EB 100%);
+            border-radius: 0 0 16px 16px;
+            padding: 2rem;
+            margin: 0 0 2rem 0;
+            box-shadow: 0 20px 40px rgba(49, 130, 206, 0.3);
+            position: relative;
+        }
+        
+        .form-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .url-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            background: white;
+            border-radius: 12px;
+            padding: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .url-input {
+            flex: 1;
+            min-width: 0;
+            font-size: 1.15rem;
+            padding: 1rem 1.25rem;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+        
+        .url-input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .analyze-btn {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            border: none;
+            color: white;
+            background: linear-gradient(135deg, #E53E3E 0%, #DC2626 100%);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+        }
+        
+        .error {
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+            text-align: center;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        /* Key Information Block - Single Box */
+        .five-ws {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        .five-ws h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .ws-content {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+        }
+        
+        .ws-content p {
+            margin-bottom: 2rem;
+        }
+        
+        .ws-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .ws-content strong {
+            color: var(--text-dark);
+        }
+        
+        .ws-content .urgent {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+        
+        .ws-content a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        /* AI vs Traditional SEO Comparison */
+        .seo-comparison {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            margin: 3rem 0;
+            overflow: hidden;
+        }
+        
+        .comparison-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .comparison-header h3 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .comparison-side {
+            padding: 2rem;
+        }
+        
+        .comparison-side:first-child {
+            border-right: 1px solid var(--border);
+        }
+        
+        .comparison-side h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .comparison-side ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison-side li {
+            padding: 0.5rem 0;
+            color: var(--text-medium);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .comparison-side li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .comparison-cta {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-light);
+        }
+        
+        .comparison-cta a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .comparison-cta a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Quick Summary */
+        .summary-box {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .summary-box h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .summary-icon {
+            font-size: 1.25rem;
+            margin-top: 0.1rem;
+        }
+        
+        .summary-text {
+            flex: 1;
+        }
+        
+        .summary-text strong {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .summary-text span {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: nowrap;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+        
+        .quick-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--primary);
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .quick-links a:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Beta Notice */
+        .beta-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .beta-notice h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .beta-notice p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.95;
+            margin-bottom: 0.75rem;
+        }
+        
+        .beta-notice p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Final CTA Section */
+        .final-cta {
+            background: linear-gradient(135deg, #000 0%, #3182CE 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 3rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+        
+        .final-cta h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .final-cta p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .final-cta .btn-final {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+        
+        .final-cta .btn-final:hover {
+            background: #C53030;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        .content {
+            max-width: var(--content-width);
+            margin: 0 auto;
+            padding: 0 var(--pad-h);
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 4rem;
+        }
+        
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+        
+        .section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-dark);
+        }
+        
+        .section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section ul {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+        
+        .section li {
+            margin-bottom: 0.75rem;
+            color: var(--text-medium);
+            line-height: 1.7;
+        }
+        
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            padding: 1.5rem;
+            border-left: 3px solid var(--primary);
+            background: var(--bg-light);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .feature h4 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature p {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        /* Tech Stack Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .tech-card {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .tech-card h4 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+        
+        .tech-card p {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+        
+        .tech-list {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        /* PROPERLY FIXED PRICING SECTION */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            margin: 2rem 0 3rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .pricing-card {
+            padding: 25px 18px;
+            border-right: 1px solid var(--border);
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pricing-card:last-child {
+            border-right: none;
+        }
+        
+        .pricing-card.featured {
+            background: linear-gradient(to bottom, #f0f9ff 0%, #ffffff 100%);
+        }
+        
+        .pricing-badge {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4F9CF9;
+            color: white;
+            padding: 3px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 0 0 6px 6px;
+        }
+        
+        .pricing-header {
+            margin-bottom: 1rem;
+            min-height: 50px;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        
+        .pricing-subtitle {
+            font-size: 0.7rem;
+            color: #718096;
+        }
+        
+        .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+        
+        .price-desc {
+            color: var(--text-medium);
+            font-size: 0.7rem;
+            margin-bottom: 1rem;
+            min-height: 28px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+        
+        .feature-list li {
+            padding: 0.35rem 0;
+            color: var(--text-medium);
+            font-size: 0.75rem;
+            line-height: 1.2;
+        }
+        
+        .btn-pricing {
+            display: inline-block;
+            background: #4F9CF9;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            margin-top: auto;
+            width: 80%;
+        }
+        
+        .btn-pricing:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Early Bird Section */
+        .early-bird-section {
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.1) 0%, rgba(229, 62, 62, 0.1) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .early-bird-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 1.5rem auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .newsletter-form button {
+            padding: 0.75rem 2rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .newsletter-form button:hover {
+            background: #C53030;
+            transform: translateY(-2px);
+        }
+        
+        .disclaimer {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 1rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1rem var(--pad-h);
+            margin-top: 3rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-light);
+        }
+        
+        .footer-content {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.7rem;
+        }
+        
+        .footer-content p {
+            margin: 0.15rem 0;
+        }
+        
+        /* Scroll Up Arrow — UPGRADED */
+        .scroll-up-arrow {
+            position: fixed;
+            bottom: 1rem;         /* closer to content */
+            right: 1rem;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            z-index: 1000;
+            box-shadow: 0 10px 24px rgba(49,130,206,.35);
+            animation: sr-pulse 2.4s ease-in-out infinite;
+        }
+        .scroll-up-arrow.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .scroll-up-arrow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(49,130,206,.45);
+        }
+        @keyframes sr-pulse {
+            0%, 100% { box-shadow: 0 10px 24px rgba(49,130,206,.35); }
+            50%      { box-shadow: 0 14px 30px rgba(49,130,206,.50); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .pricing-card:last-child {
+                border-bottom: none;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-side:first-child {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 1rem 0;
+            }
+            
+            h1.logo {
+                font-size: 3rem;
+            }
+            
+            h2.tagline {
+                font-size: 1.1rem;
+            }
+            
+            .hero {
+                padding: 1.5rem 1rem;
+            }
+            
+            .url-input-wrapper {
+                flex-direction: column;
+            }
+            
+            .url-input {
+                min-width: 100%;
+            }
+            
+            .analyze-btn {
+                width: 100%;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-links {
+                flex-wrap: wrap;
+                flex-direction: column;
+            }
+            
+            .quick-links a {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+            
+            .newsletter-form input {
+                min-width: 100%;
+            }
+            
+            .newsletter-form button {
+                width: 100%;
+            }
+            
+            .section {
+                padding: 0 1rem;
+            }
+            
+            .beta-notice {
+                padding: 1.5rem 1rem;
+            }
+            
+            .analyze-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="brand">
-      <div class="logo">AI</div>
-      <div>
-        <h1>AI Visibility Index</h1>
-        <p class="sub">A measurement layer for AI understanding</p>
-      </div>
-    </div>
+    <!-- Header -->
+    <header>
+        <h1 class="logo">AI Visibility Index</h1>
+        <h2 class="tagline">Is your website ready for the age of AI search?</h2>
+        <p class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></p>
+    </header>
 
+    <!-- Hero Section -->
     <div class="hero">
-      <p class="big">AI is using your website as a reference.</p>
-      <p class="small">Is it telling the right story about you?</p>
+        <div class="hero-description" style="margin-top: -2rem;">
+            <p>
+                See how ChatGPT, Gemini, Claude, and modern answer engines interpret your website — and get specific fixes to improve your AI Visibility.
+            </p>
+        </div>
+
+        <!-- Live LLM Stats Ticker -->
+        <div class="form-ticker" id="free-scan-section">
+            <div class="form-ticker-content">
+                <span class="form-ticker-item">🔥 ChatGPT: <span class="form-ticker-number">800M</span> weekly users, <span class="form-ticker-number">69%</span> US market share</span>
+                <span class="form-ticker-item">🤖 Google Gemini: <span class="form-ticker-number">82M</span> monthly users, <span class="form-ticker-number">40%</span> US adoption</span>
+                <span class="form-ticker-item">💎 Claude AI: <span class="form-ticker-number">30M</span> monthly users, <span class="form-ticker-number">25B</span> API calls monthly</span>
+                <span class="form-ticker-item">🔍 Perplexity: <span class="form-ticker-number">110M</span> monthly visits, <span class="form-ticker-number">22M</span> active users</span>
+                <span class="form-ticker-item">⚡ <span class="form-ticker-number">1B+</span> LLM queries processed daily across all platforms</span>
+                <span class="form-ticker-item">📊 <span class="form-ticker-number">750M</span> apps will use LLMs by 2025</span>
+                <span class="form-ticker-item">💼 <span class="form-ticker-number">57%</span> of professionals use LLMs for productivity at work</span>
+                <span class="form-ticker-item">🏥 <span class="form-ticker-number">21%</span> of healthcare organizations use LLMs for patient care</span>
+                <span class="form-ticker-item">🏢 <span class="form-ticker-number">92%</span> of Fortune 500 companies now use AI/LLM tools</span>
+                <span class="form-ticker-item">🌍 <span class="form-ticker-number">190M</span> people use AI chatbots daily worldwide</span>
+                <span class="form-ticker-item">🚀 LLMs process <span class="form-ticker-number">2,206</span> queries every second globally</span>
+                <span class="form-ticker-item">🔥 ChatGPT: <span class="form-ticker-number">800M</span> weekly users, <span class="form-ticker-number">69%</span> US market share</span>
+                <span class="form-ticker-item">🤖 Google Gemini: <span class="form-ticker-number">82M</span> monthly users, <span class="form-ticker-number">40%</span> US adoption</span>
+                <span class="form-ticker-item">💎 Claude AI: <span class="form-ticker-number">30M</span> monthly users, <span class="form-ticker-number">25B</span> API calls monthly</span>
+                <span class="form-ticker-item">🔍 Perplexity: <span class="form-ticker-number">110M</span> monthly visits, <span class="form-ticker-number">22M</span> active users</span>
+            </div>
+        </div>
+
+        <!-- PROMINENT URL INPUT FORM -->
+        <div class="analyze-form">
+            <div class="form-header">
+                <h2>Run a Free Scan</h2>
+                <p>Get your FREE AIVI snapshot in under 30 seconds. Upgrade to a deeper report when paid plans launch.</p>
+            </div>
+            <form id="analyze-form">
+                <div class="url-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="url" 
+                        name="url" 
+                        class="url-input"
+                        placeholder="Enter your website URL" 
+                        required 
+                        autocomplete="url"
+                    />
+                    <button type="submit" class="analyze-btn">Analyze Site →</button>
+                </div>
+                <div id="error-message" class="error"></div>
+            </form>
+        </div>
+
+        <!-- Key Information Block -->
+        <div class="five-ws">
+            <h3>Why This Matters Now</h3>
+            <div class="ws-content">
+                <p><strong>Who It's For:</strong> Business owners, marketers, web developers, and digital agencies who depend on online visibility and want to stay ahead of AI-driven discovery.</p>
+                
+                <p><strong>What It Does:</strong> An AI Visibility audit that shows how modern AI systems understand your website — beyond keywords.</p>
+                
+                <p><strong>Why It Matters:</strong> AI now powers search results, recommendations, and answers. If AI can’t interpret your site accurately, it can’t confidently surface your brand.</p>
+                
+                <p><strong>Timing:</strong> <span class="urgent">Right now</span> as AI assistants and answer engines become the primary way people discover businesses and information online.</p>
+                
+                <p><strong>How to Start:</strong> Begin with a free scan to see what AI understands about your site, and what it misses. <a href="#analyze-form">Run your scan →</a></p>
+            </div>
+        </div>
+
+        <!-- AI vs Traditional SEO Comparison -->
+        <div class="seo-comparison">
+            <div class="comparison-header">
+                <h3>AI Visibility ≠ Traditional SEO</h3>
+            </div>
+            <div class="comparison-grid">
+                <div class="comparison-side">
+                    <h4>Traditional SEO:</h4>
+                    <ul>
+                        <li>Keywords and backlinks</li>
+                        <li>Optimized for crawlers</li>
+                        <li>Focused on ranking</li>
+                        <li>Keyword density matters</li>
+                        <li>Link building campaigns</li>
+                    </ul>
+                </div>
+                <div class="comparison-side">
+                    <h4>AI Visibility:</h4>
+                    <ul>
+                        <li>Context and meaning</li>
+                        <li>Optimized for AI understanding</li>
+                        <li>Focused on being surfaced in AI answers</li>
+                        <li>Entity + semantic relationships matter</li>
+                        <li>Content AI can parse and recommend</li>
+                    </ul>
+                </div>
+                <div class="comparison-cta">
+                    <a href="#analyze-form">Get your AIVI snapshot →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Beta Notice -->
+        <div class="beta-notice">
+            <h3>Beta Release — You're Early</h3>
+            <p>
+                You're experiencing a new class of visibility measurement: <strong>AI Visibility Index (AIVI)</strong>.
+                We’re actively refining the scoring model and recommendations based on real-world scans and feedback.
+            </p>
+            <p>
+                <strong>Note:</strong> Some corporate firewalls may limit crawling. If you receive limited results, try testing from a personal network for best results.
+            </p>
+        </div>
     </div>
 
-    <section class="card">
-      <h2>Run an AI Visibility check</h2>
-      <p>Enter a homepage URL to generate an initial analysis.</p>
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Quick Summary Box -->
+        <div class="summary-box">
+            <h3>What AIVI Analyzes</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-icon">🤖</span>
+                    <div class="summary-text">
+                        <strong>AI Perception Analysis</strong>
+                        <span>Understand how AI models interpret your content</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-icon">📊</span>
+                    <div class="summary-text">
+                        <strong>AI Visibility Signals</strong>
+                        <span>Beyond keywords — clarity, entities, and trust</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-icon">⚡</span>
+                    <div class="summary-text">
+                        <strong>Real Time Intelligence</strong>
+                        <span>Live analysis with actionable recommendations</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-icon">🔍</span>
+                    <div class="summary-text">
+                        <strong>Site Understanding</strong>
+                        <span>Multi-layer evaluation of key pages and structure</span>
+                    </div>
+                </div>
+            </div>
+            <div class="quick-links">
+                <a href="#how-it-works">Detailed Overview ↓</a>
+                <a href="#pricing">Pricing ↓</a>
+                <a href="#whitepaper">Technical Whitepaper ↓</a>
+                <a href="#technology">Architecture & Stack ↓</a>
+            </div>
+        </div>
 
-      <div class="row tight">
-        <input id="siteUrl" type="url" inputmode="url" placeholder="example.com or https://example.com" />
-        <button class="btn" id="analyzeBtn">Analyze</button>
-      </div>
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="section">
+            <h2>How AIVI Works</h2>
+            
+            <p>
+                The AI Visibility Index (AIVI) measures how modern AI systems understand, trust, and describe your website.
+                Unlike traditional SEO tools that focus on crawlers and keywords, AIVI is designed for the era of AI answers —
+                where being accurately represented is the new visibility.
+            </p>
 
-      <div id="urlError" class="error">Please enter a valid URL.</div>
+            <h3>The AIVI Process</h3>
+            
+            <div class="feature-grid">
+                <div class="feature">
+                    <h4>1. Intelligent Crawling</h4>
+                    <p>Our crawler navigates your site like a human would, mapping structure and hierarchy while respecting robots.txt and rate limits.</p>
+                </div>
+                
+                <div class="feature">
+                    <h4>2. Content & Entity Extraction</h4>
+                    <p>We extract topics, entities, and relationships so AI can clearly understand who you are, what you offer, and when to surface you.</p>
+                </div>
+                
+                <div class="feature">
+                    <h4>3. AI Perception Modeling</h4>
+                    <p>We model how AI systems interpret your pages, measuring clarity, semantic coherence, topical authority, and “describe-ability.”</p>
+                </div>
+                
+                <div class="feature">
+                    <h4>4. Technical AI Visibility Signals</h4>
+                    <p>We evaluate structural and technical factors that impact AI crawlability and comprehension (rendering, accessibility, markup, performance).</p>
+                </div>
+                
+                <div class="feature">
+                    <h4>5. Competitive Context</h4>
+                    <p>We benchmark against strong sites in your category to reveal gaps and quick wins in content, structure, and trust signals.</p>
+                </div>
+                
+                <div class="feature">
+                    <h4>6. Prioritized Fixes</h4>
+                    <p>Receive a clear report with the highest-impact improvements — designed to strengthen how AI summarizes and recommends your brand.</p>
+                </div>
+            </div>
 
-      <div class="note">
-        AI Visibility Index does not guarantee rankings or outcomes. It measures whether AI systems are likely to understand your site’s story.
-      </div>
-    </section>
+            <h3>Key Differentiators</h3>
+            <ul>
+                <li><strong>AI-First Approach:</strong> Built to reflect how AI assistants interpret, summarize, and select sources</li>
+                <li><strong>Semantic Understanding:</strong> Goes beyond keywords to measure entities, context, and intent</li>
+                <li><strong>Action-Oriented Output:</strong> Prioritized fixes that improve visibility in AI answers (not just rankings)</li>
+                <li><strong>Holistic Signals:</strong> Structure, content, clarity, and trust — consolidated into one index</li>
+                <li><strong>Future-Ready:</strong> Designed for assistants, answer engines, voice, and AI-driven discovery</li>
+            </ul>
+        </section>
 
-    <div class="foot">
-      © <span id="year"></span> Quontora. AI Visibility Index.
+        <!-- PROPERLY FIXED Pricing Section with small fonts -->
+        <section id="pricing" class="section">
+            <h2>Pricing</h2>
+            <p style="text-align: center; color: var(--text-medium); margin-bottom: 2rem;">
+                <strong style="color: var(--primary); font-size: 1.2rem;">🎉 Beta Special:</strong> Studio scans are FREE during our launch phase!
+            </p>
+            
+            <div class="pricing-grid">
+                <!-- Starter -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Starter</h3>
+                        <p class="pricing-subtitle">Always free</p>
+                    </div>
+                    
+                    <div class="price">$0</div>
+                    <p class="price-desc">Instant AIVI snapshot</p>
+                    
+                    <ul class="feature-list">
+                        <li>• Core AIVI snapshot</li>
+                        <li>• Key insights & opportunities</li>
+                        <li>• Shareable summary</li>
+                        <li>• Single-page view</li>
+                        <li>• Basic recommendations</li>
+                    </ul>
+                    
+                    <a href="#free-scan-section" class="btn-pricing">Get Free Snapshot</a>
+                </div>
+                
+                <!-- Studio -->
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Free for Now</div>
+                    <div class="pricing-header">
+                        <h3>Studio</h3>
+                        <p class="pricing-subtitle">Pay per analysis</p>
+                    </div>
+                    
+                    <div class="price">$24.99</div>
+                    <p class="price-desc">per report (free during beta)</p>
+                    
+                    <ul class="feature-list">
+                        <li>• Everything in Starter, plus:</li>
+                        <li>• Multi-page crawl (beta limits apply)</li>
+                        <li>• Page-by-page findings</li>
+                        <li>• Stronger AI visibility insights</li>
+                        <li>• Priority email support</li>
+                        <li>• Downloadable report (coming)</li>
+                    </ul>
+                    
+                    <a href="#free-scan-section" class="btn-pricing">Try Studio Beta</a>
+                </div>
+                
+                <!-- Enterprise -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <p class="pricing-subtitle">Agencies & enterprises</p>
+                    </div>
+                    
+                    <div class="price" style="font-size: 1rem;">Contact Us</div>
+                    <p class="price-desc">Custom pricing for volume</p>
+                    
+                    <ul class="feature-list">
+                        <li>• High-volume scans</li>
+                        <li>• Large-site crawling</li>
+                        <li>• Multiple projects</li>
+                        <li>• White-label reports</li>
+                        <li>• API access</li>
+                        <li>• Priority support</li>
+                    </ul>
+                    
+                    <a href="mailto:sales@quontora.com?subject=AIVI%20Enterprise%20Inquiry" class="btn-pricing">Contact Sales</a>
+                </div>
+            </div>
+            
+            <!-- Early Bird Signup -->
+            <div class="early-bird-section" id="newsletter">
+                <h3>Stay Updated on New Features</h3>
+                <p>Get notified when we release new AI Visibility capabilities and paid plans.</p>
+                <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+                    <input type="email" placeholder="you@company.com" required>
+                    <button type="submit">Keep Me Updated</button>
+                </form>
+                <p class="disclaimer">We'll only email about AIVI updates and new features. Unsubscribe anytime.</p>
+            </div>
+        </section>
+
+        <!-- Whitepaper Section -->
+        <section id="whitepaper" class="section">
+            <h2>Technical Whitepaper</h2>
+            
+            <h3>Executive Summary</h3>
+            <p>
+                The AI Visibility Index (AIVI) represents a shift in how visibility should be measured in the age of AI answers.
+                Instead of optimizing only for rankings, AIVI focuses on whether AI systems can accurately interpret, trust, and surface your website as a source.
+                This whitepaper outlines the methodology, technical principles, and architecture behind AIVI.
+            </p>
+
+            <h3>The Challenge: Visibility in the Age of AI</h3>
+            <p>
+                Traditional SEO tools were designed for keyword matching and crawler signals. Today, AI systems use large language models to
+                synthesize answers and select sources based on meaning, entity confidence, and trust. This requires a new measurement layer —
+                one that can evaluate how AI systems interpret content, not just whether a page is crawlable.
+            </p>
+
+            <h3>Our Solution: AI Visibility Measurement</h3>
+            <p>
+                AIVI evaluates websites across multiple dimensions that influence how AI assistants describe, cite, and recommend a brand:
+            </p>
+            
+            <ul>
+                <li><strong>Semantic Clarity:</strong> How clearly your pages define topics, entities, and intent for AI comprehension.</li>
+                
+                <li><strong>Structure & Accessibility:</strong> Whether content is technically accessible, parseable, and logically organized.</li>
+                
+                <li><strong>Authority Signals:</strong> Credibility markers that influence whether AI systems trust your claims and cite you.</li>
+                
+                <li><strong>AI Readability:</strong> How well AI can summarize your site without misrepresenting your offerings.</li>
+            </ul>
+
+            <h3>Technical Architecture</h3>
+            <p>
+                AIVI is built on a scalable pipeline designed to crawl, extract, interpret, and score websites efficiently:
+            </p>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h4>Retrieval & Crawl Layer</h4>
+                    <p>Adaptive crawling and extraction designed for AI visibility use cases and page-type variation.</p>
+                    <div class="tech-list">Technologies: Node.js, HTML parsing, rate limiting</div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>AI Interpretation Layer</h4>
+                    <p>Model-assisted interpretation that evaluates clarity, meaning, and trust signals.</p>
+                    <div class="tech-list">Technologies: LLM APIs, prompts, normalization</div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>Scoring & Reporting</h4>
+                    <p>Deterministic + AI-assisted scoring that outputs a clear index and prioritized fixes.</p>
+                    <div class="tech-list">Technologies: Rule engine, scoring weights, reporting templates</div>
+                </div>
+            </div>
+
+            <h3>Privacy & Security</h3>
+            <p>
+                AIVI adheres to privacy-first principles. We aim to minimize data retention, run analysis primarily in memory,
+                and avoid storing sensitive content. Results are secured and handled with care to support business use cases.
+            </p>
+        </section>
+
+        <!-- Technology Stack Section -->
+        <section id="technology" class="section">
+            <h2>Technology Stack & Implementation</h2>
+            
+            <p>
+                Building AIVI required combining modern crawling, extraction, and multi-model interpretation into a single measurement framework.
+                The system is designed to be lightweight and extensible — with an API-first architecture that can expand into dashboards, CMS plugins, and enterprise workflows.
+            </p>
+
+            <h3>Core Technologies</h3>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h4>Backend Infrastructure</h4>
+                    <p>Asynchronous backend designed for crawling + AI interpretation.</p>
+                    <div class="tech-list">
+                        <strong>Runtime:</strong> Node.js<br>
+                        <strong>Deployment:</strong> Serverless / containers<br>
+                        <strong>APIs:</strong> REST endpoints for scoring + reporting
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>AI & Model Layer</h4>
+                    <p>Multi-model lens to reduce bias and improve interpretability.</p>
+                    <div class="tech-list">
+                        <strong>Providers:</strong> OpenAI, Anthropic, Google<br>
+                        <strong>Outputs:</strong> Summaries, issues, recommendations<br>
+                        <strong>Controls:</strong> Normalization + consistency checks
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>Data Processing</h4>
+                    <p>Extraction and scoring logic built for repeatable, explainable results.</p>
+                    <div class="tech-list">
+                        <strong>Parsing:</strong> DOM + text extraction<br>
+                        <strong>Signals:</strong> Structure, clarity, trust<br>
+                        <strong>Scoring:</strong> Weighted index + bands (beta)
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>Frontend & Experience</h4>
+                    <p>Fast, frictionless flow from URL → scan → report.</p>
+                    <div class="tech-list">
+                        <strong>Stack:</strong> HTML / CSS / Vanilla JS<br>
+                        <strong>Goal:</strong> Fast load + low friction<br>
+                        <strong>Future:</strong> Dashboards + exports
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>Security & Monitoring</h4>
+                    <p>Foundational safeguards for reliability and abuse prevention.</p>
+                    <div class="tech-list">
+                        <strong>Validation:</strong> Input sanitization<br>
+                        <strong>Limits:</strong> Rate limiting<br>
+                        <strong>Ops:</strong> Error logging + observability
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <h4>Cloud & DevOps</h4>
+                    <p>Simple, deployable infrastructure that can scale.</p>
+                    <div class="tech-list">
+                        <strong>CI/CD:</strong> GitHub Actions<br>
+                        <strong>Hosting:</strong> Vercel / Render<br>
+                        <strong>Scale:</strong> Horizontal concurrency
+                    </div>
+                </div>
+            </div>
+
+            <h3>Engineering Highlights</h3>
+            <ul>
+                <li><strong>Fast time-to-insight:</strong> Quick scans that surface high-impact clarity and trust issues</li>
+                <li><strong>Scalable pipeline:</strong> Designed to handle parallel crawling + model calls</li>
+                <li><strong>Explainable outputs:</strong> Findings are translated into actionable fixes, not just scores</li>
+                <li><strong>Index-first product:</strong> AIVI is built to become a standard measurement category</li>
+                <li><strong>Extensible architecture:</strong> Roadmap-ready for CMS integrations and enterprise workflows</li>
+            </ul>
+        </section>
+
+        <!-- Final CTA Section -->
+        <div class="final-cta">
+            <h3>Be visible in the age of AI.</h3>
+            <p>Find out how AI systems see your website — and what you can do about it.</p>
+            <a href="#free-scan-section" class="btn-final">Run Free Scan</a>
+        </div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    <!-- Scroll Up Arrow -->
+    <button id="scroll-up-arrow" class="scroll-up-arrow" title="Run Free Scan">↑</button>
 
-    function normalizeUrl(raw){
-      let v = (raw || "").trim();
-      if(!v) return "";
-      if(!/^https?:\/\//i.test(v)){
-        v = "https://" + v;
-      }
-      try{
-        const u = new URL(v);
-        if(!u.hostname || u.hostname.indexOf(".") === -1) return "";
-        return u.toString();
-      }catch(e){
-        return "";
-      }
-    }
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 AI Visibility Index (AIVI). All rights reserved. Last updated December 2025 — v2025.12.14-1.</p>
+            <p>A product of <a href="https://quontora.com" target="_blank" rel="noopener" style="color: var(--primary); text-decoration: none;">Quontora</a></p>
+        </div>
+    </footer>
 
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const siteUrl = document.getElementById("siteUrl");
-    const urlError = document.getElementById("urlError");
+    <script>
+        // URL validation unchanged
+        function isValidURL(input) {
+            const pattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+            return pattern.test(input);
+        }
 
-    analyzeBtn.addEventListener("click", () => {
-      urlError.style.display = "none";
-      const normalized = normalizeUrl(siteUrl.value);
-      if(!normalized){
-        urlError.style.display = "block";
-        return;
-      }
-      window.location.href = `analyze.html?url=${encodeURIComponent(normalized)}`;
-    });
+        document.getElementById("analyze-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const urlInput = document.getElementById("url");
+            let url = urlInput.value.trim();
+            const errorDiv = document.getElementById("error-message");
+            errorDiv.classList.remove('show');
+            if (!isValidURL(url)) {
+                errorDiv.textContent = "Please enter a valid domain (e.g., example.com)";
+                errorDiv.classList.add('show');
+                return;
+            }
+            if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+            window.location.href = "analyze.html?url=" + encodeURIComponent(url);
+        });
 
-    siteUrl.addEventListener("keydown", (e) => {
-      if(e.key === "Enter"){
-        analyzeBtn.click();
-      }
-    });
-  </script>
+        // Newsletter form handler
+        function handleNewsletterSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            form.reset();
+            alert('Thanks for joining our early list! We\'ll notify you when new AIVI features and paid plans launch.');
+        }
+
+        // Upgraded Scroll-up arrow
+        const scrollUpArrow = document.getElementById('scroll-up-arrow');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 220) {
+                scrollUpArrow.classList.add('visible');
+            } else {
+                scrollUpArrow.classList.remove('visible');
+            }
+        });
+        scrollUpArrow.addEventListener('click', function() {
+            const freeScanSection = document.getElementById('free-scan-section');
+            if (freeScanSection) {
+                freeScanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
