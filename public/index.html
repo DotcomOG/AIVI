@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.12-1 (Brand update: VistaScore → AI Visibility Index)
+  Version: v2025.12.14-1 (Restore public index; remove access gate)
+  Built: 2025-12-14
 
   NOTES:
-  - No layout/design changes in this version.
-  - Text + branding updates only (VistaScore/NuVista → AI Visibility Index (AIVI)/Quontora).
-  - Flow remains: index.html → analyze.html?url=...
+  - No access code on the index page.
+  - Public entry point only: URL → analyze.html?url=...
+  - Text/branding aligned to AI Visibility Index (AIVI) / Quontora.
 -->
 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AIVI — Vetted Access</title>
+  <title>AI Visibility Index</title>
 
   <style>
     :root{
@@ -28,7 +29,7 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
       color:#111;
       background:var(--bg);
     }
@@ -65,14 +66,14 @@
     }
 
     .hero{
-      margin:1.25rem 0 1.75rem;
-      padding:1.25rem 1.25rem;
+      margin:1.25rem 0 1.25rem;
+      padding:1.25rem;
       border:1px solid var(--border);
       border-radius:var(--radius);
       background:var(--soft);
     }
     .hero .big{
-      margin:0 0 .5rem 0;
+      margin:0 0 .45rem 0;
       font-size:1.55rem;
       line-height:1.95rem;
       font-weight:800;
@@ -101,12 +102,14 @@
       color:var(--muted);
       line-height:1.45rem;
     }
+
     .row{
       display:flex;
       gap:.65rem;
       flex-wrap:wrap;
     }
-    input[type="text"], input[type="url"]{
+    .row.tight{ flex-wrap:wrap; }
+    input[type="url"]{
       width:100%;
       padding:.85rem .9rem;
       border:1px solid var(--border);
@@ -115,7 +118,7 @@
       outline:none;
       background:#fff;
     }
-    input[type="text"]:focus, input[type="url"]:focus{
+    input[type="url"]:focus{
       border-color:rgba(49,130,206,.65);
       box-shadow:0 0 0 4px rgba(49,130,206,.12);
     }
@@ -134,48 +137,25 @@
       min-width:160px;
     }
     .btn:active{ transform:translateY(1px); }
-    .btn.secondary{
-      background:#fff;
-      color:#111;
-      border:1px solid var(--border);
-      min-width:auto;
-      font-weight:700;
-    }
 
-    .note{
-      margin-top:.75rem;
-      font-size:.92rem;
-      color:var(--muted);
-    }
     .error{
       margin-top:.75rem;
       color:#b00020;
       font-weight:600;
       display:none;
     }
-    .success{
-      margin-top:.75rem;
-      color:#0b7a2a;
-      font-weight:700;
-      display:none;
+    .note{
+      margin-top:.85rem;
+      font-size:.92rem;
+      color:var(--muted);
+      line-height:1.35rem;
     }
-
-    .divider{
-      height:1px;
-      background:var(--border);
-      margin:1.15rem 0;
-    }
-
     .foot{
       margin-top:1.75rem;
       color:var(--muted);
       font-size:.9rem;
       line-height:1.35rem;
     }
-
-    /* Sections toggled by JS */
-    #gateSection{ display:block; }
-    #appSection{ display:none; }
 
     @media (min-width:640px){
       .row.tight{ flex-wrap:nowrap; }
@@ -190,7 +170,7 @@
       <div class="logo">AI</div>
       <div>
         <h1>AI Visibility Index</h1>
-        <p class="sub">Early access portal (vetted partners only)</p>
+        <p class="sub">A measurement layer for AI understanding</p>
       </div>
     </div>
 
@@ -199,85 +179,38 @@
       <p class="small">Is it telling the right story about you?</p>
     </div>
 
-    <!-- GATE -->
-    <section id="gateSection" class="card">
-      <h2>Vetted access</h2>
-      <p>
-        This preview is currently limited to invited partners.
-        If you have an access code, enter it below.
-      </p>
-
-      <div class="row tight">
-        <input id="accessCode" type="text" autocomplete="off" placeholder="Access code (e.g., AIVI-XXXX)" />
-        <button class="btn" id="unlockBtn">Unlock</button>
-      </div>
-
-      <div id="gateError" class="error">That code doesn’t look right. Try again.</div>
-      <div id="gateSuccess" class="success">Access granted. Welcome.</div>
-
-      <div class="divider"></div>
-
-      <p class="note">
-        Need access? Email the team with your name + company and we’ll respond quickly.
-        <br/>
-        <strong>Email:</strong> <a href="mailto:hello@aivindex.io">hello@aivindex.io</a>
-      </p>
-
-      <p class="note" style="margin-top:.85rem;">
-        (Yes, we considered “send a selfie holding a sign.” We decided to stay professional… for now.)
-      </p>
-    </section>
-
-    <!-- APP ENTRY -->
-    <section id="appSection" class="card">
+    <section class="card">
       <h2>Run an AI Visibility check</h2>
-      <p>Enter a homepage URL. We’ll analyze structure, clarity, content alignment, and trust signals.</p>
+      <p>Enter a homepage URL to generate an initial analysis.</p>
 
       <div class="row tight">
         <input id="siteUrl" type="url" inputmode="url" placeholder="example.com or https://example.com" />
         <button class="btn" id="analyzeBtn">Analyze</button>
-        <button class="btn secondary" id="lockBtn" title="End this session">Lock</button>
       </div>
 
       <div id="urlError" class="error">Please enter a valid URL.</div>
 
-      <p class="note">
-        AIVI does not guarantee rankings or outcomes. It measures whether AI systems are likely to understand your site’s story.
-      </p>
+      <div class="note">
+        AI Visibility Index does not guarantee rankings or outcomes. It measures whether AI systems are likely to understand your site’s story.
+      </div>
     </section>
 
     <div class="foot">
-      © <span id="year"></span> AI Visibility Index. Early access preview.
+      © <span id="year"></span> Quontora. AI Visibility Index.
     </div>
   </div>
 
   <script>
-    // --- CONFIG ---
-    // Replace these with the codes you actually want to distribute.
-    // NOTE: Front-end gating is not real security; it’s a vetted-beta friction layer.
-    const VALID_CODES = [
-      "AIVI-ALPHA-2025",
-      "AIVI-PARTNER",
-      "QUONTORA-FRIENDS"
-    ];
-
-    const SESSION_KEY = "AIVI_VETTED_ACCESS_GRANTED";
-
-    // --- Helpers ---
-    function normalizeCode(v){
-      return (v || "").trim().toUpperCase();
-    }
+    document.getElementById("year").textContent = new Date().getFullYear();
 
     function normalizeUrl(raw){
       let v = (raw || "").trim();
       if(!v) return "";
-      // Add protocol if missing
       if(!/^https?:\/\//i.test(v)){
         v = "https://" + v;
       }
       try{
         const u = new URL(v);
-        // Basic host check
         if(!u.hostname || u.hostname.indexOf(".") === -1) return "";
         return u.toString();
       }catch(e){
@@ -285,60 +218,7 @@
       }
     }
 
-    function showApp(){
-      document.getElementById("gateSection").style.display = "none";
-      document.getElementById("appSection").style.display = "block";
-    }
-
-    function showGate(){
-      document.getElementById("gateSection").style.display = "block";
-      document.getElementById("appSection").style.display = "none";
-    }
-
-    // --- Init ---
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    if(sessionStorage.getItem(SESSION_KEY) === "1"){
-      showApp();
-    }else{
-      showGate();
-    }
-
-    // --- Gate logic ---
-    const unlockBtn = document.getElementById("unlockBtn");
-    const accessCode = document.getElementById("accessCode");
-    const gateError = document.getElementById("gateError");
-    const gateSuccess = document.getElementById("gateSuccess");
-
-    function attemptUnlock(){
-      gateError.style.display = "none";
-      gateSuccess.style.display = "none";
-
-      const code = normalizeCode(accessCode.value);
-      const ok = VALID_CODES.includes(code);
-
-      if(!ok){
-        gateError.style.display = "block";
-        return;
-      }
-
-      sessionStorage.setItem(SESSION_KEY, "1");
-      gateSuccess.style.display = "block";
-
-      setTimeout(() => {
-        showApp();
-        accessCode.value = "";
-      }, 350);
-    }
-
-    unlockBtn.addEventListener("click", attemptUnlock);
-    accessCode.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") attemptUnlock();
-    });
-
-    // --- App logic ---
     const analyzeBtn = document.getElementById("analyzeBtn");
-    const lockBtn = document.getElementById("lockBtn");
     const siteUrl = document.getElementById("siteUrl");
     const urlError = document.getElementById("urlError");
 
@@ -356,16 +236,6 @@
       if(e.key === "Enter"){
         analyzeBtn.click();
       }
-    });
-
-    lockBtn.addEventListener("click", () => {
-      sessionStorage.removeItem(SESSION_KEY);
-      siteUrl.value = "";
-      urlError.style.display = "none";
-      gateError.style.display = "none";
-      gateSuccess.style.display = "none";
-      showGate();
-      accessCode.focus();
     });
   </script>
 </body>
