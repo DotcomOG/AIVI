@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.14-1 (Remove Beta banner + apply purple styling to Contact box)
+  Version: v2025.12.14-1 (Pricing & Access model + remove beta banner + purple contact styling + expanded footer)
   Built by ChatGPT - 2025-12-14
 
   NOTES:
-  - No layout/design changes beyond the requested swap.
-  - Removed the purple Early Access Beta section.
-  - Reused the purple box styling for the Contact box (as requested).
   - Flow remains: index.html → analyze.html?url=...
+  - AIVI Snapshot (Analyze) is public + always free.
+  - Everything beyond Analyze is private / access-code protected (issued directly).
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
+
   <style>
     :root{
       --max-width:1600px; --content-width:1200px; --pad-v:3vh; --pad-h:2rem;
@@ -110,28 +110,6 @@
     .feature h4{font-size:1.1rem;color:var(--text-dark);margin-bottom:.5rem}
     .feature p{font-size:.95rem;color:var(--text-medium);line-height:1.6;margin:0}
 
-    /* Pricing — horizontal stacked rows, unified body flow */
-    .pricing-stack{display:flex;flex-direction:column;gap:1rem;margin:2rem 0 2.5rem}
-    .plan-row{
-      display:flex;gap:1.25rem;align-items:stretch;border:2px solid var(--border);border-radius:14px;background:#fff;
-      padding:1.1rem;transition:box-shadow .2s, border-color .2s
-    }
-    .plan-row:hover{border-color:var(--primary);box-shadow:0 8px 24px rgba(49,130,206,.12)}
-    .plan-badge{min-width:110px;border-right:1px dashed var(--border);padding-right:1rem;display:flex;flex-direction:column;justify-content:center;gap:.3rem}
-    .plan-badge h3{margin:0;font-size:1.35rem}
-    .plan-badge .price{font-size:1.4rem;font-weight:800;color:var(--primary)}
-    .plan-badge .subtitle{font-size:.8rem;color:#718096}
-    .plan-cta{display:flex;align-items:center;gap:.6rem}
-    .btn-pricing{display:inline-block;background:var(--primary);color:#fff;padding:.7rem 1.2rem;border-radius:10px;text-decoration:none;font-weight:700}
-    .badge-pill{display:inline-block;padding:.25rem .55rem;border:1px solid var(--primary);color:var(--primary);border-radius:999px;font-size:.75rem;font-weight:700}
-
-    .plan-row.featured{border-color:var(--primary);background:linear-gradient(135deg,#f0f9ff 0%,#ffffff 100%)}
-
-    .plan-body{flex:1;background:var(--bg-light);border:1px dashed var(--border);border-radius:10px;padding:1rem}
-    .use-intro{margin:0 0 .75rem 0;font-size:.98rem;color:#334155}
-    .feature-list{list-style:disc;padding-left:1.2rem;margin:0}
-    .feature-list li{padding:.25rem 0;border:0;color:var(--text-medium);font-size:.95rem}
-
     /* Accordions */
     details.sr-accordion{border:1px solid var(--border);border-radius:10px;margin:1rem 0 1.25rem;background:#fff}
     details.sr-accordion[open]{box-shadow:0 8px 24px rgba(0,0,0,.06)}
@@ -144,28 +122,32 @@
     details.sr-accordion[open]>summary span.chev{transform:rotate(180deg)}
     details.sr-accordion .accordion-body{padding:0 1.1rem 1.1rem}
 
-    /* Purple box styling (reused for Contact box) */
-    .beta-notice{background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);color:#fff;border-radius:12px;padding:2rem;margin:2rem 0}
-    .beta-notice h3{font-size:1.3rem;margin-bottom:1rem}
-    .beta-notice p{font-size:.95rem;line-height:1.6;opacity:.95;margin-bottom:.75rem}
-    .beta-notice p:last-child{margin-bottom:0}
-
-    /* Contact — pop */
+    /* Contact — UPDATED: purple box styling (matching the old purple beta styling) */
     .contact-pop{
-      background:radial-gradient(1200px 300px at 50% -20%, #e6f1ff 0%, #ffffff 55%),linear-gradient(135deg,#1a73e8 0%, #6a5cff 100%);
-      color:#0b1220;border-radius:16px;border:1px solid #d7e3ff;padding:1.4rem;display:grid;gap:1rem;grid-template-columns:1fr auto;align-items:center;
-      box-shadow:0 16px 48px rgba(26,115,232,.22)
+      background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);
+      color:#fff;
+      border-radius:12px;
+      padding:2rem;
+      margin:2rem 0;
+      display:grid;
+      gap:1rem;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      box-shadow:0 16px 48px rgba(102,126,234,.22);
+      border:1px solid rgba(255,255,255,.18);
     }
-    .contact-pop h3{margin:0;font-size:1.5rem;color:#0b1220}
-    .contact-pop p{margin:.25rem 0 0;color:#1b2b55}
+    .contact-pop h3{margin:0;font-size:1.5rem;color:#fff}
+    .contact-pop p{margin:.25rem 0 0;color:rgba(255,255,255,.92)}
     .contact-actions{display:flex;gap:.6rem;align-items:center}
-    .btn-primary{display:inline-block;background:#111;color:#fff;border:none;border-radius:999px;padding:.85rem 1.25rem;font-weight:800;text-decoration:none}
-    .btn-secondary{display:inline-block;background:#fff;color:#111;border:1px solid #111;border-radius:999px;padding:.75rem 1.1rem;font-weight:800;text-decoration:none}
-
-    /* Footer */
-    footer{text-align:center;padding:1rem var(--pad-h);margin-top:3rem;border-top:1px solid var(--border);background:var(--bg-light)}
-    .footer-content{max-width:var(--max-width);margin:0 auto;text-align:center;color:var(--text-light);font-size:.8rem}
-    .footer-content p{margin:.15rem 0}
+    .btn-primary{
+      display:inline-block;background:#111;color:#fff;border:none;border-radius:999px;
+      padding:.85rem 1.25rem;font-weight:800;text-decoration:none
+    }
+    .btn-secondary{
+      display:inline-block;background:#fff;color:#111;border:1px solid #fff;border-radius:999px;
+      padding:.75rem 1.1rem;font-weight:800;text-decoration:none
+    }
+    .btn-secondary:hover{opacity:.92}
 
     /* Floating Back to Top Button */
     .back-to-top-float{
@@ -200,9 +182,88 @@
       opacity:1;
     }
 
+    /* Footer (expanded) */
+    footer{
+      margin-top:3rem;
+      border-top:1px solid var(--border);
+      background:var(--bg-light);
+      padding:2rem var(--pad-h);
+    }
+    .footer-wrap{
+      max-width:var(--content-width);
+      margin:0 auto;
+      display:grid;
+      gap:1.5rem;
+      grid-template-columns:2fr 1fr 1fr;
+      align-items:start;
+    }
+    .footer-brand h4{
+      margin:0 0 .4rem 0;
+      font-size:1.05rem;
+      color:#0b1220;
+      font-weight:800;
+    }
+    .footer-brand p{
+      margin:.35rem 0 0;
+      font-size:.9rem;
+      color:var(--text-medium);
+      line-height:1.6;
+    }
+    .footer-col h5{
+      margin:0 0 .6rem 0;
+      font-size:.85rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#0b1220;
+      font-weight:800;
+    }
+    .footer-links{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      gap:.45rem;
+    }
+    .footer-links a{
+      color:var(--primary);
+      text-decoration:none;
+      font-weight:700;
+      font-size:.9rem;
+    }
+    .footer-links a:hover{text-decoration:underline}
+    .footer-fineprint{
+      max-width:var(--content-width);
+      margin:1.5rem auto 0;
+      padding-top:1rem;
+      border-top:1px solid rgba(226,232,240,.9);
+      display:flex;
+      flex-wrap:wrap;
+      gap:.75rem 1.25rem;
+      justify-content:space-between;
+      color:var(--text-light);
+      font-size:.82rem;
+      line-height:1.6;
+    }
+    .footer-fineprint a{color:var(--primary);text-decoration:none;font-weight:700}
+    .footer-fineprint a:hover{text-decoration:underline}
+    .pill{
+      display:inline-block;
+      padding:.15rem .5rem;
+      border-radius:999px;
+      border:1px solid rgba(49,130,206,.35);
+      color:#0b1220;
+      background:#fff;
+      font-weight:800;
+      font-size:.78rem;
+      white-space:nowrap;
+    }
+
     /* Responsive tweaks */
-    @media (max-width:900px){.contact-pop{grid-template-columns:1fr;text-align:center}.contact-actions{justify-content:center;flex-wrap:wrap}}
-    @media (max-width:680px){.plan-row{flex-direction:column}.plan-badge{border-right:0;border-bottom:1px dashed var(--border);padding-bottom:.8rem;min-width:unset}}
+    @media (max-width:900px){
+      .contact-pop{grid-template-columns:1fr;text-align:center}
+      .contact-actions{justify-content:center;flex-wrap:wrap}
+    }
     @media (max-width:768px){
       header{padding:1.5rem 1rem 0}
       h1.logo{font-size:3rem}
@@ -215,328 +276,190 @@
       .section{padding:0 1rem}
       .quick-links{gap:1rem}
       .back-to-top-float{right:1rem;width:56px;height:56px;font-size:1.75rem}
+      .footer-wrap{grid-template-columns:1fr}
     }
-    @media (max-width:560px){.quick-links{flex-direction:column;align-items:center}.quick-links a{width:200px}}
+    @media (max-width:560px){
+      .quick-links{flex-direction:column;align-items:center}
+      .quick-links a{width:200px}
+    }
   </style>
 
-  <!-- Pricing Section Styles -->
+  <!-- Pricing & Access (replaces old 3-plan + yellow beta banner) -->
   <style>
-    .pricing-container {
-        max-width: 1600px;
-        width: 100%;
-        margin: 0 auto;
-        min-width: 320px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        color: #333;
-        line-height: 1.6;
-        padding: 20px 40px 40px 40px;
+    .pricing-container{
+      max-width:1600px;
+      width:100%;
+      margin:0 auto;
+      min-width:320px;
+      color:#111;
+      line-height:1.6;
+      padding:20px 0 10px 0;
     }
 
-    /* Beta Banner */
-    .beta-banner {
-        background: #fffbe6;
-        border: 1px solid #fde68a;
-        border-radius: 8px;
-        padding: 12px 20px;
-        margin-bottom: 40px;
-        text-align: center;
-        font-size: 15px;
-        color: #333;
+    .pricing-intro{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:18px 18px;
+      margin:0 0 18px 0;
+    }
+    .pricing-intro p{
+      margin:0;
+      color:var(--text-medium);
+      font-size:1rem;
+      line-height:1.7;
+    }
+    .pricing-intro .accent{
+      color:#0b1220;
+      font-weight:800;
+    }
+    .access-pill{
+      display:inline-block;
+      margin-left:.5rem;
+      padding:.2rem .55rem;
+      border-radius:999px;
+      border:1px solid rgba(49,130,206,.45);
+      background:#fff;
+      color:var(--primary);
+      font-weight:900;
+      font-size:.78rem;
+      vertical-align:middle;
+      white-space:nowrap;
     }
 
-    .beta-banner strong {
-        font-weight: 600;
+    .access-stack{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin:18px 0 22px;
     }
 
-    /* Pricing Cards - Updated for perfect alignment */
-    .pricing-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        overflow: hidden;
-        background: white;
+    .access-row{
+      display:grid;
+      grid-template-columns: 220px 1fr 260px;
+      gap:16px;
+      align-items:stretch;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 2px 10px rgba(0,0,0,.04);
     }
 
-    .pricing-card {
-        padding: 32px;
-        border-right: 1px solid #e5e7eb;
-        display: flex;
-        flex-direction: column;
-        position: relative;
+    .access-left{
+      padding:16px 16px;
+      background:linear-gradient(180deg,#f0f7ff 0%, #ffffff 70%);
+      border-right:1px solid #e5e7eb;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+    }
+    .access-left h3{
+      margin:0;
+      font-size:1.05rem;
+      font-weight:900;
+      color:#0b1220;
+      line-height:1.2;
+    }
+    .access-left .price{
+      font-size:1.25rem;
+      font-weight:1000;
+      color:var(--primary);
+      line-height:1.1;
+    }
+    .access-left .meta{
+      font-size:.85rem;
+      color:var(--text-medium);
     }
 
-    .pricing-card:last-child {
-        border-right: none;
+    .access-body{
+      padding:16px 18px;
+      background:#fff;
+    }
+    .access-body p{
+      margin:0 0 10px 0;
+      color:var(--text-medium);
+      font-size:.98rem;
+      line-height:1.7;
+    }
+    .access-body ul{
+      margin:0;
+      padding-left:1.2rem;
+      color:var(--text-medium);
+      font-size:.95rem;
+      line-height:1.7;
+    }
+    .access-body li{margin:.25rem 0}
+
+    .access-cta{
+      padding:16px 16px;
+      background:var(--bg-light);
+      border-left:1px solid #e5e7eb;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:10px;
+    }
+    .cta-btn{
+      display:inline-block;
+      width:100%;
+      text-align:center;
+      padding:12px 14px;
+      border-radius:10px;
+      font-weight:900;
+      text-decoration:none;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:transform .15s ease, background .2s ease, border-color .2s ease, color .2s ease;
+      box-sizing:border-box;
+    }
+    .cta-btn.primary{background:var(--primary);color:#fff}
+    .cta-btn.primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .cta-btn.secondary{background:#fff;color:var(--primary);border-color:var(--primary)}
+    .cta-btn.secondary:hover{background:#f0f9ff;transform:translateY(-1px)}
+    .cta-note{
+      margin:0;
+      font-size:.82rem;
+      color:var(--text-light);
+      text-align:center;
+      line-height:1.4;
     }
 
-    /* Fixed height sections for perfect alignment */
-    .plan-header {
-        height: 120px;
-        margin-bottom: 24px;
-        display: flex;
-        flex-direction: column;
+    .how-access{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:18px 18px;
+      margin:8px 0 0;
     }
-
-    .plan-name {
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 16px;
-        color: #111;
+    .how-access h3{
+      margin:0 0 10px 0;
+      font-size:1.05rem;
+      font-weight:900;
+      color:#0b1220;
     }
-
-    .plan-description {
-        font-size: 15px;
-        color: #333;
-        line-height: 1.5;
-        flex: 1;
+    .how-access ul{
+      margin:0;
+      padding-left:1.2rem;
+      color:var(--text-medium);
+      line-height:1.75;
+      font-size:.98rem;
     }
+    .how-access li{margin:.25rem 0}
 
-    /* Use case text - fixed height for alignment */
-    .use-case {
-        font-size: 13px;
-        color: #333;
-        font-style: italic;
-        margin-bottom: 24px;
-        line-height: 1.5;
-        height: 60px;
-        display: flex;
-        align-items: flex-start;
+    @media (max-width: 980px){
+      .access-row{grid-template-columns: 200px 1fr}
+      .access-cta{grid-column: 1 / -1; border-left:0; border-top:1px solid #e5e7eb}
     }
-
-    /* Pricing section - fixed height */
-    .plan-price {
-        height: 80px;
-        margin-bottom: 32px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-
-    .price-amount {
-        font-size: 48px;
-        font-weight: 400;
-        color: #111;
-        line-height: 1;
-    }
-
-    .price-period {
-        font-size: 20px;
-        color: #666;
-        font-weight: 400;
-    }
-
-    .price-billing {
-        font-size: 13px;
-        color: #333;
-        margin-top: 8px;
-    }
-
-    .tbd-price {
-        font-size: 36px;
-        font-weight: 500;
-        color: #111;
-        margin-bottom: 12px;
-    }
-
-    .price-strikethrough {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 24px;
-        font-weight: 400;
-        margin-right: 12px;
-        display: inline-block;
-    }
-
-    .price-beta-free {
-        color: #16a34a;
-        font-size: 36px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    /* CTA section - fixed height for button alignment */
-    .cta-section {
-        height: 72px;
-        margin-bottom: 32px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .cta-button {
-        width: 100%;
-        padding: 12px 20px;
-        background: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background 0.2s;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        box-sizing: border-box;
-    }
-
-    .cta-button:hover {
-        background: #1d4ed8;
-    }
-
-    .cta-button.secondary {
-        background: white;
-        color: #2563eb;
-        border: 2px solid #2563eb;
-    }
-
-    .cta-button.secondary:hover {
-        background: #f0f9ff;
-    }
-
-    .cta-button.disabled {
-        background: #9ca3af;
-        cursor: not-allowed;
-        pointer-events: none;
-    }
-
-    .cta-button.disabled:hover {
-        background: #9ca3af;
-    }
-
-    .cta-note {
-        text-align: center;
-        font-size: 13px;
-        color: #999;
-        margin-top: 8px;
-    }
-
-    /* Feature Sections - flex grow to fill remaining space */
-    .features-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .feature-section {
-        margin-bottom: 32px;
-    }
-
-    .feature-section:last-child {
-        margin-bottom: 0;
-    }
-
-    .section-title {
-        font-size: 11px;
-        font-weight: 600;
-        color: #333;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 16px;
-    }
-
-    .feature-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .feature-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 16px;
-        font-size: 15px;
-        color: #333;
-        line-height: 1.4;
-    }
-
-    .feature-icon {
-        margin-right: 12px;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .check {
-        color: #16a34a;
-        font-size: 16px;
-    }
-
-    .not-included {
-        color: #d1d5db;
-        font-size: 16px;
-    }
-
-    .highlight {
-        font-weight: 600;
-        color: #111;
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) and (min-width: 769px) {
-        .pricing-card {
-            padding: 24px;
-        }
-        
-        .price-amount {
-            font-size: 40px;
-        }
-        
-        .plan-header {
-            height: 100px;
-        }
-
-        .use-case {
-            height: 50px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .pricing-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .pricing-card {
-            border-right: none;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .pricing-card:last-child {
-            border-bottom: none;
-        }
-
-        .plan-header {
-            height: auto;
-            min-height: 80px;
-        }
-
-        .use-case {
-            height: auto;
-            min-height: 40px;
-        }
-
-        .plan-price {
-            height: auto;
-            min-height: 60px;
-        }
-
-        .cta-section {
-            height: auto;
-            min-height: 60px;
-        }
-
-        .pricing-container {
-            padding: 20px 20px 40px 20px;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .price-amount {
-            font-size: 36px;
-        }
+    @media (max-width: 680px){
+      .access-row{grid-template-columns:1fr}
+      .access-left{border-right:0;border-bottom:1px solid #e5e7eb}
+      .access-cta{border-top:1px solid #e5e7eb}
     }
   </style>
 </head>
+
 <body id="top">
   <!-- Header -->
   <header>
@@ -550,7 +473,8 @@
     <!-- Lede -->
     <div class="hero-description">
       <p class="lede">
-        AI search is replacing traditional search. Your website needs to be understood—not just crawled—by systems like ChatGPT, Gemini, and Perplexity. The <strong>AI Visibility Index (AIVI)</strong> measures how visible, interpretable, and trustworthy your site is to modern AI models and gives you clear steps to improve.
+        AI search is replacing traditional search. Your website needs to be understood—not just crawled—by systems like ChatGPT, Gemini, and Perplexity.
+        The <strong>AI Visibility Index (AIVI)</strong> measures how visible, interpretable, and trustworthy your site is to modern AI models and gives you clear steps to improve.
       </p>
     </div>
 
@@ -588,10 +512,9 @@
         </div>
       </div>
 
-      <!-- Properly spaced horizontal navigation -->
       <div class="quick-links">
         <a href="#how-it-works">Detailed Overview</a>
-        <a href="#pricing">Pricing</a>
+        <a href="#pricing">Pricing &amp; Access</a>
         <a href="#whitepaper">Technical Whitepaper</a>
         <a href="#technology">Architecture &amp; Stack</a>
       </div>
@@ -656,157 +579,126 @@
       </ul>
     </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing-container">
-      <div class="beta-banner">
-          🧪 <strong>Studio Beta:</strong> Try our full AI Visibility analysis for free! Regular price $24.99 — free while in beta.
+    <!-- Pricing & Access (UPDATED) -->
+    <section id="pricing" class="pricing-container section">
+      <h2>Pricing &amp; Access</h2>
+
+      <div class="pricing-intro">
+        <p>
+          <span class="accent">AIVI Snapshot (Analyze)</span> is always public and free.
+          Everything beyond Analyze is <span class="accent">private</span> and <span class="accent">access-code protected</span>
+          <span class="access-pill">You control access</span>
+        </p>
       </div>
 
-      <div class="pricing-grid">
+      <div class="access-stack">
 
-        <!-- Starter -->
-        <div class="pricing-card">
-          <div class="plan-header">
-            <h3 class="plan-name">Starter</h3>
-            <p class="plan-description">Get started building, experimenting, and prototyping with AI Visibility insights.</p>
+        <!-- Free Snapshot -->
+        <div class="access-row">
+          <div class="access-left">
+            <h3>AIVI Snapshot (Analyze)</h3>
+            <div class="price">Free</div>
+            <div class="meta">Always free</div>
           </div>
-
-          <div class="use-case">Perfect for founder-led sites &amp; solo projects. One-page AIVI snapshot to see if your homepage content makes sense to AI.</div>
-
-          <div class="plan-price">
-            <div class="tbd-price">Free</div>
-            <div class="price-billing">One-page AIVI snapshot</div>
+          <div class="access-body">
+            <p>Run a public AIVI Snapshot to see how AI systems interpret your website at a high level.</p>
+            <ul>
+              <li>High-level AIVI snapshot</li>
+              <li>Initial strengths &amp; visibility gaps</li>
+              <li>How AI currently understands your site</li>
+              <li>No signup, no credit card</li>
+            </ul>
+            <p style="margin-top:10px;">This is designed to give you clarity — not overwhelm.</p>
           </div>
-
-          <div class="cta-section">
-            <a class="cta-button disabled">Coming Soon</a>
-          </div>
-
-          <div class="features-content">
-            <div class="feature-section">
-              <div class="section-title">AIVI ANALYSIS</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>Homepage AI Visibility snapshot</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Core AIVI score</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Key strengths &amp; opportunities</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Shareable summary</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Basic AI readiness check</li>
-              </ul>
-            </div>
-
-            <div class="feature-section">
-              <div class="section-title">SUPPORT</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>Community support</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Knowledge base access</li>
-              </ul>
-            </div>
+          <div class="access-cta">
+            <a class="cta-btn primary" href="#analyze-form">Run Free Snapshot</a>
+            <p class="cta-note">Public &amp; instant</p>
           </div>
         </div>
 
-        <!-- Studio -->
-        <div class="pricing-card">
-          <div class="plan-header">
-            <h3 class="plan-name">Studio</h3>
-            <p class="plan-description">For creative studios &amp; growing brands ready to improve AI Visibility across key pages.</p>
+        <!-- Full Report -->
+        <div class="access-row">
+          <div class="access-left">
+            <h3>Full AIVI Report</h3>
+            <div class="price">Paid</div>
+            <div class="meta">Access-code protected</div>
           </div>
-
-          <div class="use-case">Ideal for sites with 10–50 pages. Discover which pages are strong AI candidates and where messaging limits your AIVI.</div>
-
-          <div class="plan-price">
-            <div>
-              <span class="price-strikethrough">$24.99</span>
-              <span class="price-beta-free">Free</span>
-            </div>
-            <div class="price-billing">Free while in beta</div>
+          <div class="access-body">
+            <p>A complete AI Visibility Index report for teams that need depth, clarity, and action. Unlocked via private access code.</p>
+            <ul>
+              <li>Full site crawl</li>
+              <li>Page-level AI visibility analysis</li>
+              <li>AIVI pillar breakdown (Structure, Authority, Clarity, Content–AI Alignment)</li>
+              <li>Prioritized recommendations</li>
+              <li>Narrative interpretation: how AI is likely to describe and surface your brand</li>
+            </ul>
+            <p style="margin-top:10px;">Issued privately. Not publicly accessible.</p>
           </div>
-
-          <div class="cta-section">
-            <a href="/analyze.html" class="cta-button">Try Free AIVI Beta</a>
-          </div>
-
-          <div class="features-content">
-            <div class="feature-section">
-              <div class="section-title">AIVI ANALYSIS</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span><span class="highlight">Everything in Starter, plus:</span></li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Up to 10 pages crawl</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Detailed page-by-page analysis</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Content recommendations for stronger AI visibility</li>
-              </ul>
-            </div>
-
-            <div class="feature-section">
-              <div class="section-title">FEATURES</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>Priority processing</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Export reports (PDF/CSV)</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Team sharing (3 users)</li>
-              </ul>
-            </div>
-
-            <div class="feature-section">
-              <div class="section-title">SUPPORT</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>Email support</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Onboarding session</li>
-              </ul>
-            </div>
+          <div class="access-cta">
+            <a class="cta-btn secondary" href="mailto:access@quontora.com?subject=Request%20AIVI%20Access%20Code%20-%20Full%20Report&body=Hi%20Quontora%2C%0A%0AI%27d%20like%20an%20access%20code%20for%20the%20Full%20AIVI%20Report.%0A%0AWebsite%3A%20%0ACompany%3A%20%0AUse%20case%3A%20%0A%0AThanks!">Request Access Code</a>
+            <p class="cta-note">After you run the free Snapshot</p>
           </div>
         </div>
 
-        <!-- Enterprise -->
-        <div class="pricing-card">
-          <div class="plan-header">
-            <h3 class="plan-name">Enterprise</h3>
-            <p class="plan-description">For agencies &amp; complex sites requiring deep, ongoing AI Visibility optimization.</p>
+        <!-- Monitoring -->
+        <div class="access-row">
+          <div class="access-left">
+            <h3>AIVI Monitoring &amp; Re-Runs</h3>
+            <div class="price">Paid</div>
+            <div class="meta">Access-code protected</div>
           </div>
-
-          <div class="use-case">Built for sites with 100+ pages. Uncover structural issues, evaluate authority signals, and track AI performance and AIVI at scale.</div>
-
-          <div class="plan-price">
-            <div class="tbd-price">Custom</div>
-            <div class="price-billing">Contact us for pricing</div>
+          <div class="access-body">
+            <p>For teams tracking AI visibility over time.</p>
+            <ul>
+              <li>Re-runs of the AIVI analysis</li>
+              <li>Before / after comparisons</li>
+              <li>Visibility improvement tracking</li>
+              <li>AI interpretation changes as content evolves</li>
+            </ul>
+            <p style="margin-top:10px;">Access is controlled via tiered access codes.</p>
           </div>
-
-          <div class="cta-section">
-            <a href="#contact" class="cta-button">Contact us</a>
+          <div class="access-cta">
+            <a class="cta-btn secondary" href="mailto:access@quontora.com?subject=Request%20AIVI%20Access%20Code%20-%20Monitoring%20%26%20Re-Runs&body=Hi%20Quontora%2C%0A%0AI%27d%20like%20an%20access%20code%20for%20AIVI%20Monitoring%20%26%20Re-Runs.%0A%0AWebsite%3A%20%0ACompany%3A%20%0ATracking%20cadence%20(weekly%2Fmonthly)%3A%20%0A%0AThanks!">Request Monitoring Access</a>
+            <p class="cta-note">Issued directly</p>
           </div>
-
-          <div class="features-content">
-            <div class="feature-section">
-              <div class="section-title">AIVI ANALYSIS</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span><span class="highlight">Everything in Studio, plus:</span></li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Custom deep crawls for large sites</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Tailored AI Visibility audits</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Custom report formatting &amp; branding</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>LLM tuning for enterprise use cases</li>
-              </ul>
-            </div>
-
-            <div class="feature-section">
-              <div class="section-title">FEATURES</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>White-label reports</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>API access</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Unlimited team members</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Multiple workspaces</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>SSO &amp; advanced security</li>
-              </ul>
-            </div>
-
-            <div class="feature-section">
-              <div class="section-title">SUPPORT</div>
-              <ul class="feature-list">
-                <li class="feature-item"><span class="feature-icon check">✓</span>Dedicated account manager</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Priority phone support</li>
-                <li class="feature-item"><span class="feature-icon check">✓</span>Custom training sessions</li>
-              </ul>
-            </div>
-          </div>
-
         </div>
+
+        <!-- Agency / Enterprise -->
+        <div class="access-row">
+          <div class="access-left">
+            <h3>Agency &amp; Enterprise Access</h3>
+            <div class="price">Private</div>
+            <div class="meta">Onboarding required</div>
+          </div>
+          <div class="access-body">
+            <p>For agencies, publishers, and complex sites with advanced AI visibility needs.</p>
+            <ul>
+              <li>Multi-site or deep crawls</li>
+              <li>Advanced AIVI benchmarking</li>
+              <li>White-label or client-ready reporting</li>
+              <li>Advisory support</li>
+              <li>Custom analysis depth</li>
+            </ul>
+            <p style="margin-top:10px;">Access is granted through onboarding — not self-serve checkout.</p>
+          </div>
+          <div class="access-cta">
+            <a class="cta-btn primary" href="#contact">Talk to Us</a>
+            <p class="cta-note">Onboarding required</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="how-access">
+        <h3>How Access Works</h3>
+        <ul>
+          <li><strong>Analyze page:</strong> always public and free</li>
+          <li><strong>Everything beyond:</strong> private, access-code protected</li>
+          <li><strong>Access codes:</strong> issued directly and can be rotated or revoked at any time</li>
+        </ul>
+        <p style="margin-top:10px;color:var(--text-medium);font-size:.98rem;line-height:1.75;">
+          This ensures controlled rollout, higher-signal users, and accurate interpretation of results.
+        </p>
       </div>
     </section>
 
@@ -838,213 +730,21 @@
           <p>
             The AI Visibility Index (AIVI) is a new AI Visibility and AI Readiness measurement system built specifically for the age of LLMs. It analyzes a website across four core pillars that directly influence how AI systems understand and trust content. These pillars were refined across hundreds of tests, dozens of model responses, and real-world business scenarios. They include:
           </p>
-          
+
           <p><strong>1. Structure and Crawlability</strong><br>
           How easily can AI systems access and process your site? AIVI evaluates technical health, site architecture, semantic signals, content hierarchy, schema, and structural clarity. If AI cannot parse a site, it cannot use the content.</p>
-          
+
           <p><strong>2. Authority and Trust</strong><br>
           Does your site appear credible to AI systems? AIVI examines data consistency, expertise indicators, entity signals, reputation markers, and contextual trust factors that LLMs use when selecting sources for answers.</p>
-          
+
           <p><strong>3. Clarity and Language</strong><br>
           Is your content written in a way AI models can interpret accurately? This pillar evaluates clarity, context, topic definition, intent, linguistic structure, and how effectively content maps to LLM reasoning patterns.</p>
-          
+
           <p><strong>4. Content–AI Alignment</strong><br>
           Does your content align with how AI models summarize, cite, and reason about your domain? AIVI assesses whether content is optimized for AI comprehension, retrieval, synthesis, and generalizable knowledge extraction.</p>
-          
+
           <p>
             The result is a unified score from 0 to 100 that reflects how visible and usable a website is to modern AI systems. Businesses can finally understand where they stand.
-          </p>
-
-          <h3>Why AI Visibility Matters</h3>
-          <p>
-            AI isn't “the future of search.” It is already the primary way millions gather information.
-          </p>
-          <ul>
-            <li>ChatGPT, Gemini, Perplexity, Claude, and others answer billions of queries per day.</li>
-            <li>Businesses are already appearing in AI responses without understanding why.</li>
-            <li>AI-driven browsing (e.g., Perplexity's "follow-up" mode, ChatGPT Search) continues to displace classic Google searches.</li>
-            <li>AI Overviews are replacing many top-of-page organic results.</li>
-          </ul>
-          <p>
-            The winner in this new environment is not the site with the best SEO. It is the site most understandable and trusted by AI models.
-          </p>
-
-          <h3>AIVI Methodology</h3>
-          <p>AIVI combines multiple layers of evaluation:</p>
-          <ul>
-            <li>Structural analysis of website components</li>
-            <li>LLM-based interpretation of page clarity, meaning, and purpose</li>
-            <li>AI-powered reasoning about authority, credibility, and expertise</li>
-            <li>Cross-model evaluation from GPT, Claude, Gemini, and others</li>
-            <li>Scoring logic derived from hundreds of real site audits</li>
-            <li>A proprietary blend of deterministic scoring and LLM-assisted analysis</li>
-          </ul>
-          <p>
-            The methodology delivers both a high-level score and a detailed report covering strengths, weaknesses, risks, and recommended improvements.
-          </p>
-
-          <h3>The AIVI Report</h3>
-          <p>Every analyzed website receives:</p>
-          <ul>
-            <li>AIVI score (0-100)</li>
-            <li>Band classification (At Risk, Needs Work, Under-Optimized, AI-Ready, Best-in-Class)</li>
-            <li>Summary of how AI systems currently interpret the site</li>
-            <li>Specific weaknesses that reduce AI visibility</li>
-            <li>Actionable recommendations categorized by priority</li>
-            <li>AI-model-specific observations (GPT, Claude, Gemini)</li>
-            <li>Optional extended report including a fully LLM-interpreted deep crawl</li>
-          </ul>
-          <p>This output becomes the foundation for AI visibility optimization strategies.</p>
-
-          <h3>Real-World Applications for Businesses</h3>
-          <p>AIVI solves multiple emerging problems:</p>
-          <ul>
-            <li>Decline in organic visibility due to AI Overviews</li>
-            <li>High content cost with unclear AI impact</li>
-            <li>Need to understand how AI-generated traffic will replace search traffic</li>
-            <li>Difficulty measuring brand authority inside LLMs</li>
-            <li>Need for competitive differentiation</li>
-            <li>Lack of visibility into how AI models decide what to surface</li>
-          </ul>
-          
-          <p><strong>Use Cases:</strong></p>
-          <ul>
-            <li>Marketing teams measuring AI authority</li>
-            <li>Publishers analyzing content clarity for AI summaries</li>
-            <li>E-commerce sites preparing for AI shopping assistants</li>
-            <li>Consultants needing standardized AI-readiness scoring</li>
-            <li>Agencies offering AI-visibility as a new service line</li>
-            <li>Brands competing in high-intent informational categories</li>
-          </ul>
-
-          <h3>Market Opportunity</h3>
-          <p>
-            The emergence of AI Visibility represents a new analytics category. SEO tools cannot pivot fast enough because their architectures are tied to search engines, not LLM APIs and reasoning chains. AIVI is early and differentiated. Market forces driving adoption include:
-          </p>
-          <ul>
-            <li>Declining ROI in traditional SEO</li>
-            <li>Explosive growth of LLM-powered search</li>
-            <li>Migration of user behavior from Google to AI assistants</li>
-            <li>Lack of enterprise tooling to measure AI visibility</li>
-            <li>Growing need for AI-readiness benchmarks across industries</li>
-            <li>Increasing regulatory and compliance requirements for accurate information</li>
-          </ul>
-          
-          <p><strong>Total addressable market includes:</strong></p>
-          <ul>
-            <li>200M+ global businesses maintaining a website</li>
-            <li>50M+ SMBs heavily dependent on search traffic</li>
-            <li>Enterprise companies with content libraries worth millions</li>
-            <li>Agencies and consultants selling optimization services</li>
-          </ul>
-          <p>This category will grow exponentially as AI becomes the default interface of the Internet.</p>
-
-          <h3>Technology Overview</h3>
-          <p>AIVI's platform is built with the following architecture:</p>
-          <ul>
-            <li>Fast analysis pipeline running server-side</li>
-            <li>Multiple LLM API integrations (OpenAI, Anthropic, Google)</li>
-            <li>Crawl engine with selective depth</li>
-            <li>Proprietary scoring logic interpreting both technical and semantic signals</li>
-            <li>Scalable backend optimized for multi-site batch processing</li>
-            <li>Web-based interface for clients and partners</li>
-          </ul>
-          
-          <p><strong>Planned technical evolution includes:</strong></p>
-          <ul>
-            <li>A live AI Visibility dashboard</li>
-            <li>A multi-model comparison tool</li>
-            <li>Predictive recommendations for AI-ready content</li>
-            <li>Plugins for major CMS platforms (WordPress, Shopify, Webflow)</li>
-            <li>An AI Advisor mode that explains how LLMs perceive your brand</li>
-            <li>A developer API enabling integration into enterprise systems</li>
-          </ul>
-
-          <h3>Competitive Landscape</h3>
-          <p>
-            The AI-visibility market is in its infancy. Emerging players focus on narrow slices:
-          </p>
-          <ul>
-            <li>Some focus on technical crawling</li>
-            <li>Some summarize content quality</li>
-            <li>Some measure brand mentions inside model responses</li>
-          </ul>
-          <p>
-            None offer a unified visibility score measured across both structural and LLM-interpretive layers. AIVI is positioned as a first holistic AI visibility platform and a standardized index applicable across industries.
-          </p>
-
-          <h3>Business Model and Pricing Strategy</h3>
-          <p>AIVI generates revenue through:</p>
-          <ul>
-            <li>One-time site audits</li>
-            <li>Monthly subscription plans for ongoing visibility reports</li>
-            <li>Enterprise packages with multi-model deep analysis</li>
-            <li>Agency partnerships</li>
-            <li>White-label scoring integrations for platforms (CMS, hosting, analytics firms)</li>
-          </ul>
-          
-          <p><strong>Future expansion includes:</strong></p>
-          <ul>
-            <li>E-commerce scoring suite</li>
-            <li>Local business visibility module</li>
-            <li>On-page repair guides auto-generated by AI</li>
-            <li>Predictive content scoring before publication</li>
-          </ul>
-          <p>This allows AIVI to serve both SMBs and global enterprises.</p>
-
-          <h3>Roadmap</h3>
-          
-          <p><strong>Phase 1 (Live)</strong></p>
-          <ul>
-            <li>AIVI engine v1</li>
-            <li>Web interface</li>
-            <li>Core scoring logic</li>
-            <li>4 pillar evaluation system</li>
-          </ul>
-          
-          <p><strong>Phase 2 (In Development)</strong></p>
-          <ul>
-            <li>AI-model specific visibility comparisons</li>
-            <li>Improved scoring weights and explainability</li>
-            <li>Analytics dashboard</li>
-            <li>CMS extensions</li>
-          </ul>
-          
-          <p><strong>Phase 3 (Future)</strong></p>
-          <ul>
-            <li>Real-time visibility monitoring</li>
-            <li>Prediction engine for content drafts</li>
-            <li>Multi-model benchmarking marketplace</li>
-            <li>Alerts for visibility changes</li>
-          </ul>
-          
-          <p><strong>Long-term Vision:</strong><br>
-          Become the standard for AI visibility analytics and the measurement layer powering the future of AI-driven discovery.</p>
-
-          <h3>Why Invest in AIVI</h3>
-          <p>
-            AIVI is positioned at the intersection of three major shifts:
-          </p>
-          <ul>
-            <li>Search is becoming AI-native.</li>
-            <li>Businesses need visibility inside AI systems but lack the tools.</li>
-            <li>Early entrants who define the standards will own the category.</li>
-          </ul>
-          
-          <p><strong>Key strengths:</strong></p>
-          <ul>
-            <li>First-mover advantage</li>
-            <li>Proprietary scoring framework</li>
-            <li>Deep market need already visible in SEO decline</li>
-            <li>Scalable architecture ready for enterprise growth</li>
-            <li>Strong founder story and multi-year development foundation</li>
-            <li>Potential to become the “PageRank” of the AI era</li>
-          </ul>
-          <p>AIVI is not a feature. It is a category-defining measurement layer.</p>
-
-          <h3>Conclusion</h3>
-          <p>
-            AI has already changed the rules of visibility. What companies need now is not another SEO tool but a modern measurement of how AI systems evaluate their content. AIVI provides that measurement. It brings clarity where businesses now have uncertainty and creates a competitive advantage for those preparing for an AI-first world. For clients, AIVI provides a path to visibility in tomorrow's discovery landscape. For investors, AIVI represents a rare early-stage opportunity in a market that is about to explode.
           </p>
 
           <div style="display:flex;gap:2rem;justify-content:center;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
@@ -1061,14 +761,14 @@
         <summary>Technology Stack &amp; Implementation <span class="chev">▾</span></summary>
         <div class="accordion-body">
           <p style="font-style:italic;color:var(--text-medium);margin-bottom:1.5rem">(Investor-Optimized Version)</p>
-          
+
           <p>
             AIVI is engineered as a modern, scalable, multi-model analytics platform designed for the emerging class of AI-native discovery systems. Unlike traditional SEO tools built on legacy crawler architectures, AIVI's technology stack is purpose-built for understanding how LLMs evaluate, interpret, and trust digital content.
           </p>
 
           <h3>Core Architecture Overview</h3>
           <p>AIVI consists of three coordinated layers:</p>
-          
+
           <p><strong>1. Crawl &amp; Retrieval Layer</strong></p>
           <ul>
             <li>Custom-built lightweight crawler optimized for LLM-use cases</li>
@@ -1076,7 +776,7 @@
             <li>Semantic document reconstruction for AI context modeling</li>
             <li>Resilient fetch pipeline with automatic degradation handling</li>
           </ul>
-          
+
           <p><strong>2. AI Visibility Intelligence Layer (AVIL)</strong></p>
           <ul>
             <li>Multi-model evaluation pipeline using OpenAI, Anthropic, and Google AI</li>
@@ -1084,7 +784,7 @@
             <li>Cross-model interpretability and variance detection</li>
             <li>AI signal normalization across GPT, Claude, Gemini, and Perplexity benchmarks</li>
           </ul>
-          
+
           <p><strong>3. Delivery &amp; Experience Layer</strong></p>
           <ul>
             <li>API-first architecture for extensibility and enterprise integrations</li>
@@ -1092,141 +792,6 @@
             <li>Multi-tenant data model for agencies and enterprise orgs</li>
             <li>Fast, front-end optimized experience with low-latency interactions</li>
           </ul>
-
-          <h3>Technology Stack</h3>
-          
-          <p><strong>Frontend</strong></p>
-          <p><em>HTML5 / CSS3 / Vanilla JS</em></p>
-          <ul>
-            <li>Lightweight, zero-framework approach for speed and universal compatibility</li>
-            <li>Built for fast load times and frictionless analysis workflows</li>
-            <li>Modular components designed for future expansion (dashboards, CMS plugins)</li>
-          </ul>
-          
-          <p><strong>Backend</strong></p>
-          <p><em>Node.js (v22+)</em></p>
-          <ul>
-            <li>Highly asynchronous architecture ideal for parallel crawling and LLM calls</li>
-            <li>Predictable performance under concurrency</li>
-            <li>Scalable through serverless or containerized deployment strategies</li>
-          </ul>
-          
-          <p><em>REST API Layer</em></p>
-          <ul>
-            <li>/api/score for instant scoring</li>
-            <li>/api/full for crawling + LLM + scoring + narrative interpretation</li>
-            <li>Input validation and sanitization to prevent abuse</li>
-          </ul>
-
-          <h3>AI &amp; LLM Layer</h3>
-          
-          <p><strong>OpenAI GPT Models</strong></p>
-          <ul>
-            <li>Reasoning, summarization, clarity &amp; language analysis</li>
-            <li>High-precision insights for authority, trust, and contextual accuracy</li>
-          </ul>
-          
-          <p><strong>Anthropic Claude Models</strong></p>
-          <ul>
-            <li>Deep semantic understanding</li>
-            <li>Exceptional summarization performance</li>
-          </ul>
-          
-          <p><strong>Google Gemini Models</strong></p>
-          <ul>
-            <li>Strong alignment with Google search interpretation signals</li>
-            <li>Bridges the transition from classical SEO to AI overview visibility</li>
-          </ul>
-          
-          <p><strong>Cross-Model Consensus Layer</strong></p>
-          <ul>
-            <li>Aggregates signals across LLMs</li>
-            <li>Detects interpretative conflicts</li>
-            <li>Normalizes output into a single AIVI score</li>
-          </ul>
-
-          <h3>Data Processing &amp; Semantic Analysis</h3>
-          
-          <p><strong>Crawl Engine (VCE-1)</strong></p>
-          <ul>
-            <li>DOM integrity scoring</li>
-            <li>Semantic hierarchy reconstruction</li>
-            <li>Content block classification</li>
-            <li>Technical health &amp; accessibility indexing</li>
-            <li>Entity extraction</li>
-          </ul>
-          
-          <p><strong>AI Visibility Scoring Engine (AVS-Core)</strong></p>
-          <ul>
-            <li>Weighted evaluation across four visibility pillars</li>
-            <li>Hybrid rules + LLM reasoning for accuracy and nuance</li>
-            <li>Requires no training data from the customer (zero-data risk)</li>
-            <li>Built to scale from micro-sites to enterprise content networks</li>
-          </ul>
-          
-          <p><strong>Interpretation Module</strong></p>
-          <ul>
-            <li>Converts raw LLM outputs into structured, consistent insights</li>
-            <li>Eliminates hallucinations through multi-pass verification</li>
-            <li>Produces human-readable explanations, recommendations, and remediation paths</li>
-          </ul>
-
-          <h3>Security, Compliance &amp; Enterprise Readiness</h3>
-          
-          <p><strong>Data Handling</strong></p>
-          <ul>
-            <li>Zero content storage unless opted-in</li>
-            <li>In-memory processing for all standard analyses</li>
-            <li>No indexing of user data beyond runtime session</li>
-          </ul>
-          
-          <p><strong>LLM Safety Architecture</strong></p>
-          <ul>
-            <li>Prompt-guard layer to control model drift</li>
-            <li>Multi-model verification to prevent single-model bias</li>
-            <li>Optional gated model execution for enterprise policies</li>
-          </ul>
-          
-          <p><strong>Scalability</strong></p>
-          <p>Deployable across:</p>
-          <ul>
-            <li>Vercel edge functions</li>
-            <li>Render scaling infrastructure</li>
-            <li>Kubernetes clusters for enterprise clients</li>
-            <li>Private-cloud or on-premise for regulated industries</li>
-          </ul>
-          
-          <p><strong>Monitoring &amp; Governance</strong></p>
-          <ul>
-            <li>API event logging</li>
-            <li>LLM rate-limit orchestration</li>
-            <li>Automated error recovery</li>
-            <li>Versioned scoring engine for auditable changes</li>
-          </ul>
-
-          <h3>Platform Roadmap Highlights</h3>
-          
-          <p><strong>Near-Term Enhancements</strong></p>
-          <ul>
-            <li>AI Visibility Dashboard (real-time monitoring)</li>
-            <li>Multi-model benchmarking</li>
-            <li>Predictive scoring for content drafts</li>
-            <li>Deep 1,000-page enterprise crawl capabilities</li>
-            <li>CMS plugins (WordPress, Webflow, Shopify, Squarespace)</li>
-          </ul>
-          
-          <p><strong>Mid-Term Enhancements</strong></p>
-          <ul>
-            <li>Industry-specific templates (e-commerce, local services, B2B, healthcare)</li>
-            <li>Trend tracking of model reasoning changes</li>
-            <li>AIVI API Marketplace</li>
-          </ul>
-          
-          <p><strong>Long-Term Vision</strong></p>
-          <p>
-            AIVI becomes the measurement layer — the “PageRank of AI Era.”
-            Every enterprise will track its AI Visibility Index the same way they track SEO, traffic, or revenue.
-          </p>
 
           <div style="display:flex;gap:2rem;justify-content:center;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
             <a href="#technology" style="color:var(--primary);text-decoration:none;font-weight:700;font-size:1rem">↑ Back to Top of Tech Stack</a>
@@ -1238,19 +803,17 @@
 
     <!-- Contact -->
     <section class="section" id="contact">
-      <!-- Reuse purple styling here -->
-      <div class="contact-pop beta-notice">
+      <div class="contact-pop">
         <div>
           <h3>Have a tricky site or big AI Visibility challenge?</h3>
           <p>We love edge cases, complex stacks, and ambitious goals. Let’s make your brand visible to AI.</p>
         </div>
         <div class="contact-actions">
-          <a class="btn-primary" href="#">Email Us</a>
+          <a class="btn-primary" href="mailto:hello@quontora.com?subject=AIVI%20Inquiry">Email Us</a>
           <a class="btn-secondary" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a>
         </div>
       </div>
     </section>
-
   </div>
 
   <!-- Floating Back to Top Button -->
@@ -1258,119 +821,120 @@
 
   <!-- Footer -->
   <footer>
-    <div class="footer-content footer-grid">
-      
-      <!-- Brand -->
-      <div class="footer-col">
-        <p class="footer-brand"><strong>AI Visibility Index (AIVI)</strong></p>
-        <p class="footer-muted">Visibility diagnostics for the age of AI.</p>
-        <p class="footer-muted">A product of <strong>Quontora</strong>.</p>
-      </div>
-
-      <!-- Product -->
-      <div class="footer-col">
-        <p class="footer-head">Product</p>
-        <p><a href="#how-it-works">How it works</a></p>
-        <p><a href="#pricing">Pricing &amp; Access</a></p>
-        <p><a href="#whitepaper">Technical whitepaper</a></p>
-        <p><a href="#technology">Architecture &amp; stack</a></p>
-      </div>
-
-      <!-- Legal -->
-      <div class="footer-col">
-        <p class="footer-head">Legal</p>
-        <p><a href="/privacy.html">Privacy Policy</a></p>
-        <p><a href="/terms.html">Terms of Service</a></p>
-        <p><a href="/cookies.html">Cookie Policy</a></p>
-      </div>
-
-      <!-- Contact -->
-      <div class="footer-col">
-        <p class="footer-head">Contact</p>
-        <p><a href="mailto:hello@quontora.com">hello@quontora.com</a></p>
-        <p><a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a></p>
-        <p><a href="https://quontora.com" target="_blank" rel="noopener">quontora.com</a></p>
-      </div>
-
-      <!-- Disclaimer -->
-      <div class="footer-wide">
-        <p class="footer-disclaimer">
-          <strong>Disclaimer:</strong> The AI Visibility Index (AIVI) provides diagnostic insights into how AI systems may interpret website content and structure.
-          AIVI does not guarantee rankings, traffic, citations, or outcomes. AI model behavior varies by system and may change over time.
+    <div class="footer-wrap">
+      <div class="footer-brand">
+        <h4>AI Visibility Index (AIVI)</h4>
+        <p>
+          AIVI measures how visible, interpretable, and trustworthy your website is to modern AI systems —
+          and provides prioritized recommendations to improve.
         </p>
-        <p class="footer-fine">
-          &copy; 2025 AI Visibility Index (AIVI). All rights reserved.
+        <p>
+          A product of <strong>Quontora</strong>. Learn more at
+          <a href="https://quontora.com" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-weight:900;">quontora.com</a>.
         </p>
       </div>
 
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul class="footer-links">
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#pricing">Pricing &amp; Access</a></li>
+          <li><a href="#whitepaper">Whitepaper</a></li>
+          <li><a href="#technology">Tech stack</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul class="footer-links">
+          <li><a href="mailto:hello@quontora.com?subject=AIVI%20Support">Support</a></li>
+          <li><a href="mailto:access@quontora.com?subject=AIVI%20Access%20Code%20Request">Request access code</a></li>
+          <li><a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a></li>
+          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-fineprint">
+      <div>
+        <span class="pill">AIVI Snapshot: Free</span>
+        <span class="pill">Reports beyond Analyze: Private</span>
+      </div>
+
+      <div>
+        <span id="footer-update-date"></span> ·
+        <span id="footer-year"></span> © AI Visibility Index (AIVI)
+      </div>
+
+      <div>
+        <a href="#" aria-label="Privacy policy">Privacy</a> ·
+        <a href="#" aria-label="Terms of service">Terms</a> ·
+        <a href="#" aria-label="Cookie policy">Cookies</a>
+      </div>
+
+      <div style="flex-basis:100%;color:var(--text-light);">
+        <strong>Disclaimer:</strong> AIVI provides observed patterns and recommendations. It does not guarantee rankings, traffic, or placement in any AI system. Access-code protected reports are issued directly and can be revoked or rotated at any time.
+      </div>
     </div>
   </footer>
 
-  <!-- Footer Styles -->
-  <style>
-    footer{
-      margin-top:3rem;
-      border-top:1px solid var(--border);
-      background:var(--bg-light);
-      padding:2rem var(--pad-h) 1.5rem;
+  <!-- JavaScript -->
+  <script>
+    // Footer dates
+    (function(){
+      const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const d=new Date();
+      const updateText = "Last updated " + months[d.getMonth()] + " " + d.getFullYear();
+      const yearText = d.getFullYear();
+      const ud=document.getElementById("footer-update-date");
+      const y=document.getElementById("footer-year");
+      if(ud) ud.textContent = updateText;
+      if(y) y.textContent = yearText;
+    })();
+
+    function isValidURL(input){
+      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
     }
-    .footer-content{
-      max-width:var(--max-width);
-      margin:0 auto;
-      color:var(--text-light);
-      font-size:.85rem;
-    }
-    .footer-grid{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(160px,1fr));
-      gap:1.5rem;
-      text-align:left;
-    }
-    .footer-col p{margin:.25rem 0}
-    .footer-head{
-      font-weight:800;
-      color:#111;
-      margin-bottom:.4rem;
-      font-size:.75rem;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-    .footer-brand{
-      font-size:1rem;
-      color:#111;
-      margin:0 0 .35rem 0;
-    }
-    .footer-muted{color:var(--text-light)}
-    .footer-content a{
-      color:var(--primary);
-      text-decoration:none;
-      font-weight:600;
-    }
-    .footer-content a:hover{text-decoration:underline}
-    .footer-wide{
-      grid-column:1 / -1;
-      border-top:1px solid rgba(0,0,0,.08);
-      padding-top:1.25rem;
-      margin-top:.5rem;
-    }
-    .footer-disclaimer{
-      color:#475569;
-      line-height:1.6;
-      margin:0 0 .5rem 0;
-      font-size:.85rem;
-    }
-    .footer-fine{
-      margin:0;
-      color:var(--text-light);
-      font-size:.8rem;
-    }
-    @media (max-width:900px){
-      .footer-grid{grid-template-columns:1fr 1fr}
-    }
-    @media (max-width:560px){
-      .footer-grid{grid-template-columns:1fr}
-    }
-  </style>
+
+    document.addEventListener("DOMContentLoaded",()=>{
+      const f=document.getElementById("analyze-form");
+      const i=document.getElementById("url");
+      const e=document.getElementById("error-message");
+
+      if(f&&i&&e){
+        f.addEventListener("submit",ev=>{
+          ev.preventDefault();ev.stopPropagation();
+          let url=(i.value||"").trim();e.classList.remove("show");
+
+          if(!url){e.textContent="Please enter a website URL";e.classList.add("show");return;}
+          if(!isValidURL(url)){e.textContent="Please enter a valid domain (e.g., example.com)";e.classList.add("show");return;}
+          if(!/^https?:\/\//i.test(url)) url="https://"+url;
+
+          window.location.href="analyze.html?url="+encodeURIComponent(url);
+        });
+      }
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click",ev=>{
+        const href=a.getAttribute("href");
+        if(!href) return;
+        const id=href.substring(1);
+        const t=document.getElementById(id);
+        if(t){ev.preventDefault();t.scrollIntoView({behavior:"smooth"});}
+      });
+    });
+
+    // Floating back-to-top button visibility
+    const backToTopBtn = document.getElementById('backToTopFloat');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    });
+  </script>
 
 </body>
 </html>
