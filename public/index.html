@@ -1,891 +1,1202 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) — Index Page
-  Version: v2025.12.15-4
+  Version: v2025.12.15-2
   Last updated: 2025-12-15
 
   NOTES:
-  - Redesigned for B2B polish: visual hierarchy, section bands, clearer CTAs, fewer bolds.
-  - Removed whitepaper + tech stack completely (standalone pages later).
-  - Flow remains: index.html → analyze.html?url=...
+  - Homepage redesign for clearer hierarchy + B2B polish.
+  - URL submission is front-and-center (primary purpose).
+  - Removed inline whitepaper/tech accordions; added links to:
+    /index/whitepaper.html and /index/technical.html
+  - Pricing: $249 per domain (Free during early access) + $99/mo monitoring + Enterprise.
+  - Request-based delivery (manual) messaging preserved.
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Visibility Index (AIVI)</title>
+  <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
 
   <style>
     :root{
-      --content-width:1180px;
-      --pad-h:2rem;
+      --max-width:1200px;
+      --pad-x:2rem;
+      --pad-y:5rem;
 
       --ink:#0b1220;
-      --muted:#44546a;
-      --soft:#6b7a90;
+      --muted:#556274;
+      --muted2:#6b7280;
 
       --primary:#2563eb;
-      --primary2:#1a73e8;
-      --accent:#7c3aed;
+      --primary-dark:#1d4ed8;
 
-      --bg:#ffffff;
-      --band:#f6f8fc;
-      --band2:#f2f7ff;
-      --card:#ffffff;
-      --border:#e6edf7;
+      --border:#e5e7eb;
+      --surface:#ffffff;
+      --surface2:#f7fafc;
+      --surface3:#f2f6ff;
 
-      --shadow: 0 18px 50px rgba(2, 6, 23, .10);
-      --shadow2: 0 14px 34px rgba(2, 6, 23, .08);
+      --shadow: 0 16px 50px rgba(15,23,42,.10);
+      --shadow2: 0 10px 28px rgba(37,99,235,.12);
 
-      --radius:18px;
+      --radius:16px;
+      --radius2:20px;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
     body{
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background:var(--bg);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       color:var(--ink);
-      line-height:1.55;
+      background:
+        radial-gradient(1400px 520px at 50% -20%, #e8f0ff 0%, #ffffff 55%),
+        #fff;
+      line-height:1.6;
     }
-    a{color:inherit;text-decoration:none}
-    a:hover{text-decoration:underline}
 
-    .wrap{max-width:var(--content-width);margin:0 auto;padding:0 var(--pad-h)}
-    .band{padding:72px 0}
-    .band.bandA{background: radial-gradient(1200px 520px at 30% -10%, rgba(37,99,235,.12), transparent 55%), var(--bg);}
-    .band.bandB{background: var(--band);}
-    .band.bandC{background: radial-gradient(1200px 520px at 70% -10%, rgba(124,58,237,.10), transparent 55%), var(--band2);}
+    a{color:var(--primary);text-decoration:none}
+    a:hover{color:var(--primary-dark)}
+    .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-x)}
 
     /* Top bar */
-    header{
-      padding:28px 0 0;
-    }
     .topbar{
+      padding:1.25rem var(--pad-x) 0;
+      max-width:var(--max-width);
+      margin:0 auto;
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:1rem;
     }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:.2rem;
+    }
+
     .brand h1{
-      font-size:52px;
-      line-height:1;
+      margin:0;
+      font-size:3.25rem;
+      line-height:1.05;
       letter-spacing:-1px;
-      margin:0 0 8px;
-      font-weight:900;
-      background:linear-gradient(135deg,#0b1220 0%, #2563eb 95%);
+      font-weight:800;
+      background:linear-gradient(135deg,#0b1220 0%, #2563eb 100%);
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
       color:transparent;
     }
+
+    .brand .sub{
+      margin:0;
+      font-size:1.05rem;
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    .topright{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:.75rem;
+      min-width:280px;
+      padding-top:.45rem;
+    }
+
     .powered{
-      margin-top:6px;
-      font-size:14px;
-      color:rgba(11,18,32,.72);
+      font-size:.95rem;
+      color:var(--muted);
       font-weight:600;
       white-space:nowrap;
     }
-    .powered a{color:var(--primary);font-weight:800}
-    .hero-sub{
-      font-size:20px;
-      color:var(--ink);
-      font-weight:800;
-      margin-top:6px;
-      max-width: 62ch;
+
+    .powered a{font-weight:700}
+
+    .navlinks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem;
+      justify-content:flex-end;
     }
-    .hero-sub2{
-      font-size:15px;
-      color:var(--soft);
-      font-weight:650;
-      margin-top:10px;
-      max-width: 72ch;
+    .navlinks a{
+      font-size:.9rem;
+      font-weight:700;
+      color:#0b1220;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.65);
+      padding:.45rem .7rem;
+      border-radius:999px;
+      transition:all .15s ease;
+    }
+    .navlinks a:hover{
+      border-color:rgba(37,99,235,.35);
+      background:#fff;
+      transform:translateY(-1px);
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
     }
 
-    /* HERO grid */
-    .hero-grid{
-      margin-top:34px;
+    /* Hero */
+    .hero{
+      padding:2.75rem 0 4rem;
+    }
+
+    .heroGrid{
       display:grid;
-      grid-template-columns: 1.25fr .95fr;
-      gap:28px;
+      grid-template-columns: 1.15fr .85fr;
+      gap:2.25rem;
       align-items:stretch;
     }
-    .hero-left{
-      padding:18px 0 0;
-    }
 
-    .hero-title{
-      margin-top:18px;
-      font-size:46px;
-      line-height:1.03;
-      letter-spacing:-1px;
-      font-weight:950;
-      max-width: 22ch;
-    }
-    .hero-title span{
-      display:block;
-      margin-top:10px;
-      font-size:24px;
-      line-height:1.25;
-      letter-spacing:-.3px;
-      font-weight:800;
-      color:rgba(11,18,32,.84);
-      max-width: 42ch;
-    }
-
-    .cta-row{
-      margin-top:22px;
+    .heroCopy{
       display:flex;
-      gap:12px;
+      flex-direction:column;
+      justify-content:center;
+      gap:1rem;
+      padding-top:.25rem;
+    }
+
+    .heroCopy .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:.78rem;
+      color:#1d4ed8;
+      background:rgba(37,99,235,.08);
+      border:1px solid rgba(37,99,235,.14);
+      padding:.35rem .6rem;
+      border-radius:999px;
+      width:fit-content;
+    }
+
+    .heroCopy h2{
+      margin:0;
+      font-size:2.25rem;
+      line-height:1.25;
+      font-weight:800;
+      letter-spacing:-.5px;
+    }
+
+    .heroCopy p{
+      margin:0;
+      color:var(--muted);
+      font-size:1.05rem;
+      max-width:58ch;
+    }
+
+    .ctaRow{
+      display:flex;
       flex-wrap:wrap;
+      gap:.75rem;
+      margin-top:.35rem;
       align-items:center;
     }
+
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      gap:.5rem;
+      font-weight:800;
       border-radius:999px;
-      padding:14px 18px;
-      font-weight:900;
-      font-size:15px;
+      padding:.9rem 1.15rem;
       border:1px solid transparent;
       cursor:pointer;
-      transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      text-decoration:none;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
       user-select:none;
+      white-space:nowrap;
     }
-    .btn-primary{
-      background:linear-gradient(135deg,var(--primary) 0%, var(--primary2) 70%);
+
+    .btnPrimary{
+      background:var(--primary);
       color:#fff;
-      box-shadow: 0 18px 44px rgba(37,99,235,.28);
+      box-shadow:0 14px 30px rgba(37,99,235,.22);
     }
-    .btn-primary:hover{transform:translateY(-1px);box-shadow: 0 24px 56px rgba(37,99,235,.34)}
-    .btn-ghost{
-      background:rgba(255,255,255,.75);
-      border-color:rgba(37,99,235,.25);
-      color:rgba(11,18,32,.86);
-      box-shadow: 0 10px 22px rgba(2,6,23,.06);
+    .btnPrimary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .btnSecondary{
+      background:rgba(255,255,255,.7);
+      color:#0b1220;
+      border-color:rgba(15,23,42,.14);
     }
-    .btn-ghost:hover{transform:translateY(-1px);border-color:rgba(37,99,235,.40)}
+    .btnSecondary:hover{background:#fff;transform:translateY(-1px);box-shadow:0 14px 30px rgba(15,23,42,.08)}
 
-    /* HERO card (Analyze) */
-    .hero-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.88) 100%);
-      border:1px solid rgba(230,237,247,.95);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      padding:18px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero-card:before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background: radial-gradient(900px 420px at 20% 10%, rgba(37,99,235,.16), transparent 55%),
-                  radial-gradient(900px 420px at 90% 30%, rgba(124,58,237,.10), transparent 60%);
-      pointer-events:none;
-    }
-    .hero-card > *{position:relative;z-index:1}
-
-    .card-top{
+    /* Hero: URL submission module */
+    .submitCard{
+      background:
+        radial-gradient(900px 280px at 20% 0%, rgba(37,99,235,.14) 0%, rgba(255,255,255,0) 55%),
+        linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      border:1px solid rgba(37,99,235,.18);
+      border-radius:var(--radius2);
+      box-shadow: var(--shadow2);
+      padding:1.25rem;
       display:flex;
+      flex-direction:column;
       justify-content:space-between;
+      gap:1rem;
+      min-height: 320px;
+    }
+
+    .submitHead{
+      display:flex;
       align-items:flex-start;
-      gap:10px;
-      margin-bottom:10px;
+      justify-content:space-between;
+      gap:1rem;
     }
-    .card-title{
-      font-weight:950;
-      letter-spacing:-.2px;
-      font-size:16px;
+
+    .submitHead h3{
       margin:0;
-      color:rgba(11,18,32,.95);
+      font-size:1.1rem;
+      font-weight:900;
+      letter-spacing:-.2px;
     }
+
     .pill{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding:6px 10px;
-      font-size:12px;
-      font-weight:950;
+      gap:.4rem;
+      font-size:.78rem;
+      font-weight:900;
+      padding:.28rem .55rem;
       border-radius:999px;
-      border:1px solid rgba(22,163,74,.28);
-      background:rgba(22,163,74,.10);
-      color:#16a34a;
+      border:1px solid rgba(22,163,74,.18);
+      background:rgba(22,163,74,.08);
+      color:#166534;
       white-space:nowrap;
     }
-    .card-desc{
-      margin:0 0 14px;
-      color:rgba(11,18,32,.76);
-      font-weight:650;
-      font-size:14px;
-      line-height:1.6;
+
+    .submitText{
+      margin:0;
+      color:var(--muted);
+      font-size:.95rem;
     }
 
-    .analyze-form{margin-top:10px}
-    .row{
+    .submitForm{
       display:flex;
-      gap:10px;
+      flex-direction:column;
+      gap:.75rem;
+      margin-top:.2rem;
+    }
+
+    .fieldRow{
+      display:flex;
+      gap:.7rem;
       align-items:stretch;
     }
+
     .input{
       flex:1;
-      padding:14px 14px;
       border-radius:14px;
-      border:2px solid rgba(230,237,247,.95);
+      border:1px solid rgba(15,23,42,.14);
+      padding:1rem 1rem;
+      font-size:1.05rem;
       outline:none;
-      font-size:15px;
-      font-weight:700;
-      background:rgba(255,255,255,.92);
-      transition:border-color .2s, box-shadow .2s;
+      background:#fff;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
     }
     .input:focus{
       border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
+      box-shadow:0 0 0 4px rgba(37,99,235,.14);
     }
-    .submit{
-      padding:14px 16px;
+
+    .submitBtn{
+      padding:1rem 1.1rem;
       border-radius:14px;
       border:0;
       background:#0b1220;
       color:#fff;
-      font-weight:950;
+      font-weight:900;
+      font-size:1.05rem;
       cursor:pointer;
-      min-width: 168px;
-      transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
-      box-shadow: 0 14px 32px rgba(11,18,32,.18);
+      transition:transform .12s ease, background .12s ease, box-shadow .12s ease;
+      box-shadow:0 14px 30px rgba(15,23,42,.18);
+      white-space:nowrap;
     }
-    .submit:hover{transform:translateY(-1px);background:#111827;box-shadow: 0 18px 44px rgba(11,18,32,.22)}
-    .error{display:none;margin-top:10px;font-size:13px;font-weight:800;color:#e11d48}
+    .submitBtn:hover{background:#111827;transform:translateY(-1px)}
+    .error{
+      display:none;
+      color:#1d4ed8;
+      font-weight:700;
+      font-size:.9rem;
+      margin-top:.2rem;
+    }
     .error.show{display:block}
 
-    .mini-feats{
-      margin-top:14px;
+    .miniGrid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
+      grid-template-columns:1fr 1fr;
+      gap:.75rem;
+      margin-top:.25rem;
     }
+
     .mini{
-      border:1px dashed rgba(230,237,247,.95);
-      background:rgba(255,255,255,.60);
       border-radius:14px;
-      padding:12px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.7);
+      padding:.75rem .8rem;
+      min-height:74px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:.25rem;
     }
-    .mini b{
-      display:block;
-      font-size:13px;
-      margin-bottom:4px;
-      color:rgba(11,18,32,.90);
-      font-weight:950;
+    .mini .t{
+      display:flex;
+      align-items:center;
+      gap:.5rem;
+      font-weight:900;
+      font-size:.92rem;
+      margin:0;
     }
-    .mini span{
-      font-size:12.5px;
-      color:rgba(11,18,32,.72);
-      font-weight:650;
-      line-height:1.45;
-      display:block;
+    .mini .d{
+      margin:0;
+      font-size:.85rem;
+      color:var(--muted);
+      line-height:1.35;
     }
 
-    /* Section headings */
-    .kicker{
-      font-size:12px;
-      letter-spacing:1px;
+    /* Section shells */
+    section{padding: 0}
+    .block{
+      padding: var(--pad-y) 0;
+    }
+
+    .label{
+      display:inline-block;
+      font-size:.78rem;
+      font-weight:900;
+      letter-spacing:.14em;
       text-transform:uppercase;
-      color:rgba(37,99,235,.85);
-      font-weight:950;
-      margin-bottom:12px;
-    }
-    h2.section-title{
-      font-size:36px;
-      line-height:1.08;
-      letter-spacing:-.8px;
-      font-weight:950;
-      margin-bottom:14px;
-      max-width: 30ch;
-    }
-    p.lead{
-      color:rgba(11,18,32,.78);
-      font-weight:650;
-      font-size:16px;
-      line-height:1.85;
-      max-width: 86ch;
+      color:#1d4ed8;
+      margin-bottom:.55rem;
     }
 
-    /* WOW list */
-    .bullet{
-      margin-top:18px;
+    .h2{
+      margin:0;
+      font-size:2.1rem;
+      line-height:1.15;
+      letter-spacing:-.7px;
+      font-weight:900;
+    }
+
+    .lead{
+      margin:.9rem 0 0;
+      color:var(--muted);
+      font-size:1.05rem;
+      max-width:75ch;
+    }
+
+    /* Thesis break */
+    .thesisWrap{
+      background:linear-gradient(180deg, rgba(37,99,235,.06) 0%, rgba(255,255,255,0) 85%);
+      border-top:1px solid rgba(15,23,42,.06);
+      border-bottom:1px solid rgba(15,23,42,.06);
+    }
+
+    .thesis{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:1.5rem;
+    }
+
+    .thesisTitle{
+      margin:0;
+      font-size:2.55rem;
+      line-height:1.05;
+      font-weight:950;
+      letter-spacing:-1px;
+    }
+
+    .thesisBody{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:1rem;
+      max-width:82ch;
+    }
+
+    .pillList{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.75rem;
+      margin-top:.25rem;
+    }
+
+    .pillItem{
+      display:flex;
+      align-items:center;
+      gap:.65rem;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.75);
+      border-radius:999px;
+      padding:.7rem .85rem;
+      font-weight:800;
+      color:#0b1220;
+      box-shadow:0 10px 26px rgba(15,23,42,.04);
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:rgba(37,99,235,.9);
+      box-shadow:0 0 0 5px rgba(37,99,235,.12);
+      flex:0 0 auto;
+    }
+
+    /* Designed interruption: Not SEO */
+    .breakBox{
+      margin-top:1.6rem;
+      border-radius:var(--radius2);
+      background:
+        radial-gradient(900px 280px at 25% 0%, rgba(229,62,62,.10) 0%, rgba(255,255,255,0) 55%),
+        linear-gradient(135deg, rgba(15,23,42,.95) 0%, rgba(37,99,235,.95) 100%);
+      color:#fff;
+      padding:1.4rem 1.5rem;
+      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .breakGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:10px 16px;
-      max-width: 980px;
-    }
-    .bitem{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      background:rgba(255,255,255,.72);
-      border:1px solid rgba(230,237,247,.95);
-      border-radius:16px;
-      padding:12px 12px;
-      box-shadow: 0 10px 26px rgba(2,6,23,.05);
-    }
-    .dot{
-      width:12px;height:12px;border-radius:999px;
-      background:linear-gradient(135deg,var(--primary) 0%, var(--accent) 100%);
-      margin-top:6px;flex:0 0 auto;
-    }
-    .bitem p{
-      margin:0;
-      color:rgba(11,18,32,.82);
-      font-weight:700;
-      line-height:1.55;
-      font-size:14px;
+      gap:1rem;
+      align-items:start;
     }
 
-    /* Break banner */
-    .break{
-      margin-top:26px;
-      border-radius:var(--radius);
-      padding:18px 18px;
-      background: linear-gradient(135deg, #0b1220 0%, #111827 55%, rgba(37,99,235,.92) 130%);
-      box-shadow: var(--shadow);
-      border:1px solid rgba(255,255,255,.08);
-      max-width: 980px;
-    }
-    .break .line1{
-      color:#fff;
+    .breakBig{
+      margin:0;
+      font-size:1.55rem;
+      line-height:1.1;
       font-weight:950;
-      letter-spacing:-.4px;
-      font-size:18px;
-      margin:0;
-    }
-    .break .line2{
-      margin-top:8px;
-      color:rgba(255,255,255,.90);
-      font-weight:750;
-      font-size:14.5px;
-      line-height:1.6;
+      letter-spacing:-.6px;
     }
 
-    /* Pillars (4 columns) */
-    .grid4{
-      margin-top:22px;
+    .breakSmall{
+      margin:.25rem 0 0;
+      font-size:1rem;
+      opacity:.92;
+      max-width:72ch;
+    }
+
+    /* Pillars */
+    .pillars{
+      background:#fff;
+    }
+
+    .pillarGrid{
+      margin-top:1.75rem;
       display:grid;
       grid-template-columns: repeat(4, 1fr);
-      gap:14px;
-    }
-    .card{
-      background:var(--card);
-      border:1px solid rgba(230,237,247,.95);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow: var(--shadow2);
-      position:relative;
-      overflow:hidden;
-    }
-    .card:before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: radial-gradient(700px 280px at 10% 10%, rgba(37,99,235,.10), transparent 60%);
-      pointer-events:none;
-    }
-    .card > *{position:relative;z-index:1}
-    .card h3{
-      margin:0 0 8px;
-      font-size:15px;
-      letter-spacing:-.2px;
-      font-weight:950;
-      color:rgba(11,18,32,.92);
-    }
-    .card p{
-      margin:0;
-      font-size:13.5px;
-      color:rgba(11,18,32,.72);
-      font-weight:650;
-      line-height:1.6;
+      gap:1rem;
     }
 
-    .full-width-note{
-      margin-top:14px;
+    .pillar{
       border-radius:var(--radius);
-      padding:14px 16px;
-      background: rgba(255,255,255,.70);
-      border:1px dashed rgba(230,237,247,.95);
-      color:rgba(11,18,32,.78);
-      font-weight:750;
-      max-width: 1180px;
+      border:1px solid rgba(15,23,42,.10);
+      background:linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      padding:1.15rem 1.15rem;
+      box-shadow:0 14px 36px rgba(15,23,42,.06);
+      min-height:150px;
+      display:flex;
+      flex-direction:column;
+      gap:.5rem;
+    }
+
+    .pIcon{
+      font-size:1.15rem;
+      width:38px;height:38px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(37,99,235,.10);
+      border:1px solid rgba(37,99,235,.12);
+    }
+
+    .pillar h4{
+      margin:0;
+      font-size:1.05rem;
+      font-weight:950;
+      letter-spacing:-.2px;
+    }
+
+    .pillar p{
+      margin:0;
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.5;
+    }
+
+    .pillarNote{
+      margin-top:1.25rem;
+      color:var(--muted);
+      font-weight:700;
+      background:rgba(37,99,235,.05);
+      border:1px solid rgba(37,99,235,.10);
+      padding:.9rem 1rem;
+      border-radius:14px;
     }
 
     /* Pricing */
-    .pricing-grid{
-      margin-top:22px;
+    .pricing{
+      background:
+        radial-gradient(1100px 360px at 50% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 55%),
+        #fff;
+      border-top:1px solid rgba(15,23,42,.06);
+      border-bottom:1px solid rgba(15,23,42,.06);
+    }
+
+    .priceGrid{
+      margin-top:1.75rem;
       display:grid;
-      grid-template-columns: 1.05fr .95fr .95fr;
-      gap:14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap:1rem;
       align-items:stretch;
     }
-    .price-head{
+
+    .priceCard{
+      border-radius:var(--radius2);
+      border:1px solid rgba(15,23,42,.10);
+      background:linear-gradient(180deg,#ffffff 0%, #f8fbff 100%);
+      box-shadow: var(--shadow);
+      padding:1.25rem 1.25rem;
       display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      margin-bottom:10px;
+      flex-direction:column;
+      gap:.9rem;
+      min-height: 420px;
     }
+
+    .priceTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:.75rem;
+    }
+
     .tag{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding:6px 10px;
-      font-size:12px;
+      gap:.4rem;
+      font-size:.78rem;
       font-weight:950;
+      padding:.3rem .55rem;
       border-radius:999px;
-      border:1px solid rgba(37,99,235,.25);
-      background:rgba(37,99,235,.10);
-      color:rgba(37,99,235,.95);
+      border:1px solid rgba(37,99,235,.18);
+      background:rgba(37,99,235,.08);
+      color:#1d4ed8;
       white-space:nowrap;
     }
-    .price{
-      margin-top:8px;
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .price .big{
-      font-size:34px;
-      font-weight:950;
-      letter-spacing:-.6px;
-      color:rgba(11,18,32,.96);
-    }
-    .price .meta{
-      font-size:13px;
-      font-weight:850;
-      color:rgba(11,18,32,.70);
-    }
-    .free-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(22,163,74,.12);
-      border:1px solid rgba(22,163,74,.28);
-      color:#16a34a;
-      font-weight:950;
-      font-size:12px;
-      white-space:nowrap;
-    }
-    ul.clean{
-      margin:12px 0 0;
-      padding-left:18px;
-    }
-    ul.clean li{
-      margin:8px 0;
-      color:rgba(11,18,32,.72);
-      font-weight:650;
-      font-size:13.5px;
-      line-height:1.5;
-    }
-    .delivery{
-      margin-top:auto;
-      border-radius:14px;
-      padding:12px 12px;
-      background:rgba(37,99,235,.06);
-      border:1px dashed rgba(37,99,235,.18);
-      color:rgba(11,18,32,.80);
-      font-weight:800;
-      font-size:13px;
-      line-height:1.5;
-    }
-    .actions{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .btn-small{
-      padding:12px 14px;
-      font-size:14px;
-      border-radius:14px;
-    }
-    .btn-outline{
-      background:#fff;
-      border:1px solid rgba(11,18,32,.20);
-      color:rgba(11,18,32,.86);
-      box-shadow: 0 10px 22px rgba(2,6,23,.06);
-    }
-    .btn-outline:hover{transform:translateY(-1px)}
 
-    /* What AIVI is / is not (section under pricing) */
-    .isnot{
-      margin-top:30px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-      align-items:start;
-    }
-    .panel{
-      background:#fff;
-      border:1px solid rgba(230,237,247,.95);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow: var(--shadow2);
-    }
-    .panel h3{
-      font-size:16px;
-      margin:0 0 10px;
+    .priceCard h3{
+      margin:0;
+      font-size:1.1rem;
       font-weight:950;
       letter-spacing:-.2px;
     }
-    .panel p{
-      margin:0 0 10px;
-      color:rgba(11,18,32,.74);
-      font-weight:650;
-      line-height:1.75;
-      font-size:14.5px;
-    }
-    .panel ul{
-      margin:0;
-      padding-left:18px;
-    }
-    .panel li{
-      margin:9px 0;
-      color:rgba(11,18,32,.72);
-      font-weight:650;
-      font-size:13.5px;
-      line-height:1.55;
-    }
-    .panel li b{font-weight:950;color:rgba(11,18,32,.92)}
 
-    /* Request Access section */
-    .request-wrap{
-      margin-top:22px;
-      border-radius:var(--radius);
-      padding:18px;
-      background: radial-gradient(900px 360px at 10% 0%, rgba(37,99,235,.14), transparent 55%),
-                  #ffffff;
-      border:1px solid rgba(230,237,247,.95);
-      box-shadow: var(--shadow2);
-      max-width: 980px;
+    .moneyLine{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:baseline;
+      gap:.6rem;
+      margin-top:.1rem;
     }
-    .form-grid{
-      margin-top:12px;
+
+    .money{
+      font-size:2.1rem;
+      font-weight:950;
+      letter-spacing:-.8px;
+      margin:0;
+      line-height:1;
+    }
+
+    .per{
+      color:var(--muted);
+      font-weight:800;
+      font-size:.95rem;
+    }
+
+    .freeBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      font-weight:950;
+      font-size:.85rem;
+      padding:.34rem .6rem;
+      border-radius:999px;
+      border:1px solid rgba(22,163,74,.20);
+      background:rgba(22,163,74,.10);
+      color:#166534;
+      white-space:nowrap;
+    }
+
+    .priceCard ul{
+      margin:.15rem 0 0;
+      padding:0 0 0 1.05rem;
+      color:var(--muted);
+      font-weight:650;
+    }
+    .priceCard li{margin:.45rem 0}
+
+    .deliveryLine{
+      margin-top:auto;
+      padding:.75rem .9rem;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.75);
+      color:#0b1220;
+      font-weight:850;
+      font-size:.92rem;
+    }
+
+    .priceActions{
+      display:flex;
+      gap:.6rem;
+      margin-top:.25rem;
+      flex-wrap:wrap;
+    }
+
+    .btnSmall{
+      padding:.78rem 1rem;
+      border-radius:999px;
+      font-weight:950;
+      font-size:.95rem;
+      border:1px solid transparent;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      white-space:nowrap;
+    }
+
+    .btnBlue{
+      background:var(--primary);
+      color:#fff;
+      box-shadow:0 12px 28px rgba(37,99,235,.20);
+    }
+    .btnBlue:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .btnGhost{
+      background:#fff;
+      border-color:rgba(15,23,42,.14);
+      color:#0b1220;
+    }
+    .btnGhost:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(15,23,42,.08)}
+
+    /* What AIVI is / is not */
+    .aboutBox{
+      margin-top:1.5rem;
+      border-radius:var(--radius2);
+      border:1px solid rgba(15,23,42,.10);
+      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .aboutGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:12px;
-      align-items:end;
     }
-    label{
-      display:block;
-      font-size:12px;
+
+    .aboutCol{
+      padding:1.25rem 1.25rem;
+    }
+
+    .aboutCol + .aboutCol{
+      border-left:1px solid rgba(15,23,42,.08);
+      background:rgba(37,99,235,.03);
+    }
+
+    .aboutTitle{
+      margin:0 0 .6rem 0;
+      font-size:1.05rem;
       font-weight:950;
-      letter-spacing:.6px;
-      text-transform:uppercase;
-      color:rgba(11,18,32,.70);
-      margin-bottom:6px;
     }
-    .field input{
-      width:100%;
-      padding:13px 12px;
-      border-radius:14px;
-      border:2px solid rgba(230,237,247,.95);
-      outline:none;
-      font-size:14.5px;
-      font-weight:700;
-      background:#fff;
+
+    .aboutP{
+      margin:0;
+      color:var(--muted);
+      font-weight:650;
+      font-size:.98rem;
+      line-height:1.6;
     }
-    .field input:focus{
-      border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
-    }
-    .hint{
-      margin-top:6px;
-      font-size:12.5px;
-      color:rgba(11,18,32,.60);
+
+    .aboutBullets{
+      margin:.9rem 0 0;
+      padding:0 0 0 1.05rem;
+      color:var(--muted);
       font-weight:650;
     }
-    .form-actions{
-      grid-column: 1 / -1;
-      margin-top:8px;
+    .aboutBullets li{margin:.55rem 0}
+    .aboutBullets b{color:#0b1220}
+
+    /* Request Access form section */
+    .request{
+      background:
+        radial-gradient(1100px 420px at 50% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
+        #fff;
+    }
+
+    .requestCard{
+      margin-top:1.75rem;
+      border-radius:var(--radius2);
+      border:1px solid rgba(37,99,235,.18);
+      background:linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      box-shadow: var(--shadow2);
+      padding:1.35rem 1.4rem;
+    }
+
+    .requestCard h3{
+      margin:0;
+      font-size:1.35rem;
+      font-weight:950;
+      letter-spacing:-.4px;
+    }
+
+    .requestCard p{
+      margin:.45rem 0 0;
+      color:var(--muted);
+      font-weight:650;
+    }
+
+    .formGrid{
+      margin-top:1rem;
+      display:grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap:.8rem;
+      align-items:end;
+    }
+
+    .fLabel{
+      display:block;
+      font-size:.78rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight:950;
+      color:#1f2937;
+      margin:0 0 .35rem .1rem;
+    }
+
+    .fInput{
+      width:100%;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.14);
+      padding:.95rem 1rem;
+      font-size:1rem;
+      outline:none;
+      background:#fff;
+    }
+    .fInput:focus{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,.14);
+    }
+
+    .formActions{
       display:flex;
-      gap:10px;
+      gap:.6rem;
+      justify-content:flex-end;
       flex-wrap:wrap;
-      align-items:center;
+      padding-bottom:.05rem;
     }
-    .msg{
-      margin-top:10px;
-      display:none;
-      font-weight:850;
-      font-size:13px;
+
+    .noteRow{
+      margin-top:.8rem;
+      color:var(--muted2);
+      font-size:.92rem;
+      font-weight:650;
+      display:flex;
+      gap:.55rem;
+      align-items:flex-start;
     }
-    .msg.ok{color:#16a34a}
-    .msg.err{color:#e11d48}
+    .noteRow .i{
+      width:22px;height:22px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(37,99,235,.10);
+      border:1px solid rgba(37,99,235,.12);
+      color:#1d4ed8;
+      font-weight:950;
+      flex:0 0 auto;
+      margin-top:.1rem;
+    }
 
     /* Private Access */
     .private{
-      margin-top:18px;
-      max-width: 980px;
-      border-radius:var(--radius);
-      padding:18px;
-      background: linear-gradient(135deg, #0b1220 0%, #111827 55%, rgba(124,58,237,.92) 140%);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: var(--shadow);
-      color:#fff;
+      padding-top:2.25rem;
     }
-    .private h3{margin:0 0 10px;font-weight:950;letter-spacing:-.2px;font-size:18px}
-    .private p{margin:0 0 12px;color:rgba(255,255,255,.90);font-weight:650;line-height:1.7;font-size:14.5px}
-    .private .btn{
-      background:#fff;color:#0b1220;border:0;
-      box-shadow: 0 16px 40px rgba(0,0,0,.20);
-    }
-    .private .btn:hover{transform:translateY(-1px)}
 
-    .closing{
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.16);
+    .privateCard{
+      margin-top:1.25rem;
+      border-radius:var(--radius2);
+      border:1px solid rgba(15,23,42,.10);
+      background:
+        radial-gradient(900px 260px at 30% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
+        linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      box-shadow: var(--shadow);
+      padding:1.35rem 1.4rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      flex-wrap:wrap;
+    }
+
+    .privateCard h3{
+      margin:0;
+      font-size:1.35rem;
+      font-weight:950;
+      letter-spacing:-.4px;
+    }
+
+    .privateCard p{
+      margin:.45rem 0 0;
+      color:var(--muted);
+      font-weight:650;
+      max-width:82ch;
+    }
+
+    .closingLine{
+      margin:1.25rem 0 0;
+      color:#0b1220;
       font-weight:900;
-      color:rgba(255,255,255,.92);
-      font-size:14px;
+      font-size:1.02rem;
     }
 
     /* Footer */
     footer{
-      padding:34px 0;
-      background:#0b1220;
-      color:rgba(255,255,255,.88);
-      margin-top:10px;
-    }
-    .foot{
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px 28px;
-      justify-content:space-between;
-      align-items:center;
-      font-size:13px;
-      font-weight:650;
-    }
-    .foot a{color:#fff;font-weight:900}
-    .small{
-      color:rgba(255,255,255,.72);
-      font-weight:650;
-      font-size:12.5px;
-      margin-top:6px;
-      max-width: 78ch;
+      margin-top:0;
+      border-top:1px solid rgba(15,23,42,.08);
+      background:var(--surface2);
+      padding:2.5rem 0;
     }
 
-    /* Back-to-top */
+    .footerGrid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap:1.25rem;
+      align-items:start;
+    }
+
+    .footBrand{
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+    }
+
+    .footBrand .name{
+      font-weight:950;
+      font-size:1.05rem;
+      letter-spacing:-.2px;
+    }
+
+    .footBrand .disclaimer{
+      margin:.25rem 0 0;
+      color:var(--muted);
+      font-size:.93rem;
+      font-weight:650;
+      max-width:60ch;
+    }
+
+    .footCol h4{
+      margin:0 0 .55rem 0;
+      font-size:.9rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:950;
+      color:#111827;
+    }
+
+    .footLinks{
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+      font-weight:750;
+    }
+
+    .footLinks a{
+      color:#0b1220;
+      font-weight:800;
+    }
+    .footLinks a:hover{color:var(--primary-dark)}
+
+    .footBottom{
+      margin-top:1.25rem;
+      padding-top:1rem;
+      border-top:1px solid rgba(15,23,42,.06);
+      color:var(--muted2);
+      font-size:.85rem;
+      font-weight:650;
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      flex-wrap:wrap;
+    }
+
+    /* Floating Back to Top */
     .back-to-top-float{
       position:fixed;
-      right:22px;
-      bottom:22px;
-      width:56px;height:56px;
-      border-radius:16px;
+      right:1.25rem;
+      bottom:1.25rem;
+      background:var(--primary);
+      color:#fff;
+      width:54px;
+      height:54px;
+      border-radius:14px;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:linear-gradient(135deg,var(--primary) 0%, var(--accent) 120%);
-      color:#fff;
+      font-size:1.6rem;
       font-weight:950;
-      font-size:20px;
-      box-shadow: 0 18px 44px rgba(37,99,235,.28);
+      cursor:pointer;
+      box-shadow:0 18px 45px rgba(37,99,235,.30);
+      transition:all .2s ease;
       opacity:0;
       visibility:hidden;
-      transform:translateY(8px);
-      transition:opacity .2s, transform .2s, visibility .2s;
       z-index:999;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.18);
     }
-    .back-to-top-float.visible{
+    .back-to-top-float.visible{opacity:0.95;visibility:visible}
+    .back-to-top-float:hover{
+      background:var(--primary-dark);
+      transform:translateY(-2px);
       opacity:1;
-      visibility:visible;
-      transform:translateY(0);
     }
 
     /* Responsive */
-    @media (max-width: 1040px){
-      .hero-grid{grid-template-columns: 1fr;gap:16px}
-      .hero-title{font-size:42px}
-      .grid4{grid-template-columns: repeat(2, 1fr)}
-      .pricing-grid{grid-template-columns: 1fr}
-      .isnot{grid-template-columns: 1fr}
-      .row{flex-direction:column}
-      .submit{width:100%}
-      .mini-feats{grid-template-columns:1fr}
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns:1fr;gap:1.25rem}
+      .topright{align-items:flex-start;min-width:unset}
+      .navlinks{justify-content:flex-start}
+      .pillarGrid{grid-template-columns:1fr 1fr;gap:.9rem}
+      .priceGrid{grid-template-columns:1fr;gap:1rem}
+      .aboutGrid{grid-template-columns:1fr}
+      .aboutCol + .aboutCol{border-left:0;border-top:1px solid rgba(15,23,42,.08)}
+      .formGrid{grid-template-columns:1fr;align-items:stretch}
+      .formActions{justify-content:flex-start}
+      .footerGrid{grid-template-columns:1fr;gap:1rem}
     }
+
     @media (max-width: 640px){
-      .brand h1{font-size:40px}
-      .hero-title{font-size:38px}
-      .bullet{grid-template-columns:1fr}
-      .grid4{grid-template-columns:1fr}
-      .form-grid{grid-template-columns:1fr}
-      .wrap{padding:0 1rem}
-      .band{padding:58px 0}
+      .brand h1{font-size:2.6rem}
+      .thesisTitle{font-size:2.05rem}
+      .pillarGrid{grid-template-columns:1fr}
+      .pillList{grid-template-columns:1fr}
+      .breakGrid{grid-template-columns:1fr}
+      .fieldRow{flex-direction:column}
+      .submitBtn{width:100%}
     }
   </style>
 </head>
 
 <body id="top">
 
-  <!-- HERO -->
-  <section class="band bandA">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="brand">
+      <h1>AI Visibility Index</h1>
+      <p class="sub">AI already has an opinion about your brand. AIVI shows you what it is.</p>
+    </div>
+
+    <div class="topright">
+      <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+
+      <nav class="navlinks" aria-label="Top navigation">
+        <a href="#why">Why this matters</a>
+        <a href="#pillars">How AI “sees” a website</a>
+        <a href="#pricing">Pricing &amp; Access</a>
+        <a href="#request">Request access</a>
+        <a href="/index/whitepaper.html">Whitepaper</a>
+        <a href="/index/technical.html">Technical</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
     <div class="wrap">
-      <header>
-        <div class="topbar">
-          <div class="brand">
-            <h1>AI Visibility Index</h1>
-            <div class="hero-sub">
-              The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you.
-            </div>
-            <div class="hero-sub2">
-              AI answers are replacing search results. Visibility now depends on how AI understands you.
-            </div>
-          </div>
-          <div class="powered">
-            Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
-          </div>
-        </div>
-      </header>
+      <div class="heroGrid">
+        <div class="heroCopy">
+          <div class="kicker">⚡ Visibility for the Age of AI</div>
 
-      <div class="hero-grid">
-        <div class="hero-left">
-          <div class="hero-title">
-            AI already has an opinion about your brand.
-            <span>AIVI shows you what it is.</span>
-          </div>
+          <h2>
+            The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website —
+            before customers ever see you.
+          </h2>
 
-          <div class="cta-row">
-            <a class="btn btn-primary" href="#analyze">Reveal My AI Visibility</a>
-            <a class="btn btn-ghost" href="#pillars">Learn how the index works</a>
-          </div>
-        </div>
-
-        <div class="hero-card" id="analyze" aria-label="AIVI Snapshot (Analyze)">
-          <div class="card-top">
-            <div>
-              <div class="card-title">AIVI Snapshot (Analyze)</div>
-            </div>
-            <span class="pill">Free</span>
-          </div>
-
-          <p class="card-desc">
-            Run a public AIVI Snapshot to see how AI systems interpret your website at a high level. No signup. No credit card.
+          <p>
+            AI answers are replacing search results. Visibility now depends on how AI understands you.
           </p>
 
-          <form id="analyze-form" class="analyze-form" novalidate>
-            <div class="row">
-              <input id="url" class="input" type="text" placeholder="example.com" aria-label="Website URL" autocomplete="url" />
-              <button class="submit" type="submit">Reveal My AI Visibility</button>
-            </div>
-            <div id="error-message" class="error" role="alert"></div>
-          </form>
+          <div class="ctaRow">
+            <a class="btn btnPrimary" href="#submit">✨ Reveal My AI Visibility</a>
+            <a class="btn btnSecondary" href="#pillars">Learn how the index works</a>
+          </div>
+        </div>
 
-          <div class="mini-feats" aria-label="Snapshot includes">
-            <div class="mini">
-              <b>High-level AIVI snapshot</b>
-              <span>Clarity without the overwhelm.</span>
+        <!-- URL submission: front-and-center -->
+        <div class="submitCard" id="submit">
+          <div>
+            <div class="submitHead">
+              <div>
+                <h3>AIVI Snapshot (Analyze)</h3>
+                <p class="submitText">
+                  Run a public AIVI Snapshot to see how AI systems interpret your website at a high level. No signup. No credit card.
+                </p>
+              </div>
+              <div class="pill">✅ Free</div>
             </div>
-            <div class="mini">
-              <b>Initial strengths & visibility gaps</b>
-              <span>What’s helping or holding you back.</span>
+
+            <form id="analyze-form" class="submitForm" novalidate>
+              <div class="fieldRow">
+                <input id="url" class="input" type="text" inputmode="url" autocomplete="url" placeholder="example.com" aria-label="Website URL" />
+                <button type="submit" class="submitBtn">Reveal My AI Visibility</button>
+              </div>
+              <div id="error-message" class="error" role="alert"></div>
+            </form>
+
+            <div class="miniGrid" aria-label="Snapshot highlights">
+              <div class="mini">
+                <p class="t">📌 High-level AIVI snapshot</p>
+                <p class="d">Clarity without the overwhelm.</p>
+              </div>
+              <div class="mini">
+                <p class="t">🧭 Initial strengths &amp; visibility gaps</p>
+                <p class="d">What’s helping or holding you back.</p>
+              </div>
+              <div class="mini">
+                <p class="t">🧠 How AI currently understands your site</p>
+                <p class="d">How your brand gets reconstructed.</p>
+              </div>
+              <div class="mini">
+                <p class="t">⏱️ No signup, no credit card</p>
+                <p class="d">Run it in seconds.</p>
+              </div>
             </div>
-            <div class="mini">
-              <b>How AI currently understands your site</b>
-              <span>How your brand gets reconstructed.</span>
-            </div>
-            <div class="mini">
-              <b>No signup, no credit card</b>
-              <span>Run it in seconds.</span>
-            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-top:.35rem">
+            <a class="btnSmall btnGhost" href="/index/whitepaper.html">📄 Read the whitepaper</a>
+            <a class="btnSmall btnGhost" href="/index/technical.html">🧱 View the technical notes</a>
           </div>
         </div>
       </div>
-
     </div>
-  </section>
+  </div>
 
-  <!-- WOW EXPANSION -->
-  <section class="band bandB">
-    <div class="wrap">
-      <div class="kicker">Why this matters</div>
-      <h2 class="section-title">You’re not optimizing for AI.<br/>AI is already judging you.</h2>
-      <p class="lead">
-        Large language models don’t “read” websites the way humans do. They interpret, compress, and reconstruct your brand into answers, summaries, and recommendations — often without your knowledge or control.
-      </p>
-      <p class="lead" style="margin-top:10px;">AIVI makes that invisible layer visible.</p>
+  <!-- Thesis / Why this matters -->
+  <div class="thesisWrap" id="why">
+    <div class="wrap block">
+      <div class="thesis">
+        <div>
+          <div class="label">WHY THIS MATTERS</div>
+          <h2 class="thesisTitle">
+            You’re not optimizing for AI.<br/>
+            AI is already judging you.
+          </h2>
+        </div>
 
-      <div class="bullet">
-        <div class="bitem"><span class="dot"></span><p>Understands what you actually do</p></div>
-        <div class="bitem"><span class="dot"></span><p>Recognizes your authority or treats you as generic</p></div>
-        <div class="bitem"><span class="dot"></span><p>Trusts your content enough to reference or cite</p></div>
-        <div class="bitem"><span class="dot"></span><p>Risks misrepresenting, diluting, or omitting your brand entirely</p></div>
-      </div>
+        <div class="thesisBody">
+          <p class="lead" style="margin-top:0">
+            Large language models don’t “read” websites the way humans do. They interpret, compress, and reconstruct your brand into answers,
+            summaries, and recommendations — often without your knowledge or control.
+          </p>
 
-      <div class="break" aria-label="This is AI perception break">
-        <p class="line1">This is not SEO. This is AI perception.</p>
-        <div class="line2">If AI can’t clearly understand you, it can’t confidently recommend you.</div>
+          <p class="lead" style="margin-top:0">
+            AIVI makes that invisible layer visible.
+          </p>
+
+          <div class="pillList">
+            <div class="pillItem"><span class="dot"></span>Understands what you actually do</div>
+            <div class="pillItem"><span class="dot"></span>Recognizes your authority or treats you as generic</div>
+            <div class="pillItem"><span class="dot"></span>Trusts your content enough to reference or cite</div>
+            <div class="pillItem"><span class="dot"></span>Risks misrepresenting, diluting, or omitting your brand entirely</div>
+          </div>
+
+          <div class="breakBox" aria-label="Not SEO break">
+            <div class="breakGrid">
+              <div>
+                <p class="breakBig">This is not SEO.</p>
+              </div>
+              <div>
+                <p class="breakBig">This is AI perception.</p>
+              </div>
+            </div>
+            <p class="breakSmall">If AI can’t clearly understand you, it can’t confidently recommend you.</p>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- PILLARS -->
-  <section class="band bandC" id="pillars">
-    <div class="wrap">
-      <div class="kicker">Index framework</div>
-      <h2 class="section-title">How AI “sees” a website</h2>
+  <!-- Pillars -->
+  <div class="pillars" id="pillars">
+    <div class="wrap block">
+      <div class="label">INDEX FRAMEWORK</div>
+      <h2 class="h2">How AI “sees” a website</h2>
       <p class="lead">AIVI analyzes four core layers of AI perception:</p>
 
-      <div class="grid4">
-        <div class="card">
-          <h3>Structural Legibility</h3>
+      <div class="pillarGrid">
+        <div class="pillar">
+          <div class="pIcon">🧱</div>
+          <h4>Structural Legibility</h4>
           <p>Can AI reliably parse, navigate, and segment your site?</p>
         </div>
-        <div class="card">
-          <h3>Semantic Clarity</h3>
+
+        <div class="pillar">
+          <div class="pIcon">🧠</div>
+          <h4>Semantic Clarity</h4>
           <p>Does AI understand your offering — or fill in the gaps with assumptions?</p>
         </div>
-        <div class="card">
-          <h3>Authority Recognition</h3>
+
+        <div class="pillar">
+          <div class="pIcon">🏛️</div>
+          <h4>Authority Recognition</h4>
           <p>Does AI treat your content as reference-worthy or disposable?</p>
         </div>
-        <div class="card">
-          <h3>Representation Risk</h3>
+
+        <div class="pillar">
+          <div class="pIcon">⚠️</div>
+          <h4>Representation Risk</h4>
           <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers</p>
         </div>
       </div>
 
-      <div class="full-width-note">
+      <div class="pillarNote">
         Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- PRICING -->
-  <section class="band bandA" id="pricing">
-    <div class="wrap">
-      <div class="kicker">Pricing & access</div>
-      <h2 class="section-title">Access to the AI Visibility Index</h2>
+  <!-- Pricing -->
+  <div class="pricing" id="pricing">
+    <div class="wrap block">
+      <div class="label">PRICING &amp; ACCESS</div>
+      <h2 class="h2">Access to the AI Visibility Index</h2>
       <p class="lead">
         AIVI is currently available through request-based access while the index methodology continues to mature.
         Each analysis is delivered as an index reading, not automated output.
       </p>
 
-      <div class="pricing-grid">
+      <div class="priceGrid" role="list">
 
-        <!-- Plan A -->
-        <div class="card">
-          <div class="price-head">
-            <h3 style="margin:0;font-size:16px;font-weight:950;letter-spacing:-.2px;">AIVI — Index Reading</h3>
-            <span class="tag">Request-based</span>
+        <!-- Index Reading -->
+        <div class="priceCard" role="listitem">
+          <div class="priceTop">
+            <div>
+              <h3>AIVI — Index Reading</h3>
+              <div class="moneyLine" style="margin-top:.65rem">
+                <div class="money">$249</div>
+                <div class="per">per domain</div>
+                <div class="freeBadge">✨ Free during early access</div>
+              </div>
+            </div>
+            <div class="tag">Request-based</div>
           </div>
 
-          <div class="price">
-            <span class="big">$249</span>
-            <span class="meta">per domain</span>
-            <span class="free-badge">Free during early access</span>
-          </div>
-
-          <ul class="clean">
+          <ul>
             <li>AI Visibility Index Snapshot™</li>
             <li>Visibility Tier classification</li>
             <li>Representation Risk assessment</li>
@@ -893,143 +1204,163 @@
             <li>Executive-ready findings (shareable)</li>
           </ul>
 
-          <div class="actions">
-            <a class="btn btn-primary btn-small" href="#request-access">Request access</a>
-            <a class="btn btn-outline btn-small" href="#analyze">Run free snapshot</a>
+          <div class="priceActions">
+            <a class="btnSmall btnBlue" href="#request">Request access</a>
+            <a class="btnSmall btnGhost" href="#submit">Run free snapshot</a>
           </div>
 
-          <div class="delivery" style="margin-top:12px;">Request → analysis → manual delivery</div>
+          <div class="deliveryLine">Request → analysis → manual delivery</div>
         </div>
 
-        <!-- Plan B -->
-        <div class="card">
-          <div class="price-head">
-            <h3 style="margin:0;font-size:16px;font-weight:950;letter-spacing:-.2px;">AIVI — Monitoring Access</h3>
-            <span class="tag">Request-based</span>
+        <!-- Monitoring -->
+        <div class="priceCard" role="listitem">
+          <div class="priceTop">
+            <div>
+              <h3>AIVI — Monitoring Access</h3>
+              <div class="moneyLine" style="margin-top:.65rem">
+                <div class="money">$99</div>
+                <div class="per">/ month per domain</div>
+              </div>
+            </div>
+            <div class="tag">Request-based</div>
           </div>
 
-          <div class="price">
-            <span class="big">$99</span>
-            <span class="meta">/ month per domain</span>
-          </div>
-
-          <ul class="clean">
+          <ul>
             <li>Periodic index re-readings</li>
             <li>Change detection across core perception layers</li>
             <li>Visibility Tier movement tracking</li>
             <li>Representation risk trend signals</li>
           </ul>
 
-          <div class="delivery" style="margin-top:auto;">
-            <strong>Monitoring observes perception drift, not performance metrics.</strong>
-          </div>
+          <div class="deliveryLine">Monitoring observes perception drift, not performance metrics.</div>
 
-          <div class="actions">
-            <a class="btn btn-primary btn-small" href="#request-access">Request access</a>
+          <div class="priceActions">
+            <a class="btnSmall btnBlue" href="#request">Request access</a>
           </div>
         </div>
 
-        <!-- Clarity card -->
-        <div class="card">
-          <div class="price-head">
-            <h3 style="margin:0;font-size:16px;font-weight:950;letter-spacing:-.2px;">What AIVI is — and is not</h3>
-            <span class="tag">Clarity</span>
+        <!-- Enterprise -->
+        <div class="priceCard" role="listitem">
+          <div class="priceTop">
+            <div>
+              <h3>Enterprise</h3>
+              <p class="submitText" style="margin:.65rem 0 0">
+                For organizations where AI visibility is a material risk, Private Access provides organization-level index coverage,
+                comparative context, and executive briefings. Availability is limited.
+              </p>
+            </div>
+            <div class="tag">Onboarding</div>
           </div>
 
-          <p style="margin-top:10px;color:rgba(11,18,32,.74);font-weight:650;font-size:14.5px;line-height:1.75;">
-            <b style="font-weight:950;color:rgba(11,18,32,.92);">AIVI is an observational index.</b>
-            It measures how AI systems interpret and represent a website based on observable signals.
-          </p>
-
-          <ul class="clean">
-            <li><b>Not an SEO tool</b> — no keywords, backlinks, or rank tracking</li>
-            <li><b>Not a content grader</b> — it observes interpretability, not style preference</li>
-            <li><b>Not a prompt test</b> — it evaluates persistent signals, not a single-model output</li>
-            <li><b>Not a checklist</b> — it identifies stability and risk, not to-do lists</li>
-            <li><b>Not a guarantee engine</b> — it does not promise outcomes, rankings, or citations</li>
-          </ul>
-        </div>
-
-      </div>
-
-      <!-- Under pricing: what it is / is not + request form will follow -->
-      <div class="isnot" id="what-aivi-is-not">
-        <div class="panel">
-          <h3>What AIVI is</h3>
-          <p>
-            <b style="font-weight:950;color:rgba(11,18,32,.92);">AIVI is an observational index.</b>
-            It measures how AI systems interpret and represent a website based on observable signals.
-          </p>
-          <p style="margin:0;color:rgba(11,18,32,.64);font-size:13.5px;font-weight:650;line-height:1.65;">
-            AIVI does not guarantee rankings, traffic, or outcomes.
-          </p>
-        </div>
-
-        <div class="panel">
-          <h3>AIVI is not</h3>
           <ul>
-            <li><b>Not an SEO tool</b> — no keywords, backlinks, or rank tracking</li>
-            <li><b>Not a content grader</b> — it observes interpretability, not style preference</li>
-            <li><b>Not a prompt test</b> — it evaluates persistent signals, not a single-model output</li>
-            <li><b>Not a checklist</b> — it identifies stability and risk, not to-do lists</li>
-            <li><b>Not a guarantee engine</b> — it does not promise outcomes, rankings, or citations</li>
+            <li>Organization-level coverage</li>
+            <li>Comparative context</li>
+            <li>Executive briefings</li>
+            <li>Limited availability</li>
           </ul>
+
+          <div class="priceActions" style="margin-top:auto">
+            <a class="btnSmall btnGhost" href="#private">Request Private Access</a>
+            <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
+          </div>
+
+          <div class="deliveryLine">Access is granted through onboarding — not self-serve checkout.</div>
         </div>
+
       </div>
 
-      <!-- Request Access (after is/not) -->
-      <div class="request-wrap" id="request-access">
-        <div class="kicker" style="margin:0 0 10px;">Request-based delivery</div>
-        <h2 class="section-title" style="font-size:28px;margin-bottom:8px;max-width:none;">Request access</h2>
-        <p class="lead" style="font-size:15px;max-width: 92ch;">
-          If you want a deeper AIVI index reading, send a request here. This helps route your request correctly.
-          Delivery is manual during early access.
-        </p>
-
-        <form id="requestForm" novalidate>
-          <div class="form-grid">
-            <div class="field">
-              <label for="workEmail">Work email</label>
-              <input id="workEmail" type="email" placeholder="name@company.com" autocomplete="email" />
-              <div class="hint">Tip: a work email helps route access requests faster.</div>
-            </div>
-
-            <div class="field">
-              <label for="companyName">Company</label>
-              <input id="companyName" type="text" placeholder="Company name" autocomplete="organization" />
-              <div class="hint">We use this to understand context and analysis needs.</div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn btn-primary btn-small" type="submit">Send request</button>
-              <a class="btn btn-outline btn-small" href="https://calendly.com/quontora" target="_blank" rel="noopener">Talk to us</a>
-            </div>
+      <!-- What AIVI is / is not -->
+      <div class="aboutBox" id="what">
+        <div class="aboutGrid">
+          <div class="aboutCol">
+            <h3 class="aboutTitle">What AIVI is — and is not</h3>
+            <p class="aboutP"><b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.</p>
           </div>
-
-          <div class="msg err" id="requestError"></div>
-          <div class="msg ok" id="requestSuccess"></div>
-
-          <div class="hint" style="margin-top:10px;">
-            You’ll receive a confirmation message on-screen. (Email delivery &amp; automation will be added later.)
+          <div class="aboutCol">
+            <ul class="aboutBullets">
+              <li><b>Not an SEO tool</b> — no keywords, backlinks, or rank tracking</li>
+              <li><b>Not a content grader</b> — it observes interpretability, not style preference</li>
+              <li><b>Not a prompt test</b> — it evaluates persistent signals, not a single-model output</li>
+              <li><b>Not a checklist</b> — it identifies stability and risk, not to-do lists</li>
+              <li><b>Not a guarantee engine</b> — it does not promise outcomes, rankings, or citations</li>
+            </ul>
           </div>
-        </form>
-      </div>
-
-      <!-- Private Access -->
-      <div class="private" id="private-access">
-        <h3>Private Access</h3>
-        <p>
-          For organizations where AI visibility is a material risk, Private Access provides organization-level index coverage, comparative context, and executive briefings. Availability is limited.
-        </p>
-        <a class="btn" href="#request-access">Request Private Access</a>
-
-        <div class="closing">
-          AIVI does not tell you what to do. It shows you what AI already believes.
         </div>
       </div>
 
     </div>
-  </section>
+  </div>
+
+  <!-- Request access -->
+  <div class="request" id="request">
+    <div class="wrap block">
+      <div class="label">REQUEST-BASED DELIVERY</div>
+      <h2 class="h2">Request access</h2>
+      <p class="lead">
+        If you want a deeper AIVI index reading, send a request here. This helps route your request correctly. Delivery is manual during early access.
+      </p>
+
+      <div class="requestCard">
+        <h3>Request access</h3>
+        <p>If you want a deeper AIVI output, send a request here. This helps us confirm scope and route your request correctly.</p>
+
+        <form id="request-form" novalidate>
+          <div class="formGrid">
+            <div>
+              <label class="fLabel" for="workEmail">Work email</label>
+              <input id="workEmail" class="fInput" type="email" placeholder="name@company.com" autocomplete="email" />
+            </div>
+
+            <div>
+              <label class="fLabel" for="company">Company</label>
+              <input id="company" class="fInput" type="text" placeholder="Company name" autocomplete="organization" />
+            </div>
+
+            <div class="formActions">
+              <button type="button" id="sendRequestBtn" class="btnSmall btnBlue">Send request</button>
+              <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Talk to us</a>
+            </div>
+          </div>
+
+          <div class="noteRow">
+            <div class="i">i</div>
+            <div>
+              You’ll receive a confirmation message on-screen. (Email delivery &amp; automation will be added later.)
+            </div>
+          </div>
+
+          <div id="requestMsg" style="display:none;margin-top:.9rem;font-weight:850;color:#166534;background:rgba(22,163,74,.10);border:1px solid rgba(22,163,74,.18);padding:.75rem .9rem;border-radius:14px;">
+            Request received. We’ll follow up with next steps for access.
+          </div>
+
+          <div id="requestErr" style="display:none;margin-top:.9rem;font-weight:850;color:#1d4ed8;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.14);padding:.75rem .9rem;border-radius:14px;">
+            Please enter a valid work email and company name.
+          </div>
+        </form>
+      </div>
+
+      <!-- Private Access (after request form) -->
+      <div class="private" id="private">
+        <div class="label">PRIVATE ACCESS</div>
+        <h2 class="h2">Private Access</h2>
+
+        <div class="privateCard">
+          <div style="flex:1;min-width:280px">
+            <p style="margin:0;color:var(--muted);font-weight:650">
+              For organizations where AI visibility is a material risk, Private Access provides organization-level index coverage, comparative context, and executive briefings. Availability is limited.
+            </p>
+          </div>
+
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end">
+            <a class="btnSmall btnBlue" href="#request">Request Private Access</a>
+            <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
+          </div>
+        </div>
+
+        <div class="closingLine">AIVI does not tell you what to do. It shows you what AI already believes.</div>
+      </div>
+    </div>
+  </div>
 
   <!-- Floating Back to Top Button -->
   <a href="#top" class="back-to-top-float" id="backToTopFloat" aria-label="Back to top">↑</a>
@@ -1037,112 +1368,116 @@
   <!-- Footer -->
   <footer>
     <div class="wrap">
-      <div class="foot">
-        <div>
-          © <span id="footer-year"></span> AI Visibility Index (AIVI). All rights reserved.
-          &nbsp;·&nbsp; A product of <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.
+      <div class="footerGrid">
+        <div class="footBrand">
+          <div class="name">AI Visibility Index (AIVI)</div>
+          <div class="powered" style="align-items:flex-start;font-size:.95rem;color:var(--muted);font-weight:650">
+            A product of <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.
+          </div>
+          <p class="disclaimer">
+            AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
+          </p>
         </div>
-        <div>Last updated <span id="update-date"></span></div>
+
+        <div class="footCol">
+          <h4>Product</h4>
+          <div class="footLinks">
+            <a href="#submit">Run Snapshot (Free)</a>
+            <a href="#pricing">Pricing &amp; Access</a>
+            <a href="#request">Request access</a>
+            <a href="/index/whitepaper.html">Whitepaper</a>
+            <a href="/index/technical.html">Technical</a>
+          </div>
+        </div>
+
+        <div class="footCol">
+          <h4>Company</h4>
+          <div class="footLinks">
+            <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
+            <a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
+            <a href="#request">Contact</a>
+            <a href="#" aria-disabled="true" style="opacity:.65;pointer-events:none">Privacy</a>
+            <a href="#" aria-disabled="true" style="opacity:.65;pointer-events:none">Terms</a>
+          </div>
+        </div>
       </div>
-      <div class="small">
-        AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
-        For access requests: <a href="mailto:hello@quontora.com">hello@quontora.com</a>
+
+      <div class="footBottom">
+        <div>© 2025 AI Visibility Index (AIVI). All rights reserved.</div>
+        <div>Built for AI-native discovery.</div>
       </div>
     </div>
   </footer>
 
   <script>
-    // Footer dates
-    (function(){
-      const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-      const d=new Date();
-      const updateDate = months[d.getMonth()] + " " + d.getFullYear();
-      const year = d.getFullYear();
-      const u=document.getElementById("update-date");
-      const y=document.getElementById("footer-year");
-      if(u) u.textContent = updateDate;
-      if(y) y.textContent = year;
-    })();
+    // Smooth anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click",ev=>{
+        const href=a.getAttribute("href");
+        if(!href || href.length<2) return;
+        const id=href.substring(1);
+        const t=document.getElementById(id);
+        if(t){
+          ev.preventDefault();
+          t.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      });
+    });
 
-    // URL validation
+    // Analyze form
     function isValidURL(input){
       return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
     }
 
     document.addEventListener("DOMContentLoaded",()=>{
-      // Analyze form
       const f=document.getElementById("analyze-form");
       const i=document.getElementById("url");
       const e=document.getElementById("error-message");
 
-      if(f && i && e){
-        f.addEventListener("submit",(ev)=>{
-          ev.preventDefault();
+      if(f&&i&&e){
+        f.addEventListener("submit",ev=>{
+          ev.preventDefault(); ev.stopPropagation();
           let url=(i.value||"").trim();
           e.classList.remove("show");
 
-          if(!url){
-            e.textContent="Please enter a website URL";
-            e.classList.add("show");
-            return;
-          }
-          if(!isValidURL(url)){
-            e.textContent="Please enter a valid domain (e.g., example.com)";
-            e.classList.add("show");
-            return;
-          }
+          if(!url){ e.textContent="Please enter a website URL"; e.classList.add("show"); return; }
+          if(!isValidURL(url)){ e.textContent="Please enter a valid domain (e.g., example.com)"; e.classList.add("show"); return; }
           if(!/^https?:\/\//i.test(url)) url="https://"+url;
+
           window.location.href="analyze.html?url="+encodeURIComponent(url);
         });
       }
 
-      // Request access email-domain filtering (client-side)
-      const requestForm = document.getElementById("requestForm");
-      const workEmail = document.getElementById("workEmail");
-      const companyName = document.getElementById("companyName");
-      const reqErr = document.getElementById("requestError");
-      const reqOk = document.getElementById("requestSuccess");
+      // Request access (UI-only confirmation for now)
+      const sendBtn=document.getElementById("sendRequestBtn");
+      const email=document.getElementById("workEmail");
+      const company=document.getElementById("company");
+      const msg=document.getElementById("requestMsg");
+      const err=document.getElementById("requestErr");
 
-      const personalDomains = new Set([
-        "gmail.com","googlemail.com","yahoo.com","yahoo.co.uk","hotmail.com","outlook.com","live.com",
-        "aol.com","icloud.com","me.com","mac.com","proton.me","protonmail.com","pm.me","gmx.com","gmx.net",
-        "mail.com","zoho.com","yandex.com"
-      ]);
-
-      function showErr(msg){
-        if(!reqErr) return;
-        reqErr.textContent = msg;
-        reqErr.style.display = "block";
-        if(reqOk) reqOk.style.display = "none";
-      }
-      function showOk(msg){
-        if(!reqOk) return;
-        reqOk.textContent = msg;
-        reqOk.style.display = "block";
-        if(reqErr) reqErr.style.display = "none";
+      function basicEmailOk(v){
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
       }
 
-      if(requestForm){
-        requestForm.addEventListener("submit",(ev)=>{
-          ev.preventDefault();
-          const email = (workEmail?.value || "").trim().toLowerCase();
-          const company = (companyName?.value || "").trim();
+      if(sendBtn && email && company && msg && err){
+        sendBtn.addEventListener("click",()=>{
+          msg.style.display="none";
+          err.style.display="none";
 
-          if(!email) return showErr("Please enter a work email.");
-          if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return showErr("Please enter a valid email address.");
+          const em=(email.value||"").trim();
+          const co=(company.value||"").trim();
 
-          const domain = email.split("@")[1] || "";
-          if(personalDomains.has(domain)) return showErr("Please use a work email (personal email domains are not accepted for access requests).");
+          if(!basicEmailOk(em) || !co){
+            err.style.display="block";
+            return;
+          }
 
-          if(!company) return showErr("Please enter your company name.");
-
-          showOk("Request received. We’ll follow up with next steps for access and delivery.");
-          requestForm.reset();
+          msg.style.display="block";
         });
       }
     });
 
-    // Back to top visibility
+    // Floating back-to-top visibility
     const backToTopBtn = document.getElementById('backToTopFloat');
     window.addEventListener('scroll', () => {
       if (!backToTopBtn) return;
@@ -1150,6 +1485,5 @@
       else backToTopBtn.classList.remove('visible');
     });
   </script>
-
 </body>
 </html>
