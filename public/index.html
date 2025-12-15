@@ -5,12 +5,9 @@
   Last updated: 2025-12-15
 
   NOTES:
-  - Homepage redesign for clearer hierarchy + B2B polish.
-  - URL submission is front-and-center (primary purpose).
-  - Removed inline whitepaper/tech accordions; added links to:
-    /index/whitepaper.html and /index/technical.html
-  - Pricing: $249 per domain (Free during early access) + $99/mo monitoring + Enterprise.
-  - Request-based delivery (manual) messaging preserved.
+  - Wireframe A implementation: URL submission is front-and-center (primary purpose of page).
+  - No whitepaper/technical content embedded on this page.
+  - Links added to: /index/whitepaper.html and /index/technical.html
 -->
 <html lang="en">
 <head>
@@ -20,66 +17,53 @@
 
   <style>
     :root{
-      --max-width:1200px;
-      --pad-x:2rem;
-      --pad-y:5rem;
+      --max:1200px;
+      --pad:24px;
 
-      --ink:#0b1220;
-      --muted:#556274;
-      --muted2:#6b7280;
+      --bg:#ffffff;
+      --bg-soft:#f6f8ff;
+      --bg-soft-2:#f3f6ff;
+
+      --text:#0b1220;
+      --muted:#586174;
 
       --primary:#2563eb;
       --primary-dark:#1d4ed8;
 
-      --border:#e5e7eb;
-      --surface:#ffffff;
-      --surface2:#f7fafc;
-      --surface3:#f2f6ff;
+      --border:#e6e9f2;
+      --shadow:0 14px 40px rgba(17,24,39,.10);
+      --radius:18px;
 
-      --shadow: 0 16px 50px rgba(15,23,42,.10);
-      --shadow2: 0 10px 28px rgba(37,99,235,.12);
+      --green:#16a34a;
+      --green-soft:#e9f9ee;
 
-      --radius:16px;
-      --radius2:20px;
+      --warning:#111827;
     }
 
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(1400px 520px at 50% -20%, #e8f0ff 0%, #ffffff 55%),
-        #fff;
-      line-height:1.6;
-    }
-
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
     a{color:var(--primary);text-decoration:none}
     a:hover{color:var(--primary-dark)}
-    .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-x)}
+    .wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+    .muted{color:var(--muted)}
+    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 
-    /* Top bar */
-    .topbar{
-      padding:1.25rem var(--pad-x) 0;
-      max-width:var(--max-width);
-      margin:0 auto;
+    /* Header */
+    header{
+      position:relative;
+      padding:22px 0 10px;
+    }
+    .header-row{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:1rem;
+      gap:16px;
     }
-
-    .brand{
-      display:flex;
-      flex-direction:column;
-      gap:.2rem;
-    }
-
     .brand h1{
       margin:0;
-      font-size:3.25rem;
-      line-height:1.05;
+      font-size:46px;
       letter-spacing:-1px;
+      line-height:1.05;
       font-weight:800;
       background:linear-gradient(135deg,#0b1220 0%, #2563eb 100%);
       -webkit-background-clip:text;
@@ -87,1116 +71,941 @@
       background-clip:text;
       color:transparent;
     }
-
-    .brand .sub{
-      margin:0;
-      font-size:1.05rem;
-      color:var(--muted);
-      font-weight:600;
-    }
-
-    .topright{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      gap:.75rem;
-      min-width:280px;
-      padding-top:.45rem;
-    }
-
     .powered{
-      font-size:.95rem;
+      margin-top:10px;
+      font-size:14px;
       color:var(--muted);
-      font-weight:600;
       white-space:nowrap;
     }
-
     .powered a{font-weight:700}
-
-    .navlinks{
+    .top-links{
       display:flex;
-      flex-wrap:wrap;
-      gap:.5rem;
+      gap:14px;
       justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:10px;
+      font-size:14px;
+      color:var(--muted);
     }
-    .navlinks a{
-      font-size:.9rem;
-      font-weight:700;
-      color:#0b1220;
-      border:1px solid rgba(15,23,42,.12);
-      background:rgba(255,255,255,.65);
-      padding:.45rem .7rem;
-      border-radius:999px;
-      transition:all .15s ease;
-    }
-    .navlinks a:hover{
-      border-color:rgba(37,99,235,.35);
-      background:#fff;
-      transform:translateY(-1px);
-      box-shadow:0 10px 22px rgba(15,23,42,.06);
-    }
+    .top-links a{font-weight:600;color:var(--muted)}
+    .top-links a:hover{color:var(--primary)}
 
-    /* Hero */
+    /* HERO */
     .hero{
-      padding:2.75rem 0 4rem;
+      padding:24px 0 34px;
     }
-
-    .heroGrid{
+    .hero-grid{
       display:grid;
       grid-template-columns: 1.15fr .85fr;
-      gap:2.25rem;
-      align-items:stretch;
+      gap:28px;
+      align-items:center;
     }
-
-    .heroCopy{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:1rem;
-      padding-top:.25rem;
-    }
-
-    .heroCopy .kicker{
+    .kicker{
       display:inline-flex;
       align-items:center;
-      gap:.5rem;
+      gap:10px;
       font-weight:800;
       letter-spacing:.12em;
       text-transform:uppercase;
-      font-size:.78rem;
-      color:#1d4ed8;
-      background:rgba(37,99,235,.08);
-      border:1px solid rgba(37,99,235,.14);
-      padding:.35rem .6rem;
+      font-size:12px;
+      color:var(--primary);
+      margin-bottom:14px;
+    }
+    .kicker .bolt{
+      width:22px;height:22px;
+      display:inline-flex;align-items:center;justify-content:center;
       border-radius:999px;
-      width:fit-content;
+      background:rgba(37,99,235,.12);
+      color:var(--primary);
+      font-size:14px;
+      line-height:1;
     }
-
-    .heroCopy h2{
-      margin:0;
-      font-size:2.25rem;
-      line-height:1.25;
-      font-weight:800;
-      letter-spacing:-.5px;
+    .hero h2{
+      margin:0 0 12px;
+      font-size:48px;
+      line-height:1.06;
+      letter-spacing:-1px;
+      font-weight:900;
     }
-
-    .heroCopy p{
-      margin:0;
+    .hero p.lede{
+      margin:0 0 18px;
+      font-size:16px;
       color:var(--muted);
-      font-size:1.05rem;
       max-width:58ch;
     }
-
-    .ctaRow{
+    .cta-row{
       display:flex;
+      gap:12px;
       flex-wrap:wrap;
-      gap:.75rem;
-      margin-top:.35rem;
-      align-items:center;
+      margin:18px 0 0;
     }
-
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:.5rem;
-      font-weight:800;
+      gap:10px;
       border-radius:999px;
-      padding:.9rem 1.15rem;
+      padding:12px 18px;
+      font-weight:800;
       border:1px solid transparent;
       cursor:pointer;
       text-decoration:none;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
       user-select:none;
       white-space:nowrap;
     }
-
-    .btnPrimary{
+    .btn.primary{
       background:var(--primary);
       color:#fff;
-      box-shadow:0 14px 30px rgba(37,99,235,.22);
+      box-shadow:0 10px 26px rgba(37,99,235,.22);
     }
-    .btnPrimary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .btnSecondary{
-      background:rgba(255,255,255,.7);
-      color:#0b1220;
-      border-color:rgba(15,23,42,.14);
+    .btn.primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .btn.secondary{
+      background:#fff;
+      color:var(--text);
+      border-color:var(--border);
     }
-    .btnSecondary:hover{background:#fff;transform:translateY(-1px);box-shadow:0 14px 30px rgba(15,23,42,.08)}
+    .btn.secondary:hover{border-color:rgba(37,99,235,.35);transform:translateY(-1px);box-shadow:0 10px 26px rgba(17,24,39,.08)}
+    .btn.ghost{
+      background:transparent;
+      color:var(--primary);
+      border-color:rgba(37,99,235,.25);
+    }
 
-    /* Hero: URL submission module */
-    .submitCard{
-      background:
-        radial-gradient(900px 280px at 20% 0%, rgba(37,99,235,.14) 0%, rgba(255,255,255,0) 55%),
-        linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-      border:1px solid rgba(37,99,235,.18);
-      border-radius:var(--radius2);
-      box-shadow: var(--shadow2);
-      padding:1.25rem;
+    /* URL SUBMIT (front-and-center) */
+    .submit-card{
+      margin-top:22px;
+      background:linear-gradient(180deg,#eef4ff 0%, #ffffff 70%);
+      border:1px solid rgba(37,99,235,.25);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .submit-head{
       display:flex;
-      flex-direction:column;
+      align-items:center;
       justify-content:space-between;
-      gap:1rem;
-      min-height: 320px;
+      gap:12px;
+      margin-bottom:12px;
     }
-
-    .submitHead{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:1rem;
-    }
-
-    .submitHead h3{
-      margin:0;
-      font-size:1.1rem;
+    .submit-title{
+      font-size:16px;
       font-weight:900;
-      letter-spacing:-.2px;
+      margin:0;
     }
-
-    .pill{
+    .free-pill{
       display:inline-flex;
       align-items:center;
-      gap:.4rem;
-      font-size:.78rem;
-      font-weight:900;
-      padding:.28rem .55rem;
+      gap:8px;
+      padding:6px 10px;
       border-radius:999px;
+      background:var(--green-soft);
+      color:var(--green);
+      font-weight:900;
+      font-size:12px;
       border:1px solid rgba(22,163,74,.18);
-      background:rgba(22,163,74,.08);
-      color:#166534;
       white-space:nowrap;
     }
-
-    .submitText{
-      margin:0;
+    .free-pill .check{font-size:12px}
+    .submit-desc{
+      margin:0 0 14px;
       color:var(--muted);
-      font-size:.95rem;
+      font-size:14px;
     }
-
-    .submitForm{
+    .submit-form{
       display:flex;
-      flex-direction:column;
-      gap:.75rem;
-      margin-top:.2rem;
-    }
-
-    .fieldRow{
-      display:flex;
-      gap:.7rem;
+      gap:12px;
       align-items:stretch;
     }
-
     .input{
-      flex:1;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.14);
-      padding:1rem 1rem;
-      font-size:1.05rem;
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
       outline:none;
       background:#fff;
-      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      transition:border-color .15s ease, box-shadow .15s ease;
     }
     .input:focus{
       border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.14);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12);
     }
-
-    .submitBtn{
-      padding:1rem 1.1rem;
-      border-radius:14px;
-      border:0;
-      background:#0b1220;
+    .submit-btn{
+      min-width:210px;
+      border:none;
+      border-radius:12px;
+      background:#111827;
       color:#fff;
       font-weight:900;
-      font-size:1.05rem;
+      font-size:14px;
+      padding:12px 14px;
       cursor:pointer;
-      transition:transform .12s ease, background .12s ease, box-shadow .12s ease;
-      box-shadow:0 14px 30px rgba(15,23,42,.18);
-      white-space:nowrap;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      box-shadow:0 10px 24px rgba(17,24,39,.16);
     }
-    .submitBtn:hover{background:#111827;transform:translateY(-1px)}
-    .error{
-      display:none;
-      color:#1d4ed8;
-      font-weight:700;
-      font-size:.9rem;
-      margin-top:.2rem;
+    .submit-btn:hover{background:#0b1220;transform:translateY(-1px)}
+    .submit-foot{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
     }
-    .error.show{display:block}
-
-    .miniGrid{
+    .mini-grid{
+      margin-top:14px;
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:.75rem;
-      margin-top:.25rem;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
     }
-
     .mini{
+      border:1px solid var(--border);
       border-radius:14px;
-      border:1px solid rgba(15,23,42,.10);
-      background:rgba(255,255,255,.7);
-      padding:.75rem .8rem;
-      min-height:74px;
+      background:#fff;
+      padding:10px 12px;
+      min-height:72px;
       display:flex;
-      flex-direction:column;
+      gap:10px;
+    }
+    .mini .ico{
+      width:30px;height:30px;
+      border-radius:10px;
+      background:rgba(37,99,235,.10);
+      color:var(--primary);
+      display:flex;
+      align-items:center;
       justify-content:center;
-      gap:.25rem;
-    }
-    .mini .t{
-      display:flex;
-      align-items:center;
-      gap:.5rem;
       font-weight:900;
-      font-size:.92rem;
-      margin:0;
+      flex:0 0 auto;
+      margin-top:2px;
     }
-    .mini .d{
-      margin:0;
-      font-size:.85rem;
-      color:var(--muted);
-      line-height:1.35;
-    }
+    .mini strong{display:block;font-size:13px;line-height:1.2;margin-bottom:2px}
+    .mini span{display:block;font-size:12px;color:var(--muted);line-height:1.35}
 
-    /* Section shells */
-    section{padding: 0}
-    .block{
-      padding: var(--pad-y) 0;
+    /* Section band */
+    .band{
+      background:linear-gradient(180deg, var(--bg-soft) 0%, #ffffff 80%);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      padding:44px 0;
     }
-
-    .label{
-      display:inline-block;
-      font-size:.78rem;
-      font-weight:900;
-      letter-spacing:.14em;
+    .section-kicker{
+      font-size:12px;
+      letter-spacing:.16em;
       text-transform:uppercase;
-      color:#1d4ed8;
-      margin-bottom:.55rem;
-    }
-
-    .h2{
-      margin:0;
-      font-size:2.1rem;
-      line-height:1.15;
-      letter-spacing:-.7px;
+      color:var(--primary);
       font-weight:900;
+      margin:0 0 10px;
     }
-
-    .lead{
-      margin:.9rem 0 0;
-      color:var(--muted);
-      font-size:1.05rem;
-      max-width:75ch;
-    }
-
-    /* Thesis break */
-    .thesisWrap{
-      background:linear-gradient(180deg, rgba(37,99,235,.06) 0%, rgba(255,255,255,0) 85%);
-      border-top:1px solid rgba(15,23,42,.06);
-      border-bottom:1px solid rgba(15,23,42,.06);
-    }
-
-    .thesis{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:1.5rem;
-    }
-
-    .thesisTitle{
-      margin:0;
-      font-size:2.55rem;
-      line-height:1.05;
-      font-weight:950;
+    .h2{
+      margin:0 0 12px;
+      font-size:42px;
       letter-spacing:-1px;
+      line-height:1.08;
+      font-weight:950;
     }
-
-    .thesisBody{
+    .h2 .break{display:block}
+    .body{
+      font-size:15px;
+      color:var(--muted);
+      max-width:78ch;
+      margin:0 0 22px;
+    }
+    .chips{
       display:grid;
-      grid-template-columns:1fr;
-      gap:1rem;
-      max-width:82ch;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:10px;
     }
-
-    .pillList{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:.75rem;
-      margin-top:.25rem;
-    }
-
-    .pillItem{
+    .chip{
       display:flex;
-      align-items:center;
-      gap:.65rem;
-      border:1px solid rgba(15,23,42,.10);
-      background:rgba(255,255,255,.75);
-      border-radius:999px;
-      padding:.7rem .85rem;
-      font-weight:800;
-      color:#0b1220;
-      box-shadow:0 10px 26px rgba(15,23,42,.04);
+      align-items:flex-start;
+      gap:12px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 14px;
+      background:#fff;
+      box-shadow:0 10px 24px rgba(17,24,39,.06);
     }
-
     .dot{
-      width:10px;height:10px;border-radius:50%;
-      background:rgba(37,99,235,.9);
-      box-shadow:0 0 0 5px rgba(37,99,235,.12);
+      width:14px;height:14px;border-radius:999px;
+      margin-top:4px;
+      background:rgba(37,99,235,.20);
+      border:2px solid rgba(37,99,235,.55);
       flex:0 0 auto;
     }
+    .chip strong{display:block;font-size:14px;margin:0;color:var(--text)}
+    .chip span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 
-    /* Designed interruption: Not SEO */
-    .breakBox{
-      margin-top:1.6rem;
-      border-radius:var(--radius2);
-      background:
-        radial-gradient(900px 280px at 25% 0%, rgba(229,62,62,.10) 0%, rgba(255,255,255,0) 55%),
-        linear-gradient(135deg, rgba(15,23,42,.95) 0%, rgba(37,99,235,.95) 100%);
-      color:#fff;
-      padding:1.4rem 1.5rem;
-      box-shadow: var(--shadow);
-      border:1px solid rgba(255,255,255,.12);
+    /* Callout */
+    .callout{
+      margin:28px 0 0;
+      background:linear-gradient(135deg, rgba(37,99,235,.10) 0%, rgba(17,24,39,.02) 70%);
+      border:1px solid rgba(37,99,235,.18);
+      border-radius:20px;
+      padding:20px 22px;
+      box-shadow:0 18px 50px rgba(37,99,235,.12);
     }
-
-    .breakGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:1rem;
-      align-items:start;
-    }
-
-    .breakBig{
+    .callout p{
       margin:0;
-      font-size:1.55rem;
-      line-height:1.1;
       font-weight:950;
-      letter-spacing:-.6px;
-    }
-
-    .breakSmall{
-      margin:.25rem 0 0;
-      font-size:1rem;
-      opacity:.92;
-      max-width:72ch;
-    }
-
-    /* Pillars */
-    .pillars{
-      background:#fff;
-    }
-
-    .pillarGrid{
-      margin-top:1.75rem;
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:1rem;
-    }
-
-    .pillar{
-      border-radius:var(--radius);
-      border:1px solid rgba(15,23,42,.10);
-      background:linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-      padding:1.15rem 1.15rem;
-      box-shadow:0 14px 36px rgba(15,23,42,.06);
-      min-height:150px;
-      display:flex;
-      flex-direction:column;
-      gap:.5rem;
-    }
-
-    .pIcon{
-      font-size:1.15rem;
-      width:38px;height:38px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(37,99,235,.10);
-      border:1px solid rgba(37,99,235,.12);
-    }
-
-    .pillar h4{
-      margin:0;
-      font-size:1.05rem;
-      font-weight:950;
+      font-size:18px;
+      line-height:1.3;
       letter-spacing:-.2px;
     }
+    .callout p .line{display:block}
+    .callout p .mutedline{font-weight:800;color:#1f2a44}
 
-    .pillar p{
-      margin:0;
-      color:var(--muted);
-      font-size:.95rem;
-      line-height:1.5;
+    /* Framework */
+    .section{
+      padding:54px 0;
     }
-
-    .pillarNote{
-      margin-top:1.25rem;
+    .section h3{
+      margin:0 0 10px;
+      font-size:34px;
+      letter-spacing:-.8px;
+      font-weight:950;
+      line-height:1.1;
+    }
+    .section p{
+      margin:0 0 22px;
       color:var(--muted);
+      font-size:15px;
+      max-width:80ch;
+    }
+    .pillars{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+    .pillar{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#ffffff 0%, #fbfcff 100%);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 14px 34px rgba(17,24,39,.07);
+      position:relative;
+      overflow:hidden;
+      min-height:140px;
+    }
+    .pillar:before{
+      content:"";
+      position:absolute;
+      left:0;top:0;bottom:0;
+      width:4px;
+      background:linear-gradient(180deg, rgba(37,99,235,.9), rgba(37,99,235,.15));
+    }
+    .pillar .ico{
+      width:34px;height:34px;border-radius:12px;
+      background:rgba(37,99,235,.10);
+      color:var(--primary);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:950;
+      margin-bottom:10px;
+    }
+    .pillar h4{margin:0 0 8px;font-size:15px;font-weight:950}
+    .pillar p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+    .fullwidth-note{
+      margin-top:16px;
+      border:1px dashed rgba(37,99,235,.35);
+      background:rgba(37,99,235,.04);
+      border-radius:16px;
+      padding:14px 16px;
+      color:#1f2a44;
       font-weight:700;
-      background:rgba(37,99,235,.05);
-      border:1px solid rgba(37,99,235,.10);
-      padding:.9rem 1rem;
-      border-radius:14px;
+      font-size:13px;
     }
 
     /* Pricing */
     .pricing{
-      background:
-        radial-gradient(1100px 360px at 50% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 55%),
-        #fff;
-      border-top:1px solid rgba(15,23,42,.06);
-      border-bottom:1px solid rgba(15,23,42,.06);
+      background:linear-gradient(180deg, var(--bg-soft-2) 0%, #ffffff 80%);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      padding:54px 0;
     }
+    .pricing h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
+    .pricing p{margin:0 0 22px;color:var(--muted);max-width:85ch}
 
-    .priceGrid{
-      margin-top:1.75rem;
+    .price-grid{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:1rem;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:18px;
       align-items:stretch;
     }
-
-    .priceCard{
-      border-radius:var(--radius2);
-      border:1px solid rgba(15,23,42,.10);
-      background:linear-gradient(180deg,#ffffff 0%, #f8fbff 100%);
-      box-shadow: var(--shadow);
-      padding:1.25rem 1.25rem;
+    .card{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 18px 50px rgba(17,24,39,.10);
       display:flex;
       flex-direction:column;
-      gap:.9rem;
-      min-height: 420px;
+      min-height:320px;
     }
-
-    .priceTop{
+    .card .top{
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:space-between;
-      gap:.75rem;
+      gap:10px;
+      margin-bottom:10px;
+      min-height:28px;
     }
-
+    .card .top h4{margin:0;font-size:15px;font-weight:950}
     .tag{
       display:inline-flex;
       align-items:center;
-      gap:.4rem;
-      font-size:.78rem;
-      font-weight:950;
-      padding:.3rem .55rem;
+      gap:8px;
       border-radius:999px;
-      border:1px solid rgba(37,99,235,.18);
-      background:rgba(37,99,235,.08);
-      color:#1d4ed8;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:900;
+      border:1px solid rgba(37,99,235,.20);
+      background:rgba(37,99,235,.06);
+      color:var(--primary);
       white-space:nowrap;
     }
 
-    .priceCard h3{
-      margin:0;
-      font-size:1.1rem;
-      font-weight:950;
-      letter-spacing:-.2px;
-    }
-
-    .moneyLine{
+    .price-line{
+      margin:8px 0 10px;
       display:flex;
       flex-wrap:wrap;
       align-items:baseline;
-      gap:.6rem;
-      margin-top:.1rem;
+      gap:10px;
     }
-
-    .money{
-      font-size:2.1rem;
+    .price{
+      font-size:34px;
       font-weight:950;
-      letter-spacing:-.8px;
-      margin:0;
-      line-height:1;
+      letter-spacing:-1px;
     }
-
     .per{
       color:var(--muted);
       font-weight:800;
-      font-size:.95rem;
+      font-size:13px;
     }
-
-    .freeBadge{
-      display:inline-flex;
-      align-items:center;
-      gap:.45rem;
-      font-weight:950;
-      font-size:.85rem;
-      padding:.34rem .6rem;
-      border-radius:999px;
-      border:1px solid rgba(22,163,74,.20);
-      background:rgba(22,163,74,.10);
-      color:#166534;
-      white-space:nowrap;
-    }
-
-    .priceCard ul{
-      margin:.15rem 0 0;
-      padding:0 0 0 1.05rem;
-      color:var(--muted);
-      font-weight:650;
-    }
-    .priceCard li{margin:.45rem 0}
-
-    .deliveryLine{
-      margin-top:auto;
-      padding:.75rem .9rem;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.10);
-      background:rgba(255,255,255,.75);
-      color:#0b1220;
-      font-weight:850;
-      font-size:.92rem;
-    }
-
-    .priceActions{
-      display:flex;
-      gap:.6rem;
-      margin-top:.25rem;
-      flex-wrap:wrap;
-    }
-
-    .btnSmall{
-      padding:.78rem 1rem;
-      border-radius:999px;
-      font-weight:950;
-      font-size:.95rem;
-      border:1px solid transparent;
-      cursor:pointer;
-      text-decoration:none;
+    .free-badge{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:.5rem;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-      white-space:nowrap;
-    }
-
-    .btnBlue{
-      background:var(--primary);
-      color:#fff;
-      box-shadow:0 12px 28px rgba(37,99,235,.20);
-    }
-    .btnBlue:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .btnGhost{
-      background:#fff;
-      border-color:rgba(15,23,42,.14);
-      color:#0b1220;
-    }
-    .btnGhost:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(15,23,42,.08)}
-
-    /* What AIVI is / is not */
-    .aboutBox{
-      margin-top:1.5rem;
-      border-radius:var(--radius2);
-      border:1px solid rgba(15,23,42,.10);
-      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-
-    .aboutGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .aboutCol{
-      padding:1.25rem 1.25rem;
-    }
-
-    .aboutCol + .aboutCol{
-      border-left:1px solid rgba(15,23,42,.08);
-      background:rgba(37,99,235,.03);
-    }
-
-    .aboutTitle{
-      margin:0 0 .6rem 0;
-      font-size:1.05rem;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--green-soft);
+      color:var(--green);
       font-weight:950;
+      font-size:12px;
+      border:1px solid rgba(22,163,74,.16);
     }
 
-    .aboutP{
-      margin:0;
+    .list{
+      margin:10px 0 18px;
+      padding-left:18px;
       color:var(--muted);
-      font-weight:650;
-      font-size:.98rem;
+      font-size:13px;
       line-height:1.6;
     }
-
-    .aboutBullets{
-      margin:.9rem 0 0;
-      padding:0 0 0 1.05rem;
-      color:var(--muted);
-      font-weight:650;
+    .list li{margin:6px 0}
+    .note{
+      margin-top:auto;
+      padding:12px 12px;
+      border:1px solid rgba(37,99,235,.14);
+      background:rgba(37,99,235,.04);
+      border-radius:16px;
+      color:#1f2a44;
+      font-weight:800;
+      font-size:12px;
     }
-    .aboutBullets li{margin:.55rem 0}
-    .aboutBullets b{color:#0b1220}
-
-    /* Request Access form section */
-    .request{
-      background:
-        radial-gradient(1100px 420px at 50% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
-        #fff;
+    .card .actions{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      /* aligns buttons on a single horizontal row across all cards */
+      margin-top:auto;
+      padding-top:14px;
     }
-
-    .requestCard{
-      margin-top:1.75rem;
-      border-radius:var(--radius2);
-      border:1px solid rgba(37,99,235,.18);
-      background:linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-      box-shadow: var(--shadow2);
-      padding:1.35rem 1.4rem;
-    }
-
-    .requestCard h3{
-      margin:0;
-      font-size:1.35rem;
+    .card .actions .btn{
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:13px;
       font-weight:950;
-      letter-spacing:-.4px;
+      flex:1;
     }
-
-    .requestCard p{
-      margin:.45rem 0 0;
-      color:var(--muted);
-      font-weight:650;
+    .btn.card-primary{
+      background:var(--primary);
+      color:#fff;
+      border:1px solid transparent;
     }
+    .btn.card-primary:hover{background:var(--primary-dark)}
+    .btn.card-secondary{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
+    .btn.card-secondary:hover{border-color:rgba(37,99,235,.35)}
 
-    .formGrid{
-      margin-top:1rem;
+    /* What is / is not */
+    .what{
+      padding:54px 0;
+    }
+    .what h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
+    .what p{margin:0 0 22px;color:var(--muted);max-width:85ch}
+    .what-box{
+      border:1px solid var(--border);
+      border-radius:22px;
+      background:#fff;
+      box-shadow:0 18px 50px rgba(17,24,39,.10);
+      overflow:hidden;
+    }
+    .what-grid{
       display:grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap:.8rem;
+      grid-template-columns:1fr 1fr;
+    }
+    .what-col{
+      padding:18px;
+    }
+    .what-col + .what-col{
+      border-left:1px solid var(--border);
+      background:linear-gradient(180deg,#ffffff 0%, #fbfcff 100%);
+    }
+    .what-h{
+      margin:0 0 10px;
+      font-size:14px;
+      font-weight:950;
+      letter-spacing:.02em;
+      color:#0b1220;
+    }
+    .what-is{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+    .what-is b{color:#0b1220}
+    .not-list{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.65;
+    }
+    .not-list li{margin:8px 0}
+    .not-list b{color:#0b1220;font-weight:950}
+    .closing{
+      margin-top:14px;
+      padding:14px 16px;
+      border-top:1px solid var(--border);
+      background:rgba(37,99,235,.03);
+      color:#1f2a44;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    /* Request form */
+    .request{
+      padding:54px 0 18px;
+      background:linear-gradient(180deg, var(--bg-soft) 0%, #ffffff 85%);
+      border-top:1px solid var(--border);
+    }
+    .request h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
+    .request p{margin:0 0 18px;color:var(--muted);max-width:85ch}
+    .form-card{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:22px;
+      box-shadow:0 18px 50px rgba(17,24,39,.10);
+      padding:18px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr auto auto;
+      gap:12px;
       align-items:end;
     }
-
-    .fLabel{
+    label{
       display:block;
-      font-size:.78rem;
-      letter-spacing:.14em;
-      text-transform:uppercase;
+      font-size:11px;
       font-weight:950;
-      color:#1f2937;
-      margin:0 0 .35rem .1rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#46506a;
+      margin-bottom:8px;
     }
-
-    .fInput{
-      width:100%;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.14);
-      padding:.95rem 1rem;
-      font-size:1rem;
-      outline:none;
-      background:#fff;
-    }
-    .fInput:focus{
-      border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.14);
-    }
-
-    .formActions{
+    .help{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
       display:flex;
-      gap:.6rem;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-      padding-bottom:.05rem;
-    }
-
-    .noteRow{
-      margin-top:.8rem;
-      color:var(--muted2);
-      font-size:.92rem;
-      font-weight:650;
-      display:flex;
-      gap:.55rem;
+      gap:10px;
       align-items:flex-start;
     }
-    .noteRow .i{
-      width:22px;height:22px;border-radius:999px;
-      display:flex;align-items:center;justify-content:center;
+    .info{
+      width:18px;height:18px;
+      border-radius:999px;
       background:rgba(37,99,235,.10);
-      border:1px solid rgba(37,99,235,.12);
-      color:#1d4ed8;
+      color:var(--primary);
+      display:flex;align-items:center;justify-content:center;
       font-weight:950;
       flex:0 0 auto;
-      margin-top:.1rem;
+      margin-top:1px;
+    }
+    .form-actions .btn{
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:13px;
+      font-weight:950;
+      min-width:130px;
+    }
+    .btn.black{
+      background:#111827;color:#fff;border:1px solid transparent;
+      box-shadow:0 10px 24px rgba(17,24,39,.14);
+    }
+    .btn.black:hover{background:#0b1220}
+    .btn.outline{
+      background:#fff;color:#111827;border:1px solid var(--border);
     }
 
-    /* Private Access */
-    .private{
-      padding-top:2.25rem;
+    .status{
+      margin-top:12px;
+      font-size:13px;
+      font-weight:800;
+      color:#1f2a44;
+      display:none;
     }
+    .status.show{display:block}
+    .status.ok{color:var(--green)}
+    .status.err{color:#b91c1c}
 
-    .privateCard{
-      margin-top:1.25rem;
-      border-radius:var(--radius2);
-      border:1px solid rgba(15,23,42,.10);
-      background:
-        radial-gradient(900px 260px at 30% 0%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
-      box-shadow: var(--shadow);
-      padding:1.35rem 1.4rem;
+    /* Floating back to top */
+    .back-to-top-float{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      width:54px;height:54px;
+      border-radius:16px;
+      background:var(--primary);
+      color:#fff;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:1rem;
-      flex-wrap:wrap;
-    }
-
-    .privateCard h3{
-      margin:0;
-      font-size:1.35rem;
+      justify-content:center;
+      font-size:20px;
       font-weight:950;
-      letter-spacing:-.4px;
+      text-decoration:none;
+      box-shadow:0 14px 34px rgba(37,99,235,.30);
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
+      z-index:999;
     }
-
-    .privateCard p{
-      margin:.45rem 0 0;
-      color:var(--muted);
-      font-weight:650;
-      max-width:82ch;
-    }
-
-    .closingLine{
-      margin:1.25rem 0 0;
-      color:#0b1220;
-      font-weight:900;
-      font-size:1.02rem;
-    }
+    .back-to-top-float.visible{opacity:1;visibility:visible}
+    .back-to-top-float:hover{transform:translateY(-2px);background:var(--primary-dark)}
 
     /* Footer */
     footer{
-      margin-top:0;
-      border-top:1px solid rgba(15,23,42,.08);
-      background:var(--surface2);
-      padding:2.5rem 0;
+      margin-top:44px;
+      border-top:1px solid var(--border);
+      background:#f7f8fb;
+      padding:28px 0;
     }
-
-    .footerGrid{
+    .foot-grid{
       display:grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap:1.25rem;
+      grid-template-columns: 1.35fr 1fr 1fr;
+      gap:18px;
       align-items:start;
     }
-
-    .footBrand{
-      display:flex;
-      flex-direction:column;
-      gap:.35rem;
-    }
-
-    .footBrand .name{
+    .foot-title{
+      margin:0 0 8px;
       font-weight:950;
-      font-size:1.05rem;
-      letter-spacing:-.2px;
+      font-size:14px;
     }
-
-    .footBrand .disclaimer{
-      margin:.25rem 0 0;
+    .foot-copy{
+      margin:0;
       color:var(--muted);
-      font-size:.93rem;
-      font-weight:650;
-      max-width:60ch;
+      font-size:13px;
+      line-height:1.7;
     }
-
-    .footCol h4{
-      margin:0 0 .55rem 0;
-      font-size:.9rem;
-      letter-spacing:.12em;
-      text-transform:uppercase;
+    .foot-col h5{
+      margin:0 0 8px;
+      font-size:12px;
       font-weight:950;
-      color:#111827;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#46506a;
     }
-
-    .footLinks{
-      display:flex;
-      flex-direction:column;
-      gap:.35rem;
-      font-weight:750;
+    .foot-links{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:8px;
+      font-size:13px;
     }
-
-    .footLinks a{
-      color:#0b1220;
-      font-weight:800;
-    }
-    .footLinks a:hover{color:var(--primary-dark)}
-
-    .footBottom{
-      margin-top:1.25rem;
-      padding-top:1rem;
-      border-top:1px solid rgba(15,23,42,.06);
-      color:var(--muted2);
-      font-size:.85rem;
-      font-weight:650;
+    .foot-links a{font-weight:700;color:#1f2a44}
+    .foot-links a:hover{color:var(--primary)}
+    .foot-bottom{
+      margin-top:18px;
+      padding-top:14px;
+      border-top:1px solid var(--border);
       display:flex;
       justify-content:space-between;
-      gap:1rem;
+      gap:12px;
       flex-wrap:wrap;
-    }
-
-    /* Floating Back to Top */
-    .back-to-top-float{
-      position:fixed;
-      right:1.25rem;
-      bottom:1.25rem;
-      background:var(--primary);
-      color:#fff;
-      width:54px;
-      height:54px;
-      border-radius:14px;
-      display:flex;
+      color:var(--muted);
+      font-size:12px;
       align-items:center;
-      justify-content:center;
-      font-size:1.6rem;
-      font-weight:950;
-      cursor:pointer;
-      box-shadow:0 18px 45px rgba(37,99,235,.30);
-      transition:all .2s ease;
-      opacity:0;
-      visibility:hidden;
-      z-index:999;
-      text-decoration:none;
-      border:1px solid rgba(255,255,255,.18);
-    }
-    .back-to-top-float.visible{opacity:0.95;visibility:visible}
-    .back-to-top-float:hover{
-      background:var(--primary-dark);
-      transform:translateY(-2px);
-      opacity:1;
     }
 
     /* Responsive */
     @media (max-width: 980px){
-      .heroGrid{grid-template-columns:1fr;gap:1.25rem}
-      .topright{align-items:flex-start;min-width:unset}
-      .navlinks{justify-content:flex-start}
-      .pillarGrid{grid-template-columns:1fr 1fr;gap:.9rem}
-      .priceGrid{grid-template-columns:1fr;gap:1rem}
-      .aboutGrid{grid-template-columns:1fr}
-      .aboutCol + .aboutCol{border-left:0;border-top:1px solid rgba(15,23,42,.08)}
-      .formGrid{grid-template-columns:1fr;align-items:stretch}
-      .formActions{justify-content:flex-start}
-      .footerGrid{grid-template-columns:1fr;gap:1rem}
+      .hero-grid{grid-template-columns:1fr}
+      .hero h2{font-size:42px}
+      .submit-form{flex-direction:column}
+      .submit-btn{width:100%}
+      .mini-grid{grid-template-columns:1fr 1fr}
+      .chips{grid-template-columns:1fr}
+      .pillars{grid-template-columns:1fr 1fr}
+      .price-grid{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr;align-items:stretch}
+      .form-actions{display:flex;gap:10px}
+      .form-actions .btn{flex:1}
+      .what-grid{grid-template-columns:1fr}
+      .what-col + .what-col{border-left:0;border-top:1px solid var(--border)}
+      .foot-grid{grid-template-columns:1fr}
+      .powered{margin-top:8px}
+      .top-links{justify-content:flex-start}
     }
-
-    @media (max-width: 640px){
-      .brand h1{font-size:2.6rem}
-      .thesisTitle{font-size:2.05rem}
-      .pillarGrid{grid-template-columns:1fr}
-      .pillList{grid-template-columns:1fr}
-      .breakGrid{grid-template-columns:1fr}
-      .fieldRow{flex-direction:column}
-      .submitBtn{width:100%}
+    @media (max-width: 560px){
+      .brand h1{font-size:36px}
+      .hero h2{font-size:36px}
+      .pillars{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body id="top">
+  <div class="wrap">
+    <header>
+      <div class="header-row">
+        <div class="brand">
+          <h1>AI Visibility Index</h1>
+        </div>
 
-  <!-- Top Bar -->
-  <div class="topbar">
-    <div class="brand">
-      <h1>AI Visibility Index</h1>
-      <p class="sub">AI already has an opinion about your brand. AIVI shows you what it is.</p>
-    </div>
+        <div style="text-align:right">
+          <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+          <nav class="top-links" aria-label="Top navigation">
+            <a href="#pricing">Pricing</a>
+            <a href="#enterprise">Enterprise</a>
+            <a href="#request">Request access</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
+      </div>
+    </header>
 
-    <div class="topright">
-      <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+    <main class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="kicker">
+            <span class="bolt">⚡</span>
+            <span>Visibility for the Age of AI</span>
+          </div>
 
-      <nav class="navlinks" aria-label="Top navigation">
-        <a href="#why">Why this matters</a>
-        <a href="#pillars">How AI “sees” a website</a>
-        <a href="#pricing">Pricing &amp; Access</a>
-        <a href="#request">Request access</a>
-        <a href="/index/whitepaper.html">Whitepaper</a>
-        <a href="/index/technical.html">Technical</a>
-      </nav>
-    </div>
-  </div>
+          <h2>AI already has an opinion about your brand.<br/>AIVI shows you what it is.</h2>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="wrap">
-      <div class="heroGrid">
-        <div class="heroCopy">
-          <div class="kicker">⚡ Visibility for the Age of AI</div>
+          <p class="lede">
+            The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you.
+          </p>
 
-          <h2>
-            The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website —
-            before customers ever see you.
-          </h2>
-
-          <p>
+          <p class="lede muted" style="margin-top:-6px">
             AI answers are replacing search results. Visibility now depends on how AI understands you.
           </p>
 
-          <div class="ctaRow">
-            <a class="btn btnPrimary" href="#submit">✨ Reveal My AI Visibility</a>
-            <a class="btn btnSecondary" href="#pillars">Learn how the index works</a>
+          <div class="cta-row">
+            <a class="btn primary" href="#snapshot">Reveal My AI Visibility</a>
+            <a class="btn secondary" href="#framework">Learn how the index works</a>
           </div>
         </div>
 
-        <!-- URL submission: front-and-center -->
-        <div class="submitCard" id="submit">
+        <!-- This is NOT the primary CTA anymore. It's a supportive module. -->
+        <aside class="submit-card" aria-label="AIVI Snapshot (Analyze)">
+          <div class="submit-head">
+            <p class="submit-title">AIVI Snapshot (Analyze)</p>
+            <span class="free-pill"><span class="check">✓</span> Free</span>
+          </div>
+          <p class="submit-desc">
+            Run a public AIVI Snapshot to see how AI systems interpret your website at a high level. No signup. No credit card.
+          </p>
+
+          <div class="mini-grid">
+            <div class="mini">
+              <div class="ico">📌</div>
+              <div>
+                <strong>High-level AIVI snapshot</strong>
+                <span>Clarity without the overwhelm.</span>
+              </div>
+            </div>
+            <div class="mini">
+              <div class="ico">🧭</div>
+              <div>
+                <strong>Initial strengths &amp; visibility gaps</strong>
+                <span>What’s helping or holding you back.</span>
+              </div>
+            </div>
+            <div class="mini">
+              <div class="ico">🧠</div>
+              <div>
+                <strong>How AI currently understands your site</strong>
+                <span>How your brand gets reconstructed.</span>
+              </div>
+            </div>
+            <div class="mini">
+              <div class="ico">⚡</div>
+              <div>
+                <strong>No signup, no credit card</strong>
+                <span>Run it in seconds.</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- PRIMARY URL SUBMISSION (Front and Center) -->
+      <section id="snapshot" class="submit-card" style="margin-top:26px" aria-label="Run AIVI Snapshot">
+        <div class="submit-head">
+          <p class="submit-title">Run your free AIVI Snapshot</p>
+          <span class="free-pill"><span class="check">✓</span> Free</span>
+        </div>
+
+        <form id="analyze-form" class="submit-form" novalidate>
+          <label for="url" class="sr-only">Website URL</label>
+          <input id="url" class="input" type="text" placeholder="example.com" aria-label="Website URL" />
+          <button class="submit-btn" type="submit">Reveal My AI Visibility</button>
+        </form>
+
+        <div id="analyze-error" class="submit-foot" style="display:none;color:#b91c1c;font-weight:800"></div>
+        <div class="submit-foot">Free AIVI Snapshot (Analyze). No signup. No credit card.</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- WHY THIS MATTERS -->
+  <section class="band" id="why">
+    <div class="wrap">
+      <div class="section-kicker">Why this matters</div>
+
+      <div class="h2">
+        <span class="break">You’re not optimizing for AI.</span>
+        <span class="break">AI is already judging you.</span>
+      </div>
+
+      <p class="body">
+        Large language models don’t “read” websites the way humans do. They interpret, compress, and reconstruct your brand into answers, summaries, and recommendations — often without your knowledge or control.
+      </p>
+
+      <p class="body" style="margin-top:-8px">AIVI makes that invisible layer visible.</p>
+
+      <div class="chips">
+        <div class="chip">
+          <span class="dot"></span>
           <div>
-            <div class="submitHead">
-              <div>
-                <h3>AIVI Snapshot (Analyze)</h3>
-                <p class="submitText">
-                  Run a public AIVI Snapshot to see how AI systems interpret your website at a high level. No signup. No credit card.
-                </p>
-              </div>
-              <div class="pill">✅ Free</div>
-            </div>
-
-            <form id="analyze-form" class="submitForm" novalidate>
-              <div class="fieldRow">
-                <input id="url" class="input" type="text" inputmode="url" autocomplete="url" placeholder="example.com" aria-label="Website URL" />
-                <button type="submit" class="submitBtn">Reveal My AI Visibility</button>
-              </div>
-              <div id="error-message" class="error" role="alert"></div>
-            </form>
-
-            <div class="miniGrid" aria-label="Snapshot highlights">
-              <div class="mini">
-                <p class="t">📌 High-level AIVI snapshot</p>
-                <p class="d">Clarity without the overwhelm.</p>
-              </div>
-              <div class="mini">
-                <p class="t">🧭 Initial strengths &amp; visibility gaps</p>
-                <p class="d">What’s helping or holding you back.</p>
-              </div>
-              <div class="mini">
-                <p class="t">🧠 How AI currently understands your site</p>
-                <p class="d">How your brand gets reconstructed.</p>
-              </div>
-              <div class="mini">
-                <p class="t">⏱️ No signup, no credit card</p>
-                <p class="d">Run it in seconds.</p>
-              </div>
-            </div>
+            <strong>Understands what you actually do</strong>
+            <span></span>
           </div>
-
-          <div style="display:flex;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-top:.35rem">
-            <a class="btnSmall btnGhost" href="/index/whitepaper.html">📄 Read the whitepaper</a>
-            <a class="btnSmall btnGhost" href="/index/technical.html">🧱 View the technical notes</a>
+        </div>
+        <div class="chip">
+          <span class="dot"></span>
+          <div>
+            <strong>Recognizes your authority or treats you as generic</strong>
+            <span></span>
+          </div>
+        </div>
+        <div class="chip">
+          <span class="dot"></span>
+          <div>
+            <strong>Trusts your content enough to reference or cite</strong>
+            <span></span>
+          </div>
+        </div>
+        <div class="chip">
+          <span class="dot"></span>
+          <div>
+            <strong>Risks misrepresenting, diluting, or omitting your brand entirely</strong>
+            <span></span>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Thesis / Why this matters -->
-  <div class="thesisWrap" id="why">
-    <div class="wrap block">
-      <div class="thesis">
-        <div>
-          <div class="label">WHY THIS MATTERS</div>
-          <h2 class="thesisTitle">
-            You’re not optimizing for AI.<br/>
-            AI is already judging you.
-          </h2>
-        </div>
-
-        <div class="thesisBody">
-          <p class="lead" style="margin-top:0">
-            Large language models don’t “read” websites the way humans do. They interpret, compress, and reconstruct your brand into answers,
-            summaries, and recommendations — often without your knowledge or control.
-          </p>
-
-          <p class="lead" style="margin-top:0">
-            AIVI makes that invisible layer visible.
-          </p>
-
-          <div class="pillList">
-            <div class="pillItem"><span class="dot"></span>Understands what you actually do</div>
-            <div class="pillItem"><span class="dot"></span>Recognizes your authority or treats you as generic</div>
-            <div class="pillItem"><span class="dot"></span>Trusts your content enough to reference or cite</div>
-            <div class="pillItem"><span class="dot"></span>Risks misrepresenting, diluting, or omitting your brand entirely</div>
-          </div>
-
-          <div class="breakBox" aria-label="Not SEO break">
-            <div class="breakGrid">
-              <div>
-                <p class="breakBig">This is not SEO.</p>
-              </div>
-              <div>
-                <p class="breakBig">This is AI perception.</p>
-              </div>
-            </div>
-            <p class="breakSmall">If AI can’t clearly understand you, it can’t confidently recommend you.</p>
-          </div>
-        </div>
+      <div class="callout" aria-label="AI perception callout">
+        <p>
+          <span class="line">This is not SEO.</span>
+          <span class="line">This is AI perception.</span>
+          <span class="line mutedline">If AI can’t clearly understand you, it can’t confidently recommend you.</span>
+        </p>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Pillars -->
-  <div class="pillars" id="pillars">
-    <div class="wrap block">
-      <div class="label">INDEX FRAMEWORK</div>
-      <h2 class="h2">How AI “sees” a website</h2>
-      <p class="lead">AIVI analyzes four core layers of AI perception:</p>
+  <!-- FRAMEWORK -->
+  <section class="section" id="framework">
+    <div class="wrap">
+      <h3>How AI “sees” a website</h3>
+      <p>AIVI analyzes four core layers of AI perception:</p>
 
-      <div class="pillarGrid">
+      <div class="pillars">
         <div class="pillar">
-          <div class="pIcon">🧱</div>
+          <div class="ico">🧱</div>
           <h4>Structural Legibility</h4>
           <p>Can AI reliably parse, navigate, and segment your site?</p>
         </div>
 
         <div class="pillar">
-          <div class="pIcon">🧠</div>
+          <div class="ico">🗣️</div>
           <h4>Semantic Clarity</h4>
           <p>Does AI understand your offering — or fill in the gaps with assumptions?</p>
         </div>
 
         <div class="pillar">
-          <div class="pIcon">🏛️</div>
+          <div class="ico">🏛️</div>
           <h4>Authority Recognition</h4>
           <p>Does AI treat your content as reference-worthy or disposable?</p>
         </div>
 
         <div class="pillar">
-          <div class="pIcon">⚠️</div>
+          <div class="ico">⚠️</div>
           <h4>Representation Risk</h4>
           <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers</p>
         </div>
       </div>
 
-      <div class="pillarNote">
+      <div class="fullwidth-note">
         Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Pricing -->
-  <div class="pricing" id="pricing">
-    <div class="wrap block">
-      <div class="label">PRICING &amp; ACCESS</div>
-      <h2 class="h2">Access to the AI Visibility Index</h2>
-      <p class="lead">
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <h3>Access to the AI Visibility Index</h3>
+      <p>
         AIVI is currently available through request-based access while the index methodology continues to mature.
         Each analysis is delivered as an index reading, not automated output.
       </p>
 
-      <div class="priceGrid" role="list">
-
+      <div class="price-grid">
         <!-- Index Reading -->
-        <div class="priceCard" role="listitem">
-          <div class="priceTop">
-            <div>
-              <h3>AIVI — Index Reading</h3>
-              <div class="moneyLine" style="margin-top:.65rem">
-                <div class="money">$249</div>
-                <div class="per">per domain</div>
-                <div class="freeBadge">✨ Free during early access</div>
-              </div>
-            </div>
-            <div class="tag">Request-based</div>
+        <div class="card" aria-label="AIVI — Index Reading">
+          <div class="top">
+            <h4>AIVI — Index Reading</h4>
+            <span class="tag">Request-based</span>
           </div>
 
-          <ul>
+          <div class="price-line">
+            <div class="price">$249</div>
+            <div class="per">per domain</div>
+            <span class="free-badge">Free during early access</span>
+          </div>
+
+          <ul class="list">
             <li>AI Visibility Index Snapshot™</li>
             <li>Visibility Tier classification</li>
             <li>Representation Risk assessment</li>
@@ -1204,80 +1013,88 @@
             <li>Executive-ready findings (shareable)</li>
           </ul>
 
-          <div class="priceActions">
-            <a class="btnSmall btnBlue" href="#request">Request access</a>
-            <a class="btnSmall btnGhost" href="#submit">Run free snapshot</a>
-          </div>
+          <div class="note">Request → analysis → manual delivery (during early access)</div>
 
-          <div class="deliveryLine">Request → analysis → manual delivery</div>
+          <div class="actions">
+            <button class="btn card-primary" type="button" data-open-request data-plan="Index Reading ($249 per domain)">Request access</button>
+          </div>
         </div>
 
         <!-- Monitoring -->
-        <div class="priceCard" role="listitem">
-          <div class="priceTop">
-            <div>
-              <h3>AIVI — Monitoring Access</h3>
-              <div class="moneyLine" style="margin-top:.65rem">
-                <div class="money">$99</div>
-                <div class="per">/ month per domain</div>
-              </div>
-            </div>
-            <div class="tag">Request-based</div>
+        <div class="card" aria-label="AIVI — Monitoring Access">
+          <div class="top">
+            <h4>AIVI — Monitoring Access</h4>
+            <span class="tag">Request-based</span>
           </div>
 
-          <ul>
+          <div class="price-line">
+            <div class="price">$99</div>
+            <div class="per">/ month per domain</div>
+          </div>
+
+          <div class="note" style="margin-top:0;margin-bottom:12px">
+            Monitoring observes perception drift, not performance metrics.
+          </div>
+
+          <ul class="list">
             <li>Periodic index re-readings</li>
             <li>Change detection across core perception layers</li>
             <li>Visibility Tier movement tracking</li>
             <li>Representation risk trend signals</li>
           </ul>
 
-          <div class="deliveryLine">Monitoring observes perception drift, not performance metrics.</div>
-
-          <div class="priceActions">
-            <a class="btnSmall btnBlue" href="#request">Request access</a>
+          <div class="actions">
+            <button class="btn card-primary" type="button" data-open-request data-plan="Monitoring ($99/mo per domain)">Request access</button>
           </div>
         </div>
 
         <!-- Enterprise -->
-        <div class="priceCard" role="listitem">
-          <div class="priceTop">
-            <div>
-              <h3>Enterprise</h3>
-              <p class="submitText" style="margin:.65rem 0 0">
-                For organizations where AI visibility is a material risk, Private Access provides organization-level index coverage,
-                comparative context, and executive briefings. Availability is limited.
-              </p>
-            </div>
-            <div class="tag">Onboarding</div>
+        <div class="card" id="enterprise" aria-label="Enterprise">
+          <div class="top">
+            <h4>Enterprise</h4>
+            <span class="tag">Onboarding</span>
           </div>
 
-          <ul>
-            <li>Organization-level coverage</li>
-            <li>Comparative context</li>
+          <div class="price-line">
+            <div class="price">Custom</div>
+            <div class="per">pricing</div>
+          </div>
+
+          <ul class="list">
+            <li>Organization-level index coverage</li>
+            <li>Comparative context &amp; benchmarking</li>
             <li>Executive briefings</li>
-            <li>Limited availability</li>
+            <li>Advanced scope for complex sites</li>
           </ul>
 
-          <div class="priceActions" style="margin-top:auto">
-            <a class="btnSmall btnGhost" href="#private">Request Private Access</a>
-            <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
-          </div>
+          <div class="note">For organizations where AI visibility is a material risk. Availability is limited.</div>
 
-          <div class="deliveryLine">Access is granted through onboarding — not self-serve checkout.</div>
+          <div class="actions">
+            <button class="btn card-primary" type="button" data-open-request data-plan="Enterprise (Custom)">Request Enterprise Access</button>
+          </div>
         </div>
-
       </div>
+    </div>
+  </section>
 
-      <!-- What AIVI is / is not -->
-      <div class="aboutBox" id="what">
-        <div class="aboutGrid">
-          <div class="aboutCol">
-            <h3 class="aboutTitle">What AIVI is — and is not</h3>
-            <p class="aboutP"><b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.</p>
+  <!-- WHAT AIVI IS / IS NOT -->
+  <section class="what" id="what">
+    <div class="wrap">
+      <h3>What AIVI is — and is not</h3>
+      <p><b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.</p>
+
+      <div class="what-box">
+        <div class="what-grid">
+          <div class="what-col">
+            <div class="what-h">What AIVI is</div>
+            <p class="what-is">
+              <b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.
+            </p>
           </div>
-          <div class="aboutCol">
-            <ul class="aboutBullets">
+
+          <div class="what-col">
+            <div class="what-h">What AIVI is not</div>
+            <ul class="not-list">
               <li><b>Not an SEO tool</b> — no keywords, backlinks, or rank tracking</li>
               <li><b>Not a content grader</b> — it observes interpretability, not style preference</li>
               <li><b>Not a prompt test</b> — it evaluates persistent signals, not a single-model output</li>
@@ -1286,81 +1103,77 @@
             </ul>
           </div>
         </div>
+
+        <div class="closing">
+          AIVI does not tell you what to do. It shows you what AI already believes.
+        </div>
       </div>
-
     </div>
-  </div>
+  </section>
 
-  <!-- Request access -->
-  <div class="request" id="request">
-    <div class="wrap block">
-      <div class="label">REQUEST-BASED DELIVERY</div>
-      <h2 class="h2">Request access</h2>
-      <p class="lead">
-        If you want a deeper AIVI index reading, send a request here. This helps route your request correctly. Delivery is manual during early access.
+  <!-- REQUEST ACCESS (Email collection happens here) -->
+  <section class="request" id="request">
+    <div class="wrap">
+      <h3>Request access</h3>
+      <p>
+        If you want an index reading beyond the free snapshot, send a request here. Delivery is manual during early access.
+        We collect your work email so we can respond with next steps and deliver the report.
       </p>
 
-      <div class="requestCard">
-        <h3>Request access</h3>
-        <p>If you want a deeper AIVI output, send a request here. This helps us confirm scope and route your request correctly.</p>
-
+      <div class="form-card">
         <form id="request-form" novalidate>
-          <div class="formGrid">
+          <div class="row">
             <div>
-              <label class="fLabel" for="workEmail">Work email</label>
-              <input id="workEmail" class="fInput" type="email" placeholder="name@company.com" autocomplete="email" />
+              <label for="req-email">Work email</label>
+              <input id="req-email" class="input" type="email" placeholder="name@company.com" autocomplete="email" />
             </div>
 
             <div>
-              <label class="fLabel" for="company">Company</label>
-              <input id="company" class="fInput" type="text" placeholder="Company name" autocomplete="organization" />
+              <label for="req-company">Company</label>
+              <input id="req-company" class="input" type="text" placeholder="Company name" autocomplete="organization" />
             </div>
 
-            <div class="formActions">
-              <button type="button" id="sendRequestBtn" class="btnSmall btnBlue">Send request</button>
-              <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Talk to us</a>
-            </div>
-          </div>
-
-          <div class="noteRow">
-            <div class="i">i</div>
             <div>
-              You’ll receive a confirmation message on-screen. (Email delivery &amp; automation will be added later.)
+              <label for="req-plan">Plan</label>
+              <input id="req-plan" class="input" type="text" value="Index Reading ($249 per domain)" readonly />
+            </div>
+
+            <div class="form-actions">
+              <button class="btn black" type="submit">Send request</button>
+              <a class="btn outline" href="https://calendly.com/quontora" target="_blank" rel="noopener">Talk to us</a>
             </div>
           </div>
 
-          <div id="requestMsg" style="display:none;margin-top:.9rem;font-weight:850;color:#166534;background:rgba(22,163,74,.10);border:1px solid rgba(22,163,74,.18);padding:.75rem .9rem;border-radius:14px;">
-            Request received. We’ll follow up with next steps for access.
+          <div class="help">
+            <div class="info">i</div>
+            <div>
+              You’ll receive a confirmation message on-screen.
+              If automated delivery is not enabled yet, we’ll open your email client with a pre-filled request so we still receive it.
+            </div>
           </div>
 
-          <div id="requestErr" style="display:none;margin-top:.9rem;font-weight:850;color:#1d4ed8;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.14);padding:.75rem .9rem;border-radius:14px;">
-            Please enter a valid work email and company name.
-          </div>
+          <div id="request-status" class="status" role="status"></div>
         </form>
       </div>
+    </div>
+  </section>
 
-      <!-- Private Access (after request form) -->
-      <div class="private" id="private">
-        <div class="label">PRIVATE ACCESS</div>
-        <h2 class="h2">Private Access</h2>
+  <!-- CONTACT -->
+  <section class="section" id="contact" style="padding-top:28px">
+    <div class="wrap">
+      <div class="callout" style="margin:0">
+        <p>
+          <span class="line">Have a tricky site or big AI Visibility challenge?</span>
+          <span class="line mutedline">We love edge cases, complex stacks, and ambitious goals.</span>
+        </p>
 
-        <div class="privateCard">
-          <div style="flex:1;min-width:280px">
-            <p style="margin:0;color:var(--muted);font-weight:650">
-              For organizations where AI visibility is a material risk, Private Access provides organization-level index coverage, comparative context, and executive briefings. Availability is limited.
-            </p>
-          </div>
-
-          <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end">
-            <a class="btnSmall btnBlue" href="#request">Request Private Access</a>
-            <a class="btnSmall btnGhost" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
-          </div>
+        <div class="cta-row" style="margin-top:16px">
+          <a class="btn primary" href="mailto:hello@quontora.com?subject=AIVI%20Inquiry">Email Us</a>
+          <a class="btn secondary" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a>
         </div>
-
-        <div class="closingLine">AIVI does not tell you what to do. It shows you what AI already believes.</div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- Floating Back to Top Button -->
   <a href="#top" class="back-to-top-float" id="backToTopFloat" aria-label="Back to top">↑</a>
@@ -1368,41 +1181,39 @@
   <!-- Footer -->
   <footer>
     <div class="wrap">
-      <div class="footerGrid">
-        <div class="footBrand">
-          <div class="name">AI Visibility Index (AIVI)</div>
-          <div class="powered" style="align-items:flex-start;font-size:.95rem;color:var(--muted);font-weight:650">
-            A product of <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.
-          </div>
-          <p class="disclaimer">
+      <div class="foot-grid">
+        <div>
+          <p class="foot-title">AI Visibility Index (AIVI)</p>
+          <p class="foot-copy">
+            A product of <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.<br/>
             AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
           </p>
         </div>
 
-        <div class="footCol">
-          <h4>Product</h4>
-          <div class="footLinks">
-            <a href="#submit">Run Snapshot (Free)</a>
-            <a href="#pricing">Pricing &amp; Access</a>
-            <a href="#request">Request access</a>
-            <a href="/index/whitepaper.html">Whitepaper</a>
-            <a href="/index/technical.html">Technical</a>
-          </div>
+        <div class="foot-col">
+          <h5>Product</h5>
+          <ul class="foot-links">
+            <li><a href="#snapshot">Run Snapshot (Free)</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#request">Request access</a></li>
+            <li><a href="/index/whitepaper.html">Whitepaper</a></li>
+            <li><a href="/index/technical.html">Technical</a></li>
+          </ul>
         </div>
 
-        <div class="footCol">
-          <h4>Company</h4>
-          <div class="footLinks">
-            <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
-            <a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a>
-            <a href="#request">Contact</a>
-            <a href="#" aria-disabled="true" style="opacity:.65;pointer-events:none">Privacy</a>
-            <a href="#" aria-disabled="true" style="opacity:.65;pointer-events:none">Terms</a>
-          </div>
+        <div class="foot-col">
+          <h5>Company</h5>
+          <ul class="foot-links">
+            <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+            <li><a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a></li>
+            <li><a href="mailto:hello@quontora.com?subject=AIVI%20Inquiry">Contact</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
         </div>
       </div>
 
-      <div class="footBottom">
+      <div class="foot-bottom">
         <div>© 2025 AI Visibility Index (AIVI). All rights reserved.</div>
         <div>Built for AI-native discovery.</div>
       </div>
@@ -1410,12 +1221,33 @@
   </footer>
 
   <script>
-    // Smooth anchor scrolling
+    // ----------------------------
+    // Utilities
+    // ----------------------------
+    function isValidURL(input){
+      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
+    }
+    function normalizeURL(url){
+      url = (url || "").trim();
+      if(!/^https?:\/\//i.test(url)) url = "https://" + url;
+      return url;
+    }
+
+    // ----------------------------
+    // Back-to-top visibility
+    // ----------------------------
+    const backToTopBtn = document.getElementById('backToTopFloat');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 600) backToTopBtn.classList.add('visible');
+      else backToTopBtn.classList.remove('visible');
+    });
+
+    // ----------------------------
+    // Smooth in-page anchors
+    // ----------------------------
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener("click",ev=>{
-        const href=a.getAttribute("href");
-        if(!href || href.length<2) return;
-        const id=href.substring(1);
+        const id=a.getAttribute("href").slice(1);
         const t=document.getElementById(id);
         if(t){
           ev.preventDefault();
@@ -1424,65 +1256,136 @@
       });
     });
 
-    // Analyze form
-    function isValidURL(input){
-      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
-    }
-
+    // ----------------------------
+    // Analyze (Free Snapshot) submit
+    // ----------------------------
     document.addEventListener("DOMContentLoaded",()=>{
       const f=document.getElementById("analyze-form");
       const i=document.getElementById("url");
-      const e=document.getElementById("error-message");
+      const err=document.getElementById("analyze-error");
 
-      if(f&&i&&e){
-        f.addEventListener("submit",ev=>{
+      if(f && i){
+        f.addEventListener("submit",(ev)=>{
           ev.preventDefault(); ev.stopPropagation();
-          let url=(i.value||"").trim();
-          e.classList.remove("show");
-
-          if(!url){ e.textContent="Please enter a website URL"; e.classList.add("show"); return; }
-          if(!isValidURL(url)){ e.textContent="Please enter a valid domain (e.g., example.com)"; e.classList.add("show"); return; }
-          if(!/^https?:\/\//i.test(url)) url="https://"+url;
-
-          window.location.href="analyze.html?url="+encodeURIComponent(url);
-        });
-      }
-
-      // Request access (UI-only confirmation for now)
-      const sendBtn=document.getElementById("sendRequestBtn");
-      const email=document.getElementById("workEmail");
-      const company=document.getElementById("company");
-      const msg=document.getElementById("requestMsg");
-      const err=document.getElementById("requestErr");
-
-      function basicEmailOk(v){
-        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-      }
-
-      if(sendBtn && email && company && msg && err){
-        sendBtn.addEventListener("click",()=>{
-          msg.style.display="none";
           err.style.display="none";
+          let url=(i.value||"").trim();
 
-          const em=(email.value||"").trim();
-          const co=(company.value||"").trim();
-
-          if(!basicEmailOk(em) || !co){
+          if(!url){
+            err.textContent="Please enter a website URL";
             err.style.display="block";
             return;
           }
-
-          msg.style.display="block";
+          if(!isValidURL(url)){
+            err.textContent="Please enter a valid domain (e.g., example.com)";
+            err.style.display="block";
+            return;
+          }
+          url = normalizeURL(url);
+          window.location.href="analyze.html?url="+encodeURIComponent(url);
         });
       }
     });
 
-    // Floating back-to-top visibility
-    const backToTopBtn = document.getElementById('backToTopFloat');
-    window.addEventListener('scroll', () => {
-      if (!backToTopBtn) return;
-      if (window.scrollY > 500) backToTopBtn.classList.add('visible');
-      else backToTopBtn.classList.remove('visible');
+    // ----------------------------
+    // Request access buttons (set plan + scroll to form)
+    // ----------------------------
+    const planField = document.getElementById("req-plan");
+    document.querySelectorAll("[data-open-request]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const plan = btn.getAttribute("data-plan") || "Index Reading ($249 per domain)";
+        planField.value = plan;
+        document.getElementById("request").scrollIntoView({behavior:"smooth", block:"start"});
+        setTimeout(()=> document.getElementById("req-email").focus(), 450);
+      });
+    });
+
+    // ----------------------------
+    // Request form: collect email addresses
+    // - Primary: POST to /api/request-access (if you add it later)
+    // - Fallback: open mailto prefilled so you still receive the request
+    // - Also saves to localStorage as a backup trail
+    // ----------------------------
+    const requestForm = document.getElementById("request-form");
+    const statusEl = document.getElementById("request-status");
+
+    function showStatus(msg, kind){
+      statusEl.textContent = msg;
+      statusEl.className = "status show " + (kind || "");
+    }
+
+    function isLikelyPersonalEmail(email){
+      const e = (email||"").toLowerCase().trim();
+      const personal = [
+        "gmail.com","yahoo.com","hotmail.com","outlook.com","aol.com","icloud.com","live.com","msn.com","proton.me","protonmail.com"
+      ];
+      const domain = e.split("@")[1] || "";
+      return personal.includes(domain);
+    }
+
+    requestForm.addEventListener("submit", async (ev)=>{
+      ev.preventDefault(); ev.stopPropagation();
+      statusEl.className="status"; statusEl.textContent="";
+
+      const email = (document.getElementById("req-email").value || "").trim();
+      const company = (document.getElementById("req-company").value || "").trim();
+      const plan = (document.getElementById("req-plan").value || "").trim();
+
+      if(!email){
+        showStatus("Please enter a work email.", "err");
+        return;
+      }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        showStatus("Please enter a valid email address.", "err");
+        return;
+      }
+      if(isLikelyPersonalEmail(email)){
+        showStatus("Please use a work email (personal email domains are not accepted for access requests).", "err");
+        return;
+      }
+      if(!company){
+        showStatus("Please enter your company name.", "err");
+        return;
+      }
+
+      // Save locally as a safety net (does NOT replace backend collection)
+      try{
+        const key = "aivi_access_requests";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.push({ email, company, plan, ts: new Date().toISOString() });
+        localStorage.setItem(key, JSON.stringify(existing));
+      }catch(_){}
+
+      // Attempt API (optional — only works once you implement /api/request-access)
+      const payload = { email, company, plan, source: "index.html", ts: new Date().toISOString() };
+
+      try{
+        const res = await fetch("/api/request-access",{
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if(res.ok){
+          showStatus("Request received. We’ll follow up by email with next steps.", "ok");
+          requestForm.reset();
+          document.getElementById("req-plan").value = plan; // keep plan visible
+          return;
+        }
+      }catch(_){}
+
+      // Fallback: open email client so you still receive the request
+      const to = "hello@quontora.com";
+      const subj = encodeURIComponent("AIVI access request — " + plan);
+      const body = encodeURIComponent(
+        "Access request details:\n\n" +
+        "Plan: " + plan + "\n" +
+        "Work email: " + email + "\n" +
+        "Company: " + company + "\n\n" +
+        "Notes: Please reply with next steps and delivery details.\n"
+      );
+
+      showStatus("Almost done: your email client will open to send the request.", "ok");
+      window.location.href = `mailto:${to}?subject=${subj}&body=${body}`;
     });
   </script>
 </body>
