@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.12.12-2 -->
+  <!-- analyze.html - v2025.12.15-1 -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-12-12 -->
+  <!-- Last updated: 2025-12-15 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -57,10 +57,17 @@
     .llm-insights{margin:.4rem 0 1.2rem}
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
-    .llm-logo img{height:28px;width:auto;display:block;object-fit:contain;max-width:110px}
-    .llm-logo img.engine-copilot{height:26px;max-width:96px} /* Fix Copilot sizing */
-    .llm-logo img.engine-gemini{height:26px;max-width:110px}
+    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:34px;min-height:34px}
+    .llm-logo img{
+      height:28px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      max-width:140px;
+      image-rendering:auto;
+    }
+    .llm-logo img.engine-copilot{height:26px;max-width:120px}
+    .llm-logo img.engine-gemini{height:26px;max-width:140px}
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
@@ -83,11 +90,19 @@
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
+    .progress-title{font-weight:700;font-size:18px;display:flex;align-items:center;gap:.5rem}
     .progress-pct{color:#666;font-size:16px;font-weight:600}
     .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .25s ease}
     .progress-eta{color:#666;font-size:14px;line-height:1.4}
+
+    .spinner{
+      width:14px;height:14px;border-radius:999px;
+      border:2px solid #cfd6e6;border-top-color:#3182CE;
+      animation:spin .8s linear infinite;
+      display:inline-block;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -171,7 +186,7 @@
   <div id="progress-overlay" class="overlay">
     <div class="progress-panel">
       <div class="progress-header">
-        <div class="progress-title">Analyzing your website...</div>
+        <div class="progress-title"><span class="spinner" aria-hidden="true"></span> Analyzing your website...</div>
         <div class="progress-pct" id="progress-pct">0%</div>
       </div>
       <div class="progress-bar">
@@ -214,28 +229,90 @@
   </div>
 
   <script>
-    const LOGO_SOURCES = {
-      ChatGPT: '/img/chatgpt-logo.png',
-      Claude: '/img/claude.jpeg',
-      Gemini: '/img/gemini-icon.svg',
-      Copilot: '/img/copilot.jpeg',
-      Perplexity: '/img/perplexity-logo.png',
+    // Cache buster to avoid stale/broken assets after deployments
+    const ASSET_V = '2025-12-15';
+
+    // Try multiple paths/extensions per engine (fixes logo breakage across deployments)
+    const LOGO_CANDIDATES = {
+      ChatGPT: [
+        `/img/chatgpt-logo.png?v=${ASSET_V}`,
+        `./img/chatgpt-logo.png?v=${ASSET_V}`,
+        `/img/chatgpt-logo.svg?v=${ASSET_V}`,
+        `./img/chatgpt-logo.svg?v=${ASSET_V}`
+      ],
+      Claude: [
+        `/img/claude.png?v=${ASSET_V}`,
+        `/img/claude.jpg?v=${ASSET_V}`,
+        `/img/claude.jpeg?v=${ASSET_V}`,
+        `./img/claude.png?v=${ASSET_V}`,
+        `./img/claude.jpg?v=${ASSET_V}`,
+        `./img/claude.jpeg?v=${ASSET_V}`
+      ],
+      Gemini: [
+        `/img/gemini-icon.svg?v=${ASSET_V}`,
+        `/img/gemini-icon.png?v=${ASSET_V}`,
+        `./img/gemini-icon.svg?v=${ASSET_V}`,
+        `./img/gemini-icon.png?v=${ASSET_V}`
+      ],
+      Copilot: [
+        `/img/copilot.png?v=${ASSET_V}`,
+        `/img/copilot.jpg?v=${ASSET_V}`,
+        `/img/copilot.jpeg?v=${ASSET_V}`,
+        `./img/copilot.png?v=${ASSET_V}`,
+        `./img/copilot.jpg?v=${ASSET_V}`,
+        `./img/copilot.jpeg?v=${ASSET_V}`
+      ],
+      Perplexity: [
+        `/img/perplexity-logo.png?v=${ASSET_V}`,
+        `/img/perplexity-logo.svg?v=${ASSET_V}`,
+        `./img/perplexity-logo.png?v=${ASSET_V}`,
+        `./img/perplexity-logo.svg?v=${ASSET_V}`
+      ],
     };
 
     function logoDivFor(engine){
       const wrap = document.createElement('div');
       wrap.className = 'llm-logo';
-      const p = LOGO_SOURCES[engine];
-      if (!p) {
-        wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`;
+
+      const fall = document.createElement('span');
+      fall.className = 'llm-fallback';
+      fall.textContent = engine;
+
+      const candidates = LOGO_CANDIDATES[engine] || [];
+      if (!candidates.length) {
+        wrap.appendChild(fall);
         return wrap;
       }
+
       const img = document.createElement('img');
       img.alt = `${engine} logo`;
-      img.src = p;
       img.className = `engine-${String(engine).toLowerCase()}`;
-      img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
-      img.onerror = () => { wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`; };
+
+      let idx = 0;
+
+      const tryNext = () => {
+        if (idx >= candidates.length) {
+          wrap.innerHTML = '';
+          wrap.appendChild(fall);
+          return;
+        }
+        img.src = candidates[idx++];
+      };
+
+      img.onload = () => {
+        wrap.innerHTML = '';
+        wrap.appendChild(img);
+      };
+
+      img.onerror = () => {
+        tryNext();
+      };
+
+      // start
+      tryNext();
+      // show fallback immediately; replaced when image loads
+      wrap.appendChild(fall);
+
       return wrap;
     }
 
@@ -245,23 +322,47 @@
       let ul = title.nextElementSibling;
       while (ul && ul.tagName && ul.tagName.toLowerCase() !== 'ul') ul = ul.nextElementSibling;
       if (!ul) return;
+
       const bullets = [...ul.querySelectorAll('li')].map(li => (li.textContent || '').trim());
       if (!bullets.length) return;
+
       const engines = ['ChatGPT','Claude','Gemini','Copilot','Perplexity'];
       const box = document.createElement('div');
       box.className = 'llm-insights';
+
       engines.forEach((e, i) => {
         const t = bullets[i];
         if (!t) return;
+
         const row = document.createElement('div');
         row.className = 'llm-row';
         row.appendChild(logoDivFor(e));
+
         const p = document.createElement('p');
         p.textContent = t;
         row.appendChild(p);
+
         box.appendChild(row);
       });
+
       ul.replaceWith(box);
+    }
+
+    // Rename headings inside the injected report HTML
+    function renameWorkingAttention(root){
+      const titleNodes = [...root.querySelectorAll('h2,h3,h4,.section-title,strong')];
+
+      titleNodes.forEach(n => {
+        const txt = (n.textContent || '').trim();
+        if (!txt) return;
+
+        if (/^what['’]?\s*working$/i.test(txt) || /^what\s*is\s*working$/i.test(txt)) {
+          n.textContent = 'Strength signals';
+        }
+        if (/^need\s*attention$/i.test(txt) || /^needs\s*attention$/i.test(txt)) {
+          n.textContent = 'Visibility gaps';
+        }
+      });
     }
 
     function renderScoreCard(total, pillars, highlights){
@@ -313,28 +414,38 @@
       }
     }
 
-    // Progress simulation (fixed: no “stuck at 95%”)
+    // Progress simulation (fix: never "hang" at 99%; keep messaging moving while waiting)
     function startProgress() {
       document.getElementById('progress-overlay').style.display = 'flex';
       const startTime = Date.now();
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
+      const progressEta = document.getElementById('progress-eta');
 
-      let hardCap = 99;      // keep moving up to 99 while waiting
-      let fastWindow = 35000; // get to ~92% in ~35s
       let lastShown = 0;
+
+      const steps = [
+        'Discovering pages and site structure...',
+        'Checking crawl access and index signals...',
+        'Extracting content patterns and headings...',
+        'Evaluating trust & verification signals...',
+        'Mapping content to common prompt patterns...',
+        'Finalizing your analysis output...'
+      ];
 
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
 
+        // Smooth movement up to 95% regardless of server time
+        // (prevents the "stuck at 99%" perception)
+        const fastWindow = 35000; // ~35s
         let progress;
         if (elapsed <= fastWindow) {
-          const ratio = elapsed / fastWindow;         // 0..1
-          progress = Math.min(92, Math.floor(ratio * 92));
+          const ratio = elapsed / fastWindow; // 0..1
+          progress = Math.min(90, Math.floor(ratio * 90));
         } else {
-          // creep from 92 -> 99 slowly (never “stuck”)
           const extra = elapsed - fastWindow;
-          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500)); // +1 every 2.5s
+          progress = Math.min(95, 90 + Math.floor(extra / 3500)); // +1 every 3.5s, cap 95
         }
 
         if (progress < lastShown) progress = lastShown;
@@ -343,11 +454,15 @@
         progressFill.style.width = progress + '%';
         progressPct.textContent = progress + '%';
 
-        if (progress >= 60) {
-          document.getElementById('progress-eta').innerHTML =
-            'Processing content structure and visibility signals...<br>Almost done!';
-        }
-      }, 120);
+        // Keep the text actively changing even if progress is capped
+        const stepIndex = Math.min(steps.length - 1, Math.floor(elapsed / 9000));
+        const seconds = Math.floor(elapsed / 1000);
+
+        progressEta.innerHTML =
+          `${steps[stepIndex]}<br>` +
+          `Elapsed: <strong>${seconds}s</strong> · Typical: <strong>15–90s</strong>`;
+
+      }, 220);
 
       return interval;
     }
@@ -360,7 +475,7 @@
       progressPct.textContent = '100%';
       setTimeout(() => {
         document.getElementById('progress-overlay').style.display = 'none';
-      }, 800);
+      }, 650);
     }
 
     // Modal controls
@@ -475,6 +590,9 @@
         const html = await res.text();
         const host = document.getElementById('summary-results');
         host.innerHTML = html;
+
+        // post-process injected HTML
+        renameWorkingAttention(host);
         transformAIInsights(host);
       } catch {
         document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
