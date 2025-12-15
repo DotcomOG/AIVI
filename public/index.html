@@ -1,1011 +1,826 @@
 <!DOCTYPE html>
 <!--
-  AI Visibility Index (AIVI) — Index Page
-  Version: v2025.12.15-2
-  Last updated: 2025-12-15
+  AI Visibility Index (AIVI) Index Page
+  Version: v2025.12.15-3
+  Last updated: 2025-12-15 (America/New_York)
 
   NOTES:
-  - Wireframe A implementation: URL submission is front-and-center (primary purpose of page).
-  - No whitepaper/technical content embedded on this page.
-  - Links added to: /index/whitepaper.html and /index/technical.html
+  - Removed any right-hand snapshot column (hero is single-column).
+  - Moved snapshot/value points directly under the URL input in the search/URL area.
+  - Shortened URL input width on desktop (no longer full-width).
+  - No copy rewrites beyond relocating the existing value points into the URL section.
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
+  <meta name="description" content="AIVI reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you." />
 
   <style>
     :root{
-      --max:1200px;
-      --pad:24px;
+      --max-width:1200px;
+      --pad-h:2rem;
+      --pad-v:3vh;
 
-      --bg:#ffffff;
-      --bg-soft:#f6f8ff;
-      --bg-soft-2:#f3f6ff;
+      --primary:#3182CE;
+      --primary-dark:#2563EB;
+      --accent:#E53E3E;
 
       --text:#0b1220;
-      --muted:#586174;
+      --muted:#475569;
+      --muted-2:#64748b;
 
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
+      --border:#e2e8f0;
+      --bg:#ffffff;
+      --bg-soft:#f7fafc;
+      --bg-soft-2:#f1f5f9;
 
-      --border:#e6e9f2;
-      --shadow:0 14px 40px rgba(17,24,39,.10);
-      --radius:18px;
+      --shadow:0 14px 40px rgba(2,6,23,.10);
+      --shadow-soft:0 10px 28px rgba(49,130,206,.16), 0 2px 6px rgba(2,6,23,.05);
 
-      --green:#16a34a;
-      --green-soft:#e9f9ee;
-
-      --warning:#111827;
+      --radius:14px;
     }
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
     a{color:var(--primary);text-decoration:none}
-    a:hover{color:var(--primary-dark)}
-    .wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
-    .muted{color:var(--muted)}
-    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    a:hover{text-decoration:underline}
+
+    .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-h)}
+    .section{padding:3.2rem 0}
+    .section-tight{padding:2.2rem 0}
 
     /* Header */
     header{
-      position:relative;
-      padding:22px 0 10px;
+      padding:calc(var(--pad-v) + .5rem) 0 0;
     }
     .header-row{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:16px;
+      gap:1rem;
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 var(--pad-h);
     }
-    .brand h1{
-      margin:0;
-      font-size:46px;
-      letter-spacing:-1px;
-      line-height:1.05;
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:.25rem;
+      min-width:0;
+    }
+    h1.logo{
+      font-size:3.6rem;
       font-weight:800;
-      background:linear-gradient(135deg,#0b1220 0%, #2563eb 100%);
+      letter-spacing:-1px;
+      line-height:1;
+      margin:0;
+      background:linear-gradient(135deg,#000 0%, var(--primary) 100%);
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
       color:transparent;
-    }
-    .powered{
-      margin-top:10px;
-      font-size:14px;
-      color:var(--muted);
+      display:inline-block;
       white-space:nowrap;
     }
-    .powered a{font-weight:700}
-    .top-links{
-      display:flex;
-      gap:14px;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-      margin-top:10px;
-      font-size:14px;
+    .subhead{
+      font-size:1.05rem;
+      font-weight:700;
       color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:.5rem;
     }
-    .top-links a{font-weight:600;color:var(--muted)}
-    .top-links a:hover{color:var(--primary)}
+    .subhead .bolt{font-size:1.05rem}
+    .powered-by{
+      font-size:.9rem;
+      color:#64748b;
+      white-space:nowrap;
+      padding-top:.45rem;
+    }
+    .powered-by a{
+      color:var(--primary);
+      font-weight:600;
+      text-decoration:none;
+    }
+    .powered-by a:hover{text-decoration:underline}
 
-    /* HERO */
+    /* Hero */
     .hero{
-      padding:24px 0 34px;
+      padding:2.4rem 0 0;
     }
     .hero-grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:28px;
-      align-items:center;
-    }
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      font-size:12px;
-      color:var(--primary);
-      margin-bottom:14px;
-    }
-    .kicker .bolt{
-      width:22px;height:22px;
-      display:inline-flex;align-items:center;justify-content:center;
-      border-radius:999px;
-      background:rgba(37,99,235,.12);
-      color:var(--primary);
-      font-size:14px;
-      line-height:1;
-    }
-    .hero h2{
-      margin:0 0 12px;
-      font-size:48px;
-      line-height:1.06;
-      letter-spacing:-1px;
-      font-weight:900;
-    }
-    .hero p.lede{
-      margin:0 0 18px;
-      font-size:16px;
-      color:var(--muted);
-      max-width:58ch;
-    }
-    .cta-row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin:18px 0 0;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border-radius:999px;
-      padding:12px 18px;
-      font-weight:800;
-      border:1px solid transparent;
-      cursor:pointer;
-      text-decoration:none;
-      transition:transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .btn.primary{
-      background:var(--primary);
-      color:#fff;
-      box-shadow:0 10px 26px rgba(37,99,235,.22);
-    }
-    .btn.primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .btn.secondary{
-      background:#fff;
-      color:var(--text);
-      border-color:var(--border);
-    }
-    .btn.secondary:hover{border-color:rgba(37,99,235,.35);transform:translateY(-1px);box-shadow:0 10px 26px rgba(17,24,39,.08)}
-    .btn.ghost{
-      background:transparent;
-      color:var(--primary);
-      border-color:rgba(37,99,235,.25);
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 var(--pad-h);
     }
 
-    /* URL SUBMIT (front-and-center) */
-    .submit-card{
-      margin-top:22px;
-      background:linear-gradient(180deg,#eef4ff 0%, #ffffff 70%);
-      border:1px solid rgba(37,99,235,.25);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-    }
-    .submit-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
-    .submit-title{
-      font-size:16px;
-      font-weight:900;
-      margin:0;
-    }
-    .free-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:var(--green-soft);
-      color:var(--green);
-      font-weight:900;
-      font-size:12px;
-      border:1px solid rgba(22,163,74,.18);
-      white-space:nowrap;
-    }
-    .free-pill .check{font-size:12px}
-    .submit-desc{
-      margin:0 0 14px;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .submit-form{
-      display:flex;
-      gap:12px;
-      align-items:stretch;
-    }
-    .input{
-      width:100%;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:15px;
-      outline:none;
-      background:#fff;
-      transition:border-color .15s ease, box-shadow .15s ease;
-    }
-    .input:focus{
-      border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
-    }
-    .submit-btn{
-      min-width:210px;
-      border:none;
-      border-radius:12px;
-      background:#111827;
-      color:#fff;
-      font-weight:900;
-      font-size:14px;
-      padding:12px 14px;
-      cursor:pointer;
-      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
-      box-shadow:0 10px 24px rgba(17,24,39,.16);
-    }
-    .submit-btn:hover{background:#0b1220;transform:translateY(-1px)}
-    .submit-foot{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-    }
-    .mini-grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-    .mini{
-      border:1px solid var(--border);
-      border-radius:14px;
-      background:#fff;
-      padding:10px 12px;
-      min-height:72px;
-      display:flex;
-      gap:10px;
-    }
-    .mini .ico{
-      width:30px;height:30px;
-      border-radius:10px;
-      background:rgba(37,99,235,.10);
-      color:var(--primary);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      flex:0 0 auto;
-      margin-top:2px;
-    }
-    .mini strong{display:block;font-size:13px;line-height:1.2;margin-bottom:2px}
-    .mini span{display:block;font-size:12px;color:var(--muted);line-height:1.35}
-
-    /* Section band */
-    .band{
-      background:linear-gradient(180deg, var(--bg-soft) 0%, #ffffff 80%);
-      border-top:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      padding:44px 0;
-    }
-    .section-kicker{
-      font-size:12px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:var(--primary);
-      font-weight:900;
-      margin:0 0 10px;
-    }
-    .h2{
-      margin:0 0 12px;
-      font-size:42px;
-      letter-spacing:-1px;
+    .hero-headline{
+      font-size:clamp(2.25rem, 4vw, 3.25rem);
       line-height:1.08;
-      font-weight:950;
+      letter-spacing:-.8px;
+      font-weight:900;
+      margin:.6rem 0 .9rem;
     }
-    .h2 .break{display:block}
-    .body{
-      font-size:15px;
+    .hero-sub{
+      font-size:clamp(1.05rem, 1.7vw, 1.25rem);
       color:var(--muted);
-      max-width:78ch;
-      margin:0 0 22px;
+      max-width:860px;
+      line-height:1.8;
+      margin-bottom:1.6rem;
+      font-weight:600;
     }
-    .chips{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-      margin-top:10px;
-    }
-    .chip{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px 14px;
-      background:#fff;
-      box-shadow:0 10px 24px rgba(17,24,39,.06);
-    }
-    .dot{
-      width:14px;height:14px;border-radius:999px;
-      margin-top:4px;
-      background:rgba(37,99,235,.20);
-      border:2px solid rgba(37,99,235,.55);
-      flex:0 0 auto;
-    }
-    .chip strong{display:block;font-size:14px;margin:0;color:var(--text)}
-    .chip span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 
-    /* Callout */
-    .callout{
-      margin:28px 0 0;
-      background:linear-gradient(135deg, rgba(37,99,235,.10) 0%, rgba(17,24,39,.02) 70%);
-      border:1px solid rgba(37,99,235,.18);
-      border-radius:20px;
-      padding:20px 22px;
-      box-shadow:0 18px 50px rgba(37,99,235,.12);
+    /* Primary CTA Panel (front and center) */
+    .cta-panel{
+      background:radial-gradient(1000px 260px at 50% -10%, rgba(49,130,206,.25) 0%, rgba(255,255,255,0) 60%),
+                 linear-gradient(180deg, #f0f7ff 0%, #ffffff 72%);
+      border:2px solid rgba(49,130,206,.35);
+      border-radius:16px;
+      padding:1.35rem 1.35rem 1.15rem;
+      box-shadow:var(--shadow-soft);
+      margin:1.25rem 0 1.1rem;
     }
-    .callout p{
-      margin:0;
-      font-weight:950;
-      font-size:18px;
-      line-height:1.3;
+    .cta-top{
+      display:flex;
+      flex-direction:column;
+      gap:.5rem;
+      margin-bottom:1rem;
+    }
+    .cta-title{
+      font-size:1.15rem;
+      font-weight:900;
       letter-spacing:-.2px;
     }
-    .callout p .line{display:block}
-    .callout p .mutedline{font-weight:800;color:#1f2a44}
-
-    /* Framework */
-    .section{
-      padding:54px 0;
-    }
-    .section h3{
-      margin:0 0 10px;
-      font-size:34px;
-      letter-spacing:-.8px;
-      font-weight:950;
-      line-height:1.1;
-    }
-    .section p{
-      margin:0 0 22px;
+    .cta-note{
       color:var(--muted);
-      font-size:15px;
-      max-width:80ch;
+      font-size:.95rem;
+      font-weight:600;
     }
+
+    .cta-form{
+      display:flex;
+      gap:.75rem;
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+
+    /* URL input width reduced on desktop */
+    .url-input{
+      flex:0 0 360px;             /* reduced width (not full container) */
+      width:360px;
+      max-width:100%;
+      font-size:1.1rem;
+      padding:1rem 1.1rem;
+      border:2px solid var(--border);
+      border-radius:12px;
+      background:#fff;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .url-input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(49,130,206,.15);
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:-.2px;
+      transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding:1rem 1.2rem;
+      white-space:nowrap;
+    }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+      min-width:220px;
+      box-shadow:0 10px 22px rgba(49,130,206,.22);
+      font-size:1.05rem;
+    }
+    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .btn-secondary{
+      background:#fff;
+      color:#111;
+      border:2px solid #111;
+      font-size:1rem;
+      padding:.95rem 1.1rem;
+    }
+    .btn-secondary:hover{transform:translateY(-1px)}
+
+    .error{
+      margin-top:.65rem;
+      font-size:.95rem;
+      color:var(--primary);
+      font-weight:700;
+      display:none;
+      width:100%;
+    }
+    .error.show{display:block}
+
+    /* Value points moved under URL input */
+    .value-points{
+      margin-top:.95rem;
+      padding-top:.9rem;
+      border-top:1px solid rgba(226,232,240,.9);
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .value-points .free-flag{
+      font-weight:900;
+      color:#16a34a;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.28);
+      padding:.2rem .6rem;
+      border-radius:999px;
+      font-size:.85rem;
+      line-height:1.2;
+      margin-right:.25rem;
+    }
+    .value-points ul{
+      margin:0;
+      padding-left:1.2rem;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.65;
+      font-size:.95rem;
+      flex:1;
+      min-width:260px;
+    }
+    .value-points li{margin:.35rem 0}
+
+    /* Section headers */
+    .title{
+      font-size:2.1rem;
+      font-weight:900;
+      letter-spacing:-.6px;
+      margin-bottom:.8rem;
+    }
+    .kicker{
+      color:var(--muted);
+      font-size:1.05rem;
+      font-weight:700;
+      max-width:920px;
+      line-height:1.85;
+    }
+
+    /* Two-line header requirement */
+    .two-line{
+      margin-top:2.2rem;
+      margin-bottom:1.1rem;
+    }
+    .two-line .l1{
+      font-size:1.9rem;
+      font-weight:900;
+      letter-spacing:-.5px;
+      line-height:1.15;
+    }
+    .two-line .l2{
+      font-size:1.9rem;
+      font-weight:900;
+      letter-spacing:-.5px;
+      line-height:1.15;
+      color:#111;
+    }
+
+    /* Visual break callout */
+    .callout{
+      margin-top:1.8rem;
+      border-radius:16px;
+      padding:1.35rem 1.35rem;
+      border:1px solid rgba(49,130,206,.25);
+      background:linear-gradient(135deg, rgba(49,130,206,.12) 0%, rgba(229,62,62,.08) 100%);
+      box-shadow:0 10px 26px rgba(2,6,23,.06);
+    }
+    .callout p{
+      font-size:1.05rem;
+      color:#0f172a;
+      font-weight:800;
+      line-height:1.6;
+    }
+    .callout .line2{margin-top:.35rem;font-weight:900}
+    .callout .line3{margin-top:.35rem;color:#0f172a;font-weight:800}
+
+    /* Pillars */
     .pillars{
+      background:var(--bg-soft);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+    }
+    .pillars-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-top:18px;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:1.1rem;
+      margin-top:1.4rem;
     }
     .pillar{
+      background:#fff;
       border:1px solid var(--border);
-      background:linear-gradient(180deg,#ffffff 0%, #fbfcff 100%);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 14px 34px rgba(17,24,39,.07);
-      position:relative;
-      overflow:hidden;
-      min-height:140px;
+      border-radius:14px;
+      padding:1.2rem 1.15rem;
+      box-shadow:0 10px 24px rgba(2,6,23,.05);
     }
-    .pillar:before{
-      content:"";
-      position:absolute;
-      left:0;top:0;bottom:0;
-      width:4px;
-      background:linear-gradient(180deg, rgba(37,99,235,.9), rgba(37,99,235,.15));
+    .pillar .p-icon{
+      font-size:1.25rem;
+      margin-bottom:.55rem;
     }
-    .pillar .ico{
-      width:34px;height:34px;border-radius:12px;
-      background:rgba(37,99,235,.10);
-      color:var(--primary);
-      display:flex;align-items:center;justify-content:center;
-      font-weight:950;
-      margin-bottom:10px;
+    .pillar h4{
+      font-size:1.05rem;
+      font-weight:900;
+      letter-spacing:-.2px;
+      margin-bottom:.35rem;
+      color:#0f172a;
     }
-    .pillar h4{margin:0 0 8px;font-size:15px;font-weight:950}
-    .pillar p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
-    .fullwidth-note{
-      margin-top:16px;
-      border:1px dashed rgba(37,99,235,.35);
-      background:rgba(37,99,235,.04);
-      border-radius:16px;
-      padding:14px 16px;
-      color:#1f2a44;
+    .pillar p{
+      font-size:.95rem;
+      color:var(--muted);
       font-weight:700;
-      font-size:13px;
+      line-height:1.6;
+    }
+    .pillars-footer{
+      margin-top:1.05rem;
+      color:var(--muted);
+      font-size:.98rem;
+      font-weight:800;
     }
 
     /* Pricing */
-    .pricing{
-      background:linear-gradient(180deg, var(--bg-soft-2) 0%, #ffffff 80%);
-      border-top:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      padding:54px 0;
-    }
-    .pricing h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
-    .pricing p{margin:0 0 22px;color:var(--muted);max-width:85ch}
-
-    .price-grid{
+    .pricing{background:var(--bg)}
+    .pricing-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      margin-top:18px;
-      align-items:stretch;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:1.2rem;
+      margin-top:1.6rem;
     }
-    .card{
+    .plan{
       border:1px solid var(--border);
+      border-radius:16px;
       background:#fff;
-      border-radius:20px;
-      padding:18px;
-      box-shadow:0 18px 50px rgba(17,24,39,.10);
+      box-shadow:var(--shadow);
+      padding:1.25rem 1.2rem 1.15rem;
       display:flex;
       flex-direction:column;
-      min-height:320px;
+      gap:.75rem;
+      min-height:420px;
     }
-    .card .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-      min-height:28px;
+    .plan.featured{
+      border:2px solid rgba(49,130,206,.55);
+      background:linear-gradient(180deg,#f0f9ff 0%, #ffffff 60%);
     }
-    .card .top h4{margin:0;font-size:15px;font-weight:950}
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
+    .plan-top{display:flex;flex-direction:column;gap:.35rem}
+    .plan h3{
+      font-size:1.2rem;
       font-weight:900;
-      border:1px solid rgba(37,99,235,.20);
-      background:rgba(37,99,235,.06);
-      color:var(--primary);
-      white-space:nowrap;
+      letter-spacing:-.2px;
+      margin:0;
     }
-
     .price-line{
-      margin:8px 0 10px;
+      font-size:1rem;
+      color:#0f172a;
+      font-weight:900;
       display:flex;
-      flex-wrap:wrap;
+      gap:.5rem;
       align-items:baseline;
-      gap:10px;
+      flex-wrap:wrap;
     }
     .price{
-      font-size:34px;
-      font-weight:950;
-      letter-spacing:-1px;
+      font-size:1.25rem;
+      font-weight:900;
+      color:#0f172a;
     }
-    .per{
-      color:var(--muted);
-      font-weight:800;
-      font-size:13px;
-    }
-    .free-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px 10px;
+    .free-flag{
+      font-weight:900;
+      color:#16a34a;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.28);
+      padding:.18rem .55rem;
       border-radius:999px;
-      background:var(--green-soft);
-      color:var(--green);
-      font-weight:950;
-      font-size:12px;
-      border:1px solid rgba(22,163,74,.16);
+      font-size:.85rem;
     }
-
-    .list{
-      margin:10px 0 18px;
-      padding-left:18px;
+    .plan p{
       color:var(--muted);
-      font-size:13px;
-      line-height:1.6;
+      font-weight:700;
+      font-size:.95rem;
+      line-height:1.7;
     }
-    .list li{margin:6px 0}
-    .note{
+    .plan ul{margin:.35rem 0 0 1.1rem}
+    .plan li{
+      margin:.4rem 0;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.55;
+      font-size:.95rem;
+    }
+    .plan-actions{
       margin-top:auto;
-      padding:12px 12px;
-      border:1px solid rgba(37,99,235,.14);
-      background:rgba(37,99,235,.04);
-      border-radius:16px;
-      color:#1f2a44;
-      font-weight:800;
-      font-size:12px;
-    }
-    .card .actions{
-      margin-top:14px;
       display:flex;
-      gap:10px;
-      align-items:center;
-      /* aligns buttons on a single horizontal row across all cards */
-      margin-top:auto;
-      padding-top:14px;
+      gap:.6rem;
+      flex-wrap:wrap;
     }
-    .card .actions .btn{
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:13px;
-      font-weight:950;
+    .btn-plan{
       flex:1;
-    }
-    .btn.card-primary{
+      min-width:180px;
       background:var(--primary);
       color:#fff;
-      border:1px solid transparent;
+      padding:.9rem 1rem;
+      border-radius:12px;
+      font-weight:900;
+      text-align:center;
+      text-decoration:none;
     }
-    .btn.card-primary:hover{background:var(--primary-dark)}
-    .btn.card-secondary{
-      background:#fff;
-      color:var(--text);
-      border:1px solid var(--border);
+    .btn-plan:hover{background:var(--primary-dark);text-decoration:none}
+    .btn-plan.secondary{
+      background:#fff;color:#111;border:2px solid #111;
     }
-    .btn.card-secondary:hover{border-color:rgba(37,99,235,.35)}
+    .btn-plan.secondary:hover{text-decoration:none}
 
-    /* What is / is not */
+    /* What it is / is not */
     .what{
-      padding:54px 0;
+      background:var(--bg-soft-2);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
     }
-    .what h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
-    .what p{margin:0 0 22px;color:var(--muted);max-width:85ch}
-    .what-box{
-      border:1px solid var(--border);
-      border-radius:22px;
+    .what-card{
       background:#fff;
-      box-shadow:0 18px 50px rgba(17,24,39,.10);
-      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:1.4rem 1.3rem;
+      margin-top:1.4rem;
     }
     .what-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
+      gap:1.4rem;
+      margin-top:1rem;
     }
-    .what-col{
-      padding:18px;
-    }
-    .what-col + .what-col{
-      border-left:1px solid var(--border);
-      background:linear-gradient(180deg,#ffffff 0%, #fbfcff 100%);
-    }
-    .what-h{
-      margin:0 0 10px;
-      font-size:14px;
-      font-weight:950;
-      letter-spacing:.02em;
-      color:#0b1220;
-    }
-    .what-is{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.7;
-    }
-    .what-is b{color:#0b1220}
-    .not-list{
-      margin:0;
-      padding-left:18px;
-      color:var(--muted);
-      font-size:13.5px;
-      line-height:1.65;
-    }
-    .not-list li{margin:8px 0}
-    .not-list b{color:#0b1220;font-weight:950}
-    .closing{
-      margin-top:14px;
-      padding:14px 16px;
-      border-top:1px solid var(--border);
-      background:rgba(37,99,235,.03);
-      color:#1f2a44;
+    .what-col h4{
+      font-size:1.05rem;
       font-weight:900;
-      font-size:13px;
+      letter-spacing:-.2px;
+      margin-bottom:.55rem;
     }
-
-    /* Request form */
-    .request{
-      padding:54px 0 18px;
-      background:linear-gradient(180deg, var(--bg-soft) 0%, #ffffff 85%);
-      border-top:1px solid var(--border);
-    }
-    .request h3{margin:0 0 10px;font-size:34px;letter-spacing:-.8px;font-weight:950}
-    .request p{margin:0 0 18px;color:var(--muted);max-width:85ch}
-    .form-card{
-      border:1px solid var(--border);
-      background:#fff;
-      border-radius:22px;
-      box-shadow:0 18px 50px rgba(17,24,39,.10);
-      padding:18px;
-    }
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr auto auto;
-      gap:12px;
-      align-items:end;
-    }
-    label{
-      display:block;
-      font-size:11px;
-      font-weight:950;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:#46506a;
-      margin-bottom:8px;
-    }
-    .help{
-      margin-top:10px;
-      font-size:12px;
+    .what-col p{
       color:var(--muted);
+      font-weight:700;
+      line-height:1.75;
+    }
+    .what-col ul{margin:.25rem 0 0 1.1rem}
+    .what-col li{
+      margin:.55rem 0;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.6;
+    }
+    .what-col li b{color:#0f172a}
+
+    /* Request Access */
+    .request{background:var(--bg)}
+    .request-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      box-shadow:var(--shadow);
+      padding:1.4rem 1.3rem;
+      margin-top:1.5rem;
+    }
+    .intent-row{
       display:flex;
-      gap:10px;
-      align-items:flex-start;
+      gap:.6rem;
+      flex-wrap:wrap;
+      align-items:center;
+      margin:1rem 0 1.1rem;
     }
-    .info{
-      width:18px;height:18px;
+    .intent-pill{
+      border:1px solid rgba(49,130,206,.45);
+      color:var(--primary-dark);
+      background:rgba(49,130,206,.08);
+      padding:.5rem .85rem;
       border-radius:999px;
-      background:rgba(37,99,235,.10);
-      color:var(--primary);
-      display:flex;align-items:center;justify-content:center;
-      font-weight:950;
-      flex:0 0 auto;
-      margin-top:1px;
+      font-weight:900;
+      font-size:.92rem;
+      cursor:pointer;
+      transition:transform .12s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
     }
-    .form-actions .btn{
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:13px;
-      font-weight:950;
-      min-width:130px;
-    }
-    .btn.black{
-      background:#111827;color:#fff;border:1px solid transparent;
-      box-shadow:0 10px 24px rgba(17,24,39,.14);
-    }
-    .btn.black:hover{background:#0b1220}
-    .btn.outline{
-      background:#fff;color:#111827;border:1px solid var(--border);
-    }
-
-    .status{
-      margin-top:12px;
-      font-size:13px;
-      font-weight:800;
-      color:#1f2a44;
-      display:none;
-    }
-    .status.show{display:block}
-    .status.ok{color:var(--green)}
-    .status.err{color:#b91c1c}
-
-    /* Floating back to top */
-    .back-to-top-float{
-      position:fixed;
-      right:22px;
-      bottom:22px;
-      width:54px;height:54px;
-      border-radius:16px;
+    .intent-pill:hover{transform:translateY(-1px);background:rgba(49,130,206,.12)}
+    .intent-pill.active{
       background:var(--primary);
       color:#fff;
+      border-color:var(--primary);
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+      margin-top:.6rem;
+    }
+    .field{display:flex;flex-direction:column;gap:.35rem}
+    .field label{
+      font-size:.9rem;
+      font-weight:900;
+      color:#0f172a;
+    }
+    .field input{
+      border:2px solid var(--border);
+      border-radius:12px;
+      padding:.95rem 1rem;
+      font-size:1rem;
+      font-weight:700;
+      background:#fff;
+    }
+    .field input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(49,130,206,.14);
+    }
+    .form-actions{
+      display:flex;
+      gap:.75rem;
+      flex-wrap:wrap;
+      margin-top:1rem;
+      align-items:center;
+    }
+    .form-actions .btn{padding:.95rem 1.15rem;border-radius:12px}
+    .form-help{
+      color:var(--muted-2);
+      font-size:.92rem;
+      font-weight:700;
+      margin-top:.65rem;
+      line-height:1.65;
+    }
+    .warn{
+      display:none;
+      margin-top:.75rem;
+      padding:.85rem 1rem;
+      border-radius:12px;
+      background:rgba(229,62,62,.08);
+      border:1px solid rgba(229,62,62,.25);
+      color:#7f1d1d;
+      font-weight:800;
+      line-height:1.6;
+    }
+    .warn.show{display:block}
+
+    /* Floating Back to Top Button */
+    .back-to-top-float{
+      position:fixed;
+      top:50%;
+      transform:translateY(-50%);
+      right:calc(50% - var(--max-width)/2 + 1rem);
+      background:var(--primary);
+      color:#fff;
+      width:64px;
+      height:64px;
+      border-radius:12px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:20px;
-      font-weight:950;
-      text-decoration:none;
-      box-shadow:0 14px 34px rgba(37,99,235,.30);
+      font-size:2rem;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 6px 20px rgba(49,130,206,.4);
+      transition:all .3s ease;
       opacity:0;
       visibility:hidden;
-      transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
       z-index:999;
+      text-decoration:none;
+      border:2px solid rgba(255,255,255,.2);
     }
-    .back-to-top-float.visible{opacity:1;visibility:visible}
-    .back-to-top-float:hover{transform:translateY(-2px);background:var(--primary-dark)}
+    .back-to-top-float.visible{opacity:.95;visibility:visible}
+    .back-to-top-float:hover{
+      background:var(--primary-dark);
+      transform:translateY(-50%) scale(1.08);
+      box-shadow:0 8px 24px rgba(49,130,206,.5);
+      opacity:1;
+    }
 
     /* Footer */
     footer{
-      margin-top:44px;
+      margin-top:3rem;
       border-top:1px solid var(--border);
-      background:#f7f8fb;
-      padding:28px 0;
+      background:var(--bg-soft);
     }
-    .foot-grid{
+    .footer-inner{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:2rem var(--pad-h) 1.25rem;
       display:grid;
-      grid-template-columns: 1.35fr 1fr 1fr;
-      gap:18px;
-      align-items:start;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:1.6rem;
     }
-    .foot-title{
-      margin:0 0 8px;
-      font-weight:950;
-      font-size:14px;
+    .foot-brand h3{
+      font-size:1.1rem;
+      font-weight:900;
+      margin-bottom:.35rem;
+      letter-spacing:-.2px;
     }
-    .foot-copy{
-      margin:0;
+    .foot-brand p{
       color:var(--muted);
-      font-size:13px;
+      font-weight:700;
       line-height:1.7;
+      font-size:.95rem;
     }
-    .foot-col h5{
-      margin:0 0 8px;
-      font-size:12px;
-      font-weight:950;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:#46506a;
+    .foot-col h4{
+      font-size:.95rem;
+      font-weight:900;
+      margin-bottom:.6rem;
+      color:#0f172a;
     }
     .foot-links{
       list-style:none;
       margin:0;
       padding:0;
-      display:grid;
-      gap:8px;
-      font-size:13px;
-    }
-    .foot-links a{font-weight:700;color:#1f2a44}
-    .foot-links a:hover{color:var(--primary)}
-    .foot-bottom{
-      margin-top:18px;
-      padding-top:14px;
-      border-top:1px solid var(--border);
       display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+      flex-direction:column;
+      gap:.45rem;
+    }
+    .foot-links a{
       color:var(--muted);
-      font-size:12px;
-      align-items:center;
+      font-weight:800;
+      text-decoration:none;
+    }
+    .foot-links a:hover{color:#0f172a;text-decoration:none}
+    .foot-bottom{
+      border-top:1px solid var(--border);
+      padding:1rem var(--pad-h);
+      max-width:var(--max-width);
+      margin:0 auto;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:700;
+      line-height:1.6;
+    }
+    .disclaimer{
+      margin-top:.75rem;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:800;
+      line-height:1.6;
     }
 
     /* Responsive */
-    @media (max-width: 980px){
-      .hero-grid{grid-template-columns:1fr}
-      .hero h2{font-size:42px}
-      .submit-form{flex-direction:column}
-      .submit-btn{width:100%}
-      .mini-grid{grid-template-columns:1fr 1fr}
-      .chips{grid-template-columns:1fr}
-      .pillars{grid-template-columns:1fr 1fr}
-      .price-grid{grid-template-columns:1fr}
-      .row{grid-template-columns:1fr;align-items:stretch}
-      .form-actions{display:flex;gap:10px}
-      .form-actions .btn{flex:1}
+    @media (max-width:1020px){
+      h1.logo{font-size:3.1rem}
+      .pillars-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .pricing-grid{grid-template-columns:1fr}
+      .plan{min-height:auto}
       .what-grid{grid-template-columns:1fr}
-      .what-col + .what-col{border-left:0;border-top:1px solid var(--border)}
-      .foot-grid{grid-template-columns:1fr}
-      .powered{margin-top:8px}
-      .top-links{justify-content:flex-start}
+      .footer-inner{grid-template-columns:1fr;gap:1.2rem}
+      .back-to-top-float{right:1rem}
+      .url-input{flex:1; width:100%} /* allow better fit on narrower screens */
     }
-    @media (max-width: 560px){
-      .brand h1{font-size:36px}
-      .hero h2{font-size:36px}
-      .pillars{grid-template-columns:1fr}
-      .mini-grid{grid-template-columns:1fr}
+    @media (max-width:640px){
+      .header-row{align-items:flex-start}
+      h1.logo{font-size:2.6rem;white-space:normal}
+      .btn-primary{min-width:100%}
+      .cta-form{flex-direction:column}
+      .url-input{width:100%}
+      .form-grid{grid-template-columns:1fr}
+      .intent-row{gap:.5rem}
+      .intent-pill{width:100%;text-align:center}
+      .value-points{flex-direction:column}
+      .value-points ul{min-width:0}
     }
   </style>
 </head>
 
 <body id="top">
-  <div class="wrap">
-    <header>
-      <div class="header-row">
-        <div class="brand">
-          <h1>AI Visibility Index</h1>
-        </div>
-
-        <div style="text-align:right">
-          <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
-          <nav class="top-links" aria-label="Top navigation">
-            <a href="#pricing">Pricing</a>
-            <a href="#enterprise">Enterprise</a>
-            <a href="#request">Request access</a>
-            <a href="#contact">Contact</a>
-          </nav>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="header-row">
+      <div class="brand">
+        <h1 class="logo">AI Visibility Index</h1>
+        <div class="subhead"><span class="bolt">⚡</span> Visibility for the Age of AI</div>
       </div>
-    </header>
+      <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+    </div>
+  </header>
 
-    <main class="hero">
-      <div class="hero-grid">
-        <div>
-          <div class="kicker">
-            <span class="bolt">⚡</span>
-            <span>Visibility for the Age of AI</span>
-          </div>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-grid">
+      <div class="hero-headline">AI already has an opinion about your brand.<br/>AIVI shows you what it is.</div>
 
-          <h2>AI already has an opinion about your brand.<br/>AIVI shows you what it is.</h2>
-
-          <p class="lede">
-            The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you.
-          </p>
-
-          <p class="lede muted" style="margin-top:-6px">
-            AI answers are replacing search results. Visibility now depends on how AI understands you.
-          </p>
-
-          <div class="cta-row">
-            <a class="btn primary" href="#snapshot">Reveal My AI Visibility</a>
-            <a class="btn secondary" href="#framework">Learn how the index works</a>
-          </div>
-        </div>
-
-        <!-- This is NOT the primary CTA anymore. It's a supportive module. -->
-        <aside class="submit-card" aria-label="AIVI Snapshot (Analyze)">
-          <div class="submit-head">
-            <p class="submit-title">AIVI Snapshot (Analyze)</p>
-            <span class="free-pill"><span class="check">✓</span> Free</span>
-          </div>
-          <p class="submit-desc">
-            Run a public AIVI Snapshot to see how AI systems interpret your website at a high level. No signup. No credit card.
-          </p>
-
-          <div class="mini-grid">
-            <div class="mini">
-              <div class="ico">📌</div>
-              <div>
-                <strong>High-level AIVI snapshot</strong>
-                <span>Clarity without the overwhelm.</span>
-              </div>
-            </div>
-            <div class="mini">
-              <div class="ico">🧭</div>
-              <div>
-                <strong>Initial strengths &amp; visibility gaps</strong>
-                <span>What’s helping or holding you back.</span>
-              </div>
-            </div>
-            <div class="mini">
-              <div class="ico">🧠</div>
-              <div>
-                <strong>How AI currently understands your site</strong>
-                <span>How your brand gets reconstructed.</span>
-              </div>
-            </div>
-            <div class="mini">
-              <div class="ico">⚡</div>
-              <div>
-                <strong>No signup, no credit card</strong>
-                <span>Run it in seconds.</span>
-              </div>
-            </div>
-          </div>
-        </aside>
+      <div class="hero-sub">
+        The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you.
       </div>
 
-      <!-- PRIMARY URL SUBMISSION (Front and Center) -->
-      <section id="snapshot" class="submit-card" style="margin-top:26px" aria-label="Run AIVI Snapshot">
-        <div class="submit-head">
-          <p class="submit-title">Run your free AIVI Snapshot</p>
-          <span class="free-pill"><span class="check">✓</span> Free</span>
+      <!-- Front-and-center CTA (single-column hero) -->
+      <div class="cta-panel" id="analyze">
+        <div class="cta-top">
+          <div class="cta-title">Reveal My AI Visibility</div>
+          <div class="cta-note">Free AIVI Snapshot (Analyze)</div>
         </div>
 
-        <form id="analyze-form" class="submit-form" novalidate>
-          <label for="url" class="sr-only">Website URL</label>
-          <input id="url" class="input" type="text" placeholder="example.com" aria-label="Website URL" />
-          <button class="submit-btn" type="submit">Reveal My AI Visibility</button>
+        <form id="analyze-form" class="cta-form" novalidate>
+          <input id="url" type="text" class="url-input" placeholder="example.com" aria-label="Website URL" />
+          <button type="submit" class="btn btn-primary">Reveal My AI Visibility</button>
+          <a href="#how-it-works" class="btn btn-secondary">Learn how the index works</a>
+          <div id="error-message" class="error" role="alert"></div>
         </form>
 
-        <div id="analyze-error" class="submit-foot" style="display:none;color:#b91c1c;font-weight:800"></div>
-        <div class="submit-foot">Free AIVI Snapshot (Analyze). No signup. No credit card.</div>
-      </section>
-    </main>
-  </div>
-
-  <!-- WHY THIS MATTERS -->
-  <section class="band" id="why">
-    <div class="wrap">
-      <div class="section-kicker">Why this matters</div>
-
-      <div class="h2">
-        <span class="break">You’re not optimizing for AI.</span>
-        <span class="break">AI is already judging you.</span>
+        <!-- Value points moved here (beneath input) -->
+        <div class="value-points" aria-label="Snapshot details">
+          <span class="free-flag">Free</span>
+          <ul>
+            <li>High-level AIVI snapshot</li>
+            <li>Initial strengths &amp; visibility gaps</li>
+            <li>How AI currently understands your site / how your brand is reconstructed</li>
+            <li>No signup, no credit card</li>
+          </ul>
+        </div>
       </div>
 
-      <p class="body">
-        Large language models don’t “read” websites the way humans do. They interpret, compress, and reconstruct your brand into answers, summaries, and recommendations — often without your knowledge or control.
-      </p>
+      <!-- Two-line statement -->
+      <div class="two-line" id="wow">
+        <div class="l1">You’re not optimizing for AI — yet.</div>
+        <div class="l2">AI is already judging you.</div>
+      </div>
 
-      <p class="body" style="margin-top:-8px">AIVI makes that invisible layer visible.</p>
-
-      <div class="chips">
-        <div class="chip">
-          <span class="dot"></span>
-          <div>
-            <strong>Understands what you actually do</strong>
-            <span></span>
-          </div>
-        </div>
-        <div class="chip">
-          <span class="dot"></span>
-          <div>
-            <strong>Recognizes your authority or treats you as generic</strong>
-            <span></span>
-          </div>
-        </div>
-        <div class="chip">
-          <span class="dot"></span>
-          <div>
-            <strong>Trusts your content enough to reference or cite</strong>
-            <span></span>
-          </div>
-        </div>
-        <div class="chip">
-          <span class="dot"></span>
-          <div>
-            <strong>Risks misrepresenting, diluting, or omitting your brand entirely</strong>
-            <span></span>
-          </div>
-        </div>
+      <div class="kicker">
+        Large language models don’t read websites the way humans do. They interpret, compress, and reconstruct your brand into answers, summaries, and recommendations — often without your knowledge or control. AIVI makes that invisible layer visible.
       </div>
 
       <div class="callout" aria-label="AI perception callout">
-        <p>
-          <span class="line">This is not SEO.</span>
-          <span class="line">This is AI perception.</span>
-          <span class="line mutedline">If AI can’t clearly understand you, it can’t confidently recommend you.</span>
-        </p>
+        <p>This is not SEO.</p>
+        <p class="line2">This is AI perception.</p>
+        <p class="line3">If AI can’t clearly understand you, it can’t confidently recommend you.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- FRAMEWORK -->
-  <section class="section" id="framework">
+  <!-- Pillars -->
+  <div class="pillars section" id="how-it-works">
     <div class="wrap">
-      <h3>How AI “sees” a website</h3>
-      <p>AIVI analyzes four core layers of AI perception:</p>
+      <div class="title">How AI “sees” a website</div>
+      <div class="kicker">AIVI analyzes four core layers of AI perception:</div>
 
-      <div class="pillars">
-        <div class="pillar">
-          <div class="ico">🧱</div>
+      <div class="pillars-grid" role="list">
+        <div class="pillar" role="listitem">
+          <div class="p-icon">🧱</div>
           <h4>Structural Legibility</h4>
           <p>Can AI reliably parse, navigate, and segment your site?</p>
         </div>
-
-        <div class="pillar">
-          <div class="ico">🗣️</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">🗣️</div>
           <h4>Semantic Clarity</h4>
           <p>Does AI understand your offering — or fill in the gaps with assumptions?</p>
         </div>
-
-        <div class="pillar">
-          <div class="ico">🏛️</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">🏛️</div>
           <h4>Authority Recognition</h4>
           <p>Does AI treat your content as reference-worthy or disposable?</p>
         </div>
-
-        <div class="pillar">
-          <div class="ico">⚠️</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">⚠️</div>
           <h4>Representation Risk</h4>
-          <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers</p>
+          <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers.</p>
         </div>
       </div>
 
-      <div class="fullwidth-note">
+      <div class="pillars-footer">
         Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- PRICING -->
-  <section class="pricing" id="pricing">
+  <!-- Pricing -->
+  <div class="pricing section" id="pricing">
     <div class="wrap">
-      <h3>Access to the AI Visibility Index</h3>
-      <p>
-        AIVI is currently available through request-based access while the index methodology continues to mature.
-        Each analysis is delivered as an index reading, not automated output.
-      </p>
+      <div class="title">Access to the AI Visibility Index</div>
+      <div class="kicker">
+        AIVI is currently available through request-based access while the index methodology continues to mature. Each analysis is delivered as an index reading, not automated output.
+      </div>
 
-      <div class="price-grid">
+      <div class="pricing-grid">
         <!-- Index Reading -->
-        <div class="card" aria-label="AIVI — Index Reading">
-          <div class="top">
-            <h4>AIVI — Index Reading</h4>
-            <span class="tag">Request-based</span>
+        <div class="plan featured">
+          <div class="plan-top">
+            <h3>AIVI — Index Reading</h3>
+            <div class="price-line">
+              <span class="price">$249 per domain</span>
+              <span class="free-flag">Free during early access</span>
+            </div>
           </div>
 
-          <div class="price-line">
-            <div class="price">$249</div>
-            <div class="per">per domain</div>
-            <span class="free-badge">Free during early access</span>
-          </div>
-
-          <ul class="list">
+          <ul>
             <li>AI Visibility Index Snapshot™</li>
             <li>Visibility Tier classification</li>
             <li>Representation Risk assessment</li>
@@ -1013,88 +828,86 @@
             <li>Executive-ready findings (shareable)</li>
           </ul>
 
-          <div class="note">Request → analysis → manual delivery (during early access)</div>
+          <p><b>Delivery:</b> request-based, manual delivery</p>
 
-          <div class="actions">
-            <button class="btn card-primary" type="button" data-open-request data-plan="Index Reading ($249 per domain)">Request access</button>
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="index-reading">Request Index Reading</a>
+            <a class="btn-plan secondary" href="#analyze">Run Free Snapshot</a>
           </div>
         </div>
 
         <!-- Monitoring -->
-        <div class="card" aria-label="AIVI — Monitoring Access">
-          <div class="top">
-            <h4>AIVI — Monitoring Access</h4>
-            <span class="tag">Request-based</span>
+        <div class="plan">
+          <div class="plan-top">
+            <h3>AIVI — Monitoring Access</h3>
+            <div class="price-line">
+              <span class="price">$99 / month per domain</span>
+            </div>
           </div>
 
-          <div class="price-line">
-            <div class="price">$99</div>
-            <div class="per">/ month per domain</div>
-          </div>
-
-          <div class="note" style="margin-top:0;margin-bottom:12px">
-            Monitoring observes perception drift, not performance metrics.
-          </div>
-
-          <ul class="list">
+          <ul>
             <li>Periodic index re-readings</li>
             <li>Change detection across core perception layers</li>
             <li>Visibility Tier movement tracking</li>
             <li>Representation risk trend signals</li>
           </ul>
 
-          <div class="actions">
-            <button class="btn card-primary" type="button" data-open-request data-plan="Monitoring ($99/mo per domain)">Request access</button>
+          <p><b>Monitoring:</b> observes perception drift, not performance metrics.</p>
+
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="monitoring">Request Monitoring</a>
+            <a class="btn-plan secondary" href="#analyze">Run Free Snapshot</a>
           </div>
         </div>
 
         <!-- Enterprise -->
-        <div class="card" id="enterprise" aria-label="Enterprise">
-          <div class="top">
-            <h4>Enterprise</h4>
-            <span class="tag">Onboarding</span>
+        <div class="plan">
+          <div class="plan-top">
+            <h3>Enterprise</h3>
+            <div class="price-line">
+              <span class="price">Private access</span>
+            </div>
           </div>
 
-          <div class="price-line">
-            <div class="price">Custom</div>
-            <div class="per">pricing</div>
-          </div>
-
-          <ul class="list">
+          <ul>
             <li>Organization-level index coverage</li>
-            <li>Comparative context &amp; benchmarking</li>
+            <li>Comparative context</li>
             <li>Executive briefings</li>
-            <li>Advanced scope for complex sites</li>
+            <li>Availability is limited</li>
           </ul>
 
-          <div class="note">For organizations where AI visibility is a material risk. Availability is limited.</div>
+          <p>For organizations where AI visibility is a material risk.</p>
 
-          <div class="actions">
-            <button class="btn card-primary" type="button" data-open-request data-plan="Enterprise (Custom)">Request Enterprise Access</button>
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="enterprise">Request Enterprise Access</a>
+            <a class="btn-plan secondary" href="#contact-links">Contact</a>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- WHAT AIVI IS / IS NOT -->
-  <section class="what" id="what">
+  <!-- What AIVI is / is not -->
+  <div class="what section" id="what">
     <div class="wrap">
-      <h3>What AIVI is — and is not</h3>
-      <p><b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.</p>
+      <div class="title">What AIVI is — and is not</div>
 
-      <div class="what-box">
+      <div class="what-card">
+        <p class="kicker" style="margin:0;">
+          <b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.
+        </p>
+
         <div class="what-grid">
           <div class="what-col">
-            <div class="what-h">What AIVI is</div>
-            <p class="what-is">
-              <b>AIVI is an observational index.</b> It measures how AI systems interpret and represent a website based on observable signals.
+            <h4>What AIVI is</h4>
+            <p>
+              An index reading that summarizes observable AI perception signals and provides a clear, interpretable view of how AI is likely to understand and represent your website.
             </p>
           </div>
 
           <div class="what-col">
-            <div class="what-h">What AIVI is not</div>
-            <ul class="not-list">
+            <h4>What AIVI is not</h4>
+            <ul>
               <li><b>Not an SEO tool</b> — no keywords, backlinks, or rank tracking</li>
               <li><b>Not a content grader</b> — it observes interpretability, not style preference</li>
               <li><b>Not a prompt test</b> — it evaluates persistent signals, not a single-model output</li>
@@ -1104,288 +917,263 @@
           </div>
         </div>
 
-        <div class="closing">
+        <div style="margin-top:1rem;color:var(--muted);font-weight:900;">
           AIVI does not tell you what to do. It shows you what AI already believes.
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- REQUEST ACCESS (Email collection happens here) -->
-  <section class="request" id="request">
+  <!-- Request Access (single section; collects email) -->
+  <div class="request section" id="request">
     <div class="wrap">
-      <h3>Request access</h3>
-      <p>
-        If you want an index reading beyond the free snapshot, send a request here. Delivery is manual during early access.
-        We collect your work email so we can respond with next steps and deliver the report.
-      </p>
+      <div class="title">Request access</div>
+      <div class="kicker">
+        Request-based delivery while AIVI is in active development. You’ll receive next steps by email.
+      </div>
 
-      <div class="form-card">
+      <div class="request-card">
+        <div class="intent-row" aria-label="Choose request type">
+          <button type="button" class="intent-pill active" data-intent="index-reading">Index Reading ($249)</button>
+          <button type="button" class="intent-pill" data-intent="monitoring">Monitoring ($99/mo)</button>
+          <button type="button" class="intent-pill" data-intent="enterprise">Enterprise</button>
+        </div>
+
         <form id="request-form" novalidate>
-          <div class="row">
-            <div>
-              <label for="req-email">Work email</label>
-              <input id="req-email" class="input" type="email" placeholder="name@company.com" autocomplete="email" />
+          <div class="form-grid">
+            <div class="field">
+              <label for="reqEmail">Work email</label>
+              <input id="reqEmail" type="email" placeholder="name@company.com" autocomplete="email" />
             </div>
-
-            <div>
-              <label for="req-company">Company</label>
-              <input id="req-company" class="input" type="text" placeholder="Company name" autocomplete="organization" />
+            <div class="field">
+              <label for="reqCompany">Company</label>
+              <input id="reqCompany" type="text" placeholder="Company name" autocomplete="organization" />
             </div>
-
-            <div>
-              <label for="req-plan">Plan</label>
-              <input id="req-plan" class="input" type="text" value="Index Reading ($249 per domain)" readonly />
-            </div>
-
-            <div class="form-actions">
-              <button class="btn black" type="submit">Send request</button>
-              <a class="btn outline" href="https://calendly.com/quontora" target="_blank" rel="noopener">Talk to us</a>
+            <div class="field" style="grid-column:1 / -1;">
+              <label for="reqUrl">Website</label>
+              <input id="reqUrl" type="text" placeholder="example.com" autocomplete="url" />
             </div>
           </div>
 
-          <div class="help">
-            <div class="info">i</div>
-            <div>
-              You’ll receive a confirmation message on-screen.
-              If automated delivery is not enabled yet, we’ll open your email client with a pre-filled request so we still receive it.
-            </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" style="min-width:260px;">Send Request</button>
+            <a class="btn btn-secondary" href="#analyze">Run Free Snapshot</a>
           </div>
 
-          <div id="request-status" class="status" role="status"></div>
+          <div id="email-warning" class="warn" role="alert"></div>
+
+          <div class="form-help">
+            We recommend using a work email so we can route your request correctly. Personal email domains may be declined.
+          </div>
         </form>
       </div>
-    </div>
-  </section>
 
-  <!-- CONTACT -->
-  <section class="section" id="contact" style="padding-top:28px">
-    <div class="wrap">
-      <div class="callout" style="margin:0">
-        <p>
-          <span class="line">Have a tricky site or big AI Visibility challenge?</span>
-          <span class="line mutedline">We love edge cases, complex stacks, and ambitious goals.</span>
-        </p>
-
-        <div class="cta-row" style="margin-top:16px">
-          <a class="btn primary" href="mailto:hello@quontora.com?subject=AIVI%20Inquiry">Email Us</a>
-          <a class="btn secondary" href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a 30-min call</a>
+      <div id="contact-links" style="margin-top:1.25rem;">
+        <div class="kicker" style="max-width:none;">
+          Prefer email? Write us at <a href="mailto:hello@quontora.com?subject=AIVI%20Access%20Request">hello@quontora.com</a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Floating Back to Top Button -->
   <a href="#top" class="back-to-top-float" id="backToTopFloat" aria-label="Back to top">↑</a>
 
   <!-- Footer -->
   <footer>
-    <div class="wrap">
-      <div class="foot-grid">
-        <div>
-          <p class="foot-title">AI Visibility Index (AIVI)</p>
-          <p class="foot-copy">
-            A product of <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.<br/>
-            AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
-          </p>
-        </div>
-
-        <div class="foot-col">
-          <h5>Product</h5>
-          <ul class="foot-links">
-            <li><a href="#snapshot">Run Snapshot (Free)</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#request">Request access</a></li>
-            <li><a href="/index/whitepaper.html">Whitepaper</a></li>
-            <li><a href="/index/technical.html">Technical</a></li>
-          </ul>
-        </div>
-
-        <div class="foot-col">
-          <h5>Company</h5>
-          <ul class="foot-links">
-            <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-            <li><a href="https://calendly.com/quontora" target="_blank" rel="noopener">Book a call</a></li>
-            <li><a href="mailto:hello@quontora.com?subject=AIVI%20Inquiry">Contact</a></li>
-            <li><a href="#">Privacy</a></li>
-            <li><a href="#">Terms</a></li>
-          </ul>
+    <div class="footer-inner">
+      <div class="foot-brand">
+        <h3>AI Visibility Index (AIVI)</h3>
+        <p>
+          AIVI summarizes observable AI perception signals to help teams understand how AI systems interpret, trust, and represent a website.
+        </p>
+        <div class="disclaimer">
+          AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
         </div>
       </div>
 
-      <div class="foot-bottom">
-        <div>© 2025 AI Visibility Index (AIVI). All rights reserved.</div>
-        <div>Built for AI-native discovery.</div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <ul class="foot-links">
+          <li><a href="#analyze">Free AIVI Snapshot</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#what">What AIVI is / is not</a></li>
+          <li><a href="#request">Request access</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h4>Resources</h4>
+        <ul class="foot-links">
+          <li><a href="/index/whitepaper.html">Whitepaper</a></li>
+          <li><a href="/index/technical.html">Technical</a></li>
+          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+          <li><a href="mailto:hello@quontora.com?subject=AIVI%20Question">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div>© 2025 AI Visibility Index (AIVI). A product of Quontora.</div>
+      <div style="margin-top:.35rem;">
+        Request-based access during early development. Pricing and availability may change.
       </div>
     </div>
   </footer>
 
   <script>
-    // ----------------------------
-    // Utilities
-    // ----------------------------
+    // Basic URL validation
     function isValidURL(input){
       return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
     }
-    function normalizeURL(url){
-      url = (url || "").trim();
-      if(!/^https?:\/\//i.test(url)) url = "https://" + url;
-      return url;
-    }
 
-    // ----------------------------
-    // Back-to-top visibility
-    // ----------------------------
-    const backToTopBtn = document.getElementById('backToTopFloat');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 600) backToTopBtn.classList.add('visible');
-      else backToTopBtn.classList.remove('visible');
+    // Analyze: free snapshot
+    document.addEventListener("DOMContentLoaded", () => {
+      const analyzeForm = document.getElementById("analyze-form");
+      const urlInput = document.getElementById("url");
+      const errorDiv = document.getElementById("error-message");
+
+      if (analyzeForm && urlInput && errorDiv) {
+        analyzeForm.addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+
+          let url = (urlInput.value || "").trim();
+          errorDiv.classList.remove("show");
+
+          if (!url) {
+            errorDiv.textContent = "Please enter a website URL";
+            errorDiv.classList.add("show");
+            return;
+          }
+          if (!isValidURL(url)) {
+            errorDiv.textContent = "Please enter a valid domain (e.g., example.com)";
+            errorDiv.classList.add("show");
+            return;
+          }
+          if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+          window.location.href = "analyze.html?url=" + encodeURIComponent(url);
+        });
+      }
     });
 
-    // ----------------------------
-    // Smooth in-page anchors
-    // ----------------------------
+    // Smooth anchor scrolling
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener("click",ev=>{
-        const id=a.getAttribute("href").slice(1);
-        const t=document.getElementById(id);
-        if(t){
+        const href = a.getAttribute("href");
+        if (!href) return;
+        const id = href.substring(1);
+        const t = document.getElementById(id);
+        if (t) {
           ev.preventDefault();
           t.scrollIntoView({behavior:"smooth", block:"start"});
         }
       });
     });
 
-    // ----------------------------
-    // Analyze (Free Snapshot) submit
-    // ----------------------------
-    document.addEventListener("DOMContentLoaded",()=>{
-      const f=document.getElementById("analyze-form");
-      const i=document.getElementById("url");
-      const err=document.getElementById("analyze-error");
-
-      if(f && i){
-        f.addEventListener("submit",(ev)=>{
-          ev.preventDefault(); ev.stopPropagation();
-          err.style.display="none";
-          let url=(i.value||"").trim();
-
-          if(!url){
-            err.textContent="Please enter a website URL";
-            err.style.display="block";
-            return;
-          }
-          if(!isValidURL(url)){
-            err.textContent="Please enter a valid domain (e.g., example.com)";
-            err.style.display="block";
-            return;
-          }
-          url = normalizeURL(url);
-          window.location.href="analyze.html?url="+encodeURIComponent(url);
-        });
-      }
+    // Back-to-top float visibility
+    const backToTopBtn = document.getElementById('backToTopFloat');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 420) backToTopBtn.classList.add('visible');
+      else backToTopBtn.classList.remove('visible');
     });
 
-    // ----------------------------
-    // Request access buttons (set plan + scroll to form)
-    // ----------------------------
-    const planField = document.getElementById("req-plan");
-    document.querySelectorAll("[data-open-request]").forEach(btn=>{
-      btn.addEventListener("click",()=>{
-        const plan = btn.getAttribute("data-plan") || "Index Reading ($249 per domain)";
-        planField.value = plan;
-        document.getElementById("request").scrollIntoView({behavior:"smooth", block:"start"});
-        setTimeout(()=> document.getElementById("req-email").focus(), 450);
+    // Request access intent pills + pricing buttons
+    let selectedIntent = "index-reading";
+
+    function setIntent(intent){
+      selectedIntent = intent;
+
+      document.querySelectorAll(".intent-pill").forEach(p => {
+        p.classList.toggle("active", p.dataset.intent === intent);
       });
+    }
+
+    document.querySelectorAll(".intent-pill").forEach(p => {
+      p.addEventListener("click", () => setIntent(p.dataset.intent));
     });
 
-    // ----------------------------
-    // Request form: collect email addresses
-    // - Primary: POST to /api/request-access (if you add it later)
-    // - Fallback: open mailto prefilled so you still receive the request
-    // - Also saves to localStorage as a backup trail
-    // ----------------------------
-    const requestForm = document.getElementById("request-form");
-    const statusEl = document.getElementById("request-status");
-
-    function showStatus(msg, kind){
-      statusEl.textContent = msg;
-      statusEl.className = "status show " + (kind || "");
-    }
-
-    function isLikelyPersonalEmail(email){
-      const e = (email||"").toLowerCase().trim();
-      const personal = [
-        "gmail.com","yahoo.com","hotmail.com","outlook.com","aol.com","icloud.com","live.com","msn.com","proton.me","protonmail.com"
-      ];
-      const domain = e.split("@")[1] || "";
-      return personal.includes(domain);
-    }
-
-    requestForm.addEventListener("submit", async (ev)=>{
-      ev.preventDefault(); ev.stopPropagation();
-      statusEl.className="status"; statusEl.textContent="";
-
-      const email = (document.getElementById("req-email").value || "").trim();
-      const company = (document.getElementById("req-company").value || "").trim();
-      const plan = (document.getElementById("req-plan").value || "").trim();
-
-      if(!email){
-        showStatus("Please enter a work email.", "err");
-        return;
-      }
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        showStatus("Please enter a valid email address.", "err");
-        return;
-      }
-      if(isLikelyPersonalEmail(email)){
-        showStatus("Please use a work email (personal email domains are not accepted for access requests).", "err");
-        return;
-      }
-      if(!company){
-        showStatus("Please enter your company name.", "err");
-        return;
-      }
-
-      // Save locally as a safety net (does NOT replace backend collection)
-      try{
-        const key = "aivi_access_requests";
-        const existing = JSON.parse(localStorage.getItem(key) || "[]");
-        existing.push({ email, company, plan, ts: new Date().toISOString() });
-        localStorage.setItem(key, JSON.stringify(existing));
-      }catch(_){}
-
-      // Attempt API (optional — only works once you implement /api/request-access)
-      const payload = { email, company, plan, source: "index.html", ts: new Date().toISOString() };
-
-      try{
-        const res = await fetch("/api/request-access",{
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify(payload)
+    document.querySelectorAll("[data-intent]").forEach(el => {
+      if (el.classList.contains("btn-plan")) {
+        el.addEventListener("click", () => {
+          const intent = el.getAttribute("data-intent");
+          if (intent) setIntent(intent);
         });
+      }
+    });
 
-        if(res.ok){
-          showStatus("Request received. We’ll follow up by email with next steps.", "ok");
-          requestForm.reset();
-          document.getElementById("req-plan").value = plan; // keep plan visible
-          return;
-        }
-      }catch(_){}
+    // Email-domain filtering (level 1)
+    const PERSONAL_DOMAINS = new Set([
+      "gmail.com","yahoo.com","hotmail.com","outlook.com","live.com","icloud.com","me.com","aol.com",
+      "proton.me","protonmail.com","pm.me","gmx.com","hey.com","mail.com","zoho.com"
+    ]);
 
-      // Fallback: open email client so you still receive the request
-      const to = "hello@quontora.com";
-      const subj = encodeURIComponent("AIVI access request — " + plan);
+    function getDomain(email){
+      const parts = (email || "").toLowerCase().trim().split("@");
+      return parts.length === 2 ? parts[1] : "";
+    }
+
+    function validateWorkEmail(email){
+      if (!email) return { ok:false, msg:"Please enter a work email address." };
+      const basic = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!basic) return { ok:false, msg:"Please enter a valid email address." };
+
+      const domain = getDomain(email);
+      if (PERSONAL_DOMAINS.has(domain)) {
+        return {
+          ok:false,
+          msg:"Please use a work email (personal email domains aren’t accepted for access requests at this stage)."
+        };
+      }
+      return { ok:true, msg:"" };
+    }
+
+    // Request form: collects email + company + url, then opens mailto (manual delivery)
+    document.getElementById("request-form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+
+      const warn = document.getElementById("email-warning");
+      warn.classList.remove("show");
+      warn.textContent = "";
+
+      const email = document.getElementById("reqEmail").value.trim();
+      const company = document.getElementById("reqCompany").value.trim();
+      const site = document.getElementById("reqUrl").value.trim();
+
+      const v = validateWorkEmail(email);
+      if (!v.ok) {
+        warn.textContent = v.msg;
+        warn.classList.add("show");
+        return;
+      }
+      if (!company) {
+        warn.textContent = "Please enter your company name.";
+        warn.classList.add("show");
+        return;
+      }
+      if (!site || !isValidURL(site)) {
+        warn.textContent = "Please enter a valid website domain (e.g., example.com).";
+        warn.classList.add("show");
+        return;
+      }
+
+      const intentLabel =
+        selectedIntent === "monitoring" ? "AIVI — Monitoring Access ($99/mo per domain)" :
+        selectedIntent === "enterprise" ? "Enterprise (Private access)" :
+        "AIVI — Index Reading ($249 per domain — free during early access)";
+
+      const subject = encodeURIComponent("AIVI Access Request — " + intentLabel);
       const body = encodeURIComponent(
-        "Access request details:\n\n" +
-        "Plan: " + plan + "\n" +
-        "Work email: " + email + "\n" +
-        "Company: " + company + "\n\n" +
-        "Notes: Please reply with next steps and delivery details.\n"
+        "Request Type: " + intentLabel + "\n" +
+        "Work Email: " + email + "\n" +
+        "Company: " + company + "\n" +
+        "Website: " + site + "\n\n" +
+        "Notes:\n"
       );
 
-      showStatus("Almost done: your email client will open to send the request.", "ok");
-      window.location.href = `mailto:${to}?subject=${subj}&body=${body}`;
+      // Manual delivery: opens an email draft to Quontora with the user's details.
+      window.location.href = "mailto:hello@quontora.com?subject=" + subject + "&body=" + body;
     });
   </script>
 </body>
