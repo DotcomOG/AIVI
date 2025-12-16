@@ -1,12 +1,19 @@
 <!DOCTYPE html>
+<!--
+  AiVi - AI Visibility Analysis (Production)
+  Version: v2025.12.16-1
+  Built by ChatGPT
+  Last updated: 2025-12-16 (America/New_York)
+
+  NOTES (this version):
+  - Fix progress overlay so it never “looks stuck” at 99%: keep status messaging animated until results render.
+  - Fix “LLM logos” reliability: remove fragile image dependencies and render consistent inline “engine marks” (always display).
+  - Rename report section headers:
+      "What's Working"  -> "Strong Signals"
+      "Needs Attention" -> "Visibility Gaps"
+-->
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.12.15-1 -->
-  <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
-  <!-- Lead generation page - Full report available via form submission -->
-  <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-12-15 -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AiVi - AI Visibility Analysis</title>
@@ -57,18 +64,14 @@
     .llm-insights{margin:.4rem 0 1.2rem}
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:34px;min-height:34px}
-    .llm-logo img{
-      height:28px;
-      width:auto;
-      display:block;
-      object-fit:contain;
-      max-width:140px;
-      image-rendering:auto;
-    }
-    .llm-logo img.engine-copilot{height:26px;max-width:120px}
-    .llm-logo img.engine-gemini{height:26px;max-width:140px}
-    .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
+
+    /* Engine mark (reliable “logo”) */
+    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
+    .engine-mark{display:inline-flex;align-items:center;gap:.55rem;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .engine-dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,#000 0%,#3182CE 100%)}
+    .engine-text{font-size:.86rem;font-weight:800;letter-spacing:.2px;color:#111;line-height:1}
+    .engine-sub{font-size:.72rem;font-weight:700;color:#666;line-height:1;margin-top:2px}
+    .engine-stack{display:flex;flex-direction:column}
     .llm-row p{margin:0;line-height:1.6}
 
     .form-section{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);margin-top:3rem;width:100%}
@@ -90,19 +93,11 @@
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px;display:flex;align-items:center;gap:.5rem}
+    .progress-title{font-weight:700;font-size:18px}
     .progress-pct{color:#666;font-size:16px;font-weight:600}
     .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
     .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .25s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
-
-    .spinner{
-      width:14px;height:14px;border-radius:999px;
-      border:2px solid #cfd6e6;border-top-color:#3182CE;
-      animation:spin .8s linear infinite;
-      display:inline-block;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .progress-eta{color:#666;font-size:14px;line-height:1.4;min-height:42px}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -186,14 +181,14 @@
   <div id="progress-overlay" class="overlay">
     <div class="progress-panel">
       <div class="progress-header">
-        <div class="progress-title"><span class="spinner" aria-hidden="true"></span> Analyzing your website...</div>
+        <div class="progress-title">Analyzing your website<span id="progress-dots">...</span></div>
         <div class="progress-pct" id="progress-pct">0%</div>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
       <div class="progress-eta" id="progress-eta">
-        Performing website analysis.<br>
+        Starting analysis.<br>
         This typically takes <strong>15–90 seconds</strong>.
       </div>
     </div>
@@ -229,90 +224,43 @@
   </div>
 
   <script>
-    // Cache buster to avoid stale/broken assets after deployments
-    const ASSET_V = '2025-12-15';
-
-    // Try multiple paths/extensions per engine (fixes logo breakage across deployments)
-    const LOGO_CANDIDATES = {
-      ChatGPT: [
-        `/img/chatgpt-logo.png?v=${ASSET_V}`,
-        `./img/chatgpt-logo.png?v=${ASSET_V}`,
-        `/img/chatgpt-logo.svg?v=${ASSET_V}`,
-        `./img/chatgpt-logo.svg?v=${ASSET_V}`
-      ],
-      Claude: [
-        `/img/claude.png?v=${ASSET_V}`,
-        `/img/claude.jpg?v=${ASSET_V}`,
-        `/img/claude.jpeg?v=${ASSET_V}`,
-        `./img/claude.png?v=${ASSET_V}`,
-        `./img/claude.jpg?v=${ASSET_V}`,
-        `./img/claude.jpeg?v=${ASSET_V}`
-      ],
-      Gemini: [
-        `/img/gemini-icon.svg?v=${ASSET_V}`,
-        `/img/gemini-icon.png?v=${ASSET_V}`,
-        `./img/gemini-icon.svg?v=${ASSET_V}`,
-        `./img/gemini-icon.png?v=${ASSET_V}`
-      ],
-      Copilot: [
-        `/img/copilot.png?v=${ASSET_V}`,
-        `/img/copilot.jpg?v=${ASSET_V}`,
-        `/img/copilot.jpeg?v=${ASSET_V}`,
-        `./img/copilot.png?v=${ASSET_V}`,
-        `./img/copilot.jpg?v=${ASSET_V}`,
-        `./img/copilot.jpeg?v=${ASSET_V}`
-      ],
-      Perplexity: [
-        `/img/perplexity-logo.png?v=${ASSET_V}`,
-        `/img/perplexity-logo.svg?v=${ASSET_V}`,
-        `./img/perplexity-logo.png?v=${ASSET_V}`,
-        `./img/perplexity-logo.svg?v=${ASSET_V}`
-      ],
+    // Reliable “engine marks” (no broken images, always renders)
+    const ENGINE_META = {
+      ChatGPT: { sub: "AI Assistant" },
+      Claude: { sub: "AI Assistant" },
+      Gemini: { sub: "AI Assistant" },
+      Copilot: { sub: "AI Assistant" },
+      Perplexity: { sub: "AI Assistant" },
     };
 
-    function logoDivFor(engine){
+    function engineMark(engine){
       const wrap = document.createElement('div');
       wrap.className = 'llm-logo';
 
-      const fall = document.createElement('span');
-      fall.className = 'llm-fallback';
-      fall.textContent = engine;
+      const mark = document.createElement('div');
+      mark.className = 'engine-mark';
 
-      const candidates = LOGO_CANDIDATES[engine] || [];
-      if (!candidates.length) {
-        wrap.appendChild(fall);
-        return wrap;
-      }
+      const dot = document.createElement('span');
+      dot.className = 'engine-dot';
 
-      const img = document.createElement('img');
-      img.alt = `${engine} logo`;
-      img.className = `engine-${String(engine).toLowerCase()}`;
+      const stack = document.createElement('div');
+      stack.className = 'engine-stack';
 
-      let idx = 0;
+      const t = document.createElement('div');
+      t.className = 'engine-text';
+      t.textContent = String(engine || 'Engine');
 
-      const tryNext = () => {
-        if (idx >= candidates.length) {
-          wrap.innerHTML = '';
-          wrap.appendChild(fall);
-          return;
-        }
-        img.src = candidates[idx++];
-      };
+      const s = document.createElement('div');
+      s.className = 'engine-sub';
+      s.textContent = (ENGINE_META[engine] && ENGINE_META[engine].sub) ? ENGINE_META[engine].sub : 'AI Assistant';
 
-      img.onload = () => {
-        wrap.innerHTML = '';
-        wrap.appendChild(img);
-      };
+      stack.appendChild(t);
+      stack.appendChild(s);
 
-      img.onerror = () => {
-        tryNext();
-      };
+      mark.appendChild(dot);
+      mark.appendChild(stack);
 
-      // start
-      tryNext();
-      // show fallback immediately; replaced when image loads
-      wrap.appendChild(fall);
-
+      wrap.appendChild(mark);
       return wrap;
     }
 
@@ -322,7 +270,6 @@
       let ul = title.nextElementSibling;
       while (ul && ul.tagName && ul.tagName.toLowerCase() !== 'ul') ul = ul.nextElementSibling;
       if (!ul) return;
-
       const bullets = [...ul.querySelectorAll('li')].map(li => (li.textContent || '').trim());
       if (!bullets.length) return;
 
@@ -333,34 +280,36 @@
       engines.forEach((e, i) => {
         const t = bullets[i];
         if (!t) return;
-
         const row = document.createElement('div');
         row.className = 'llm-row';
-        row.appendChild(logoDivFor(e));
-
+        row.appendChild(engineMark(e));
         const p = document.createElement('p');
         p.textContent = t;
         row.appendChild(p);
-
         box.appendChild(row);
       });
 
       ul.replaceWith(box);
     }
 
-    // Rename headings inside the injected report HTML
-    function renameWorkingAttention(root){
-      const titleNodes = [...root.querySelectorAll('h2,h3,h4,.section-title,strong')];
+    // Rename report section headers inside the returned HTML
+    function renameReportHeadings(root){
+      const renames = [
+        { from: /what's\s*working/i, to: 'Strong Signals' },
+        { from: /needs\s*attention/i, to: 'Visibility Gaps' }
+      ];
 
-      titleNodes.forEach(n => {
+      const nodes = [...root.querySelectorAll('h2,h3,h4,.section-title,strong')];
+      nodes.forEach(n => {
         const txt = (n.textContent || '').trim();
         if (!txt) return;
 
-        if (/^what['’]?\s*working$/i.test(txt) || /^what\s*is\s*working$/i.test(txt)) {
-          n.textContent = 'Strength signals';
-        }
-        if (/^need\s*attention$/i.test(txt) || /^needs\s*attention$/i.test(txt)) {
-          n.textContent = 'Visibility gaps';
+        for (const r of renames) {
+          if (r.from.test(txt)) {
+            n.textContent = r.to;
+            // If the original heading had a trailing ":" or similar in the HTML, keep it clean.
+            break;
+          }
         }
       });
     }
@@ -414,69 +363,101 @@
       }
     }
 
-    // Progress simulation (fix: never "hang" at 99%; keep messaging moving while waiting)
-    function startProgress() {
-      document.getElementById('progress-overlay').style.display = 'flex';
-      const startTime = Date.now();
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      const progressEta = document.getElementById('progress-eta');
-
+    // Progress overlay controller (never “looks stuck”)
+    const Progress = (() => {
+      let progressInterval = null;
+      let messageInterval = null;
+      let dotsInterval = null;
       let lastShown = 0;
 
-      const steps = [
-        'Discovering pages and site structure...',
-        'Checking crawl access and index signals...',
-        'Extracting content patterns and headings...',
-        'Evaluating trust & verification signals...',
-        'Mapping content to common prompt patterns...',
-        'Finalizing your analysis output...'
+      const messages = [
+        "Discovering site structure and key pages",
+        "Checking crawl access and visibility signals",
+        "Interpreting content clarity and semantic cues",
+        "Evaluating trust and verification markers",
+        "Finalizing score + summary findings"
       ];
 
-      const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
+      function start() {
+        document.getElementById('progress-overlay').style.display = 'flex';
 
-        // Smooth movement up to 95% regardless of server time
-        // (prevents the "stuck at 99%" perception)
+        const startTime = Date.now();
+        const progressFill = document.getElementById('progress-fill');
+        const progressPct = document.getElementById('progress-pct');
+        const progressEta = document.getElementById('progress-eta');
+
+        lastShown = 0;
+
+        // Rotate status text forever until stop() is called
+        let msgIdx = 0;
+        progressEta.innerHTML = `${messages[msgIdx]}<br>This typically takes <strong>15–90 seconds</strong>.`;
+        messageInterval = setInterval(() => {
+          msgIdx = (msgIdx + 1) % messages.length;
+          // Keep the copy moving even if requests are slow
+          progressEta.innerHTML = `${messages[msgIdx]}<br>This typically takes <strong>15–90 seconds</strong>.`;
+        }, 3000);
+
+        // Animate dots in the title forever
+        const dotsEl = document.getElementById('progress-dots');
+        let dots = 0;
+        dotsInterval = setInterval(() => {
+          dots = (dots + 1) % 4; // 0..3
+          dotsEl.textContent = dots === 0 ? "" : ".".repeat(dots);
+        }, 450);
+
+        // Progress curve: fast to ~92, then creep to 98, then slow-creep to 99 (but never “dead”)
         const fastWindow = 35000; // ~35s
-        let progress;
-        if (elapsed <= fastWindow) {
-          const ratio = elapsed / fastWindow; // 0..1
-          progress = Math.min(90, Math.floor(ratio * 90));
-        } else {
-          const extra = elapsed - fastWindow;
-          progress = Math.min(95, 90 + Math.floor(extra / 3500)); // +1 every 3.5s, cap 95
-        }
+        progressInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
 
-        if (progress < lastShown) progress = lastShown;
-        lastShown = progress;
+          let progress;
+          if (elapsed <= fastWindow) {
+            const ratio = elapsed / fastWindow;
+            progress = Math.min(92, Math.floor(ratio * 92));
+          } else {
+            const extra = elapsed - fastWindow;
+            // creep 92 -> 98 (every ~2.0s), then 98 -> 99 (every ~8s)
+            const creep = 92 + Math.floor(extra / 2000);
+            progress = Math.min(98, creep);
+            if (creep > 98) {
+              const beyond = creep - 98;
+              progress = Math.min(99, 98 + Math.floor(beyond / 4)); // slower
+            }
+          }
 
-        progressFill.style.width = progress + '%';
-        progressPct.textContent = progress + '%';
+          if (progress < lastShown) progress = lastShown;
+          lastShown = progress;
 
-        // Keep the text actively changing even if progress is capped
-        const stepIndex = Math.min(steps.length - 1, Math.floor(elapsed / 9000));
-        const seconds = Math.floor(elapsed / 1000);
+          progressFill.style.width = progress + '%';
+          progressPct.textContent = progress + '%';
+        }, 140);
 
-        progressEta.innerHTML =
-          `${steps[stepIndex]}<br>` +
-          `Elapsed: <strong>${seconds}s</strong> · Typical: <strong>15–90s</strong>`;
+        return { progressInterval, messageInterval, dotsInterval };
+      }
 
-      }, 220);
+      function stop() {
+        const progressFill = document.getElementById('progress-fill');
+        const progressPct = document.getElementById('progress-pct');
 
-      return interval;
-    }
+        if (progressInterval) clearInterval(progressInterval);
+        if (messageInterval) clearInterval(messageInterval);
+        if (dotsInterval) clearInterval(dotsInterval);
 
-    function stopProgress() {
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
-      progressFill.style.width = '100%';
-      progressPct.textContent = '100%';
-      setTimeout(() => {
-        document.getElementById('progress-overlay').style.display = 'none';
-      }, 650);
-    }
+        progressInterval = null;
+        messageInterval = null;
+        dotsInterval = null;
+
+        progressFill.style.transition = 'width 0.5s ease';
+        progressFill.style.width = '100%';
+        progressPct.textContent = '100%';
+
+        setTimeout(() => {
+          document.getElementById('progress-overlay').style.display = 'none';
+        }, 800);
+      }
+
+      return { start, stop };
+    })();
 
     // Modal controls
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
@@ -566,7 +547,7 @@
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      const progressTimer = startProgress();
+      Progress.start();
 
       let apiBase = '';
       try {
@@ -576,6 +557,7 @@
         apiBase = 'https://sniperank-app2.onrender.com';
       }
 
+      // Fetch score (don’t block report render if this fails)
       try {
         const r = await fetch(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`);
         const j = await r.json();
@@ -585,22 +567,24 @@
         console.error('Score error:', e);
       }
 
+      // Fetch the HTML report (this is what ends the progress overlay)
       try {
         const res = await fetch(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`);
         const html = await res.text();
         const host = document.getElementById('summary-results');
         host.innerHTML = html;
 
-        // post-process injected HTML
-        renameWorkingAttention(host);
+        // Post-process returned report
+        renameReportHeadings(host);
         transformAIInsights(host);
       } catch {
         document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
       } finally {
-        clearInterval(progressTimer);
-        stopProgress();
+        Progress.stop();
       }
     });
   </script>
+
+  <!-- Version: v2025.12.16-1 -->
 </body>
 </html>
