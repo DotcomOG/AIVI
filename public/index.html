@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.16-1
-  Built by ChatGPT
-  Last updated: 2025-12-16 (America/New_York)
+  Version: v2025.12.17-1
 
   NOTES:
-  - Hero + primary CTA block tuned per annotated visuals:
-    - Top label reduced slightly to differentiate from hero headline.
-    - CTA title enlarged.
-    - Removed secondary CTA (“Learn how the index works”) from hero CTA area (single CTA).
-    - Moved “Free” indicator into the CTA header line (next to “Free AIVI Snapshot (Analyze)”).
-    - Increased spacing: CTA panel → next section, and cleaned spacing within value points.
-  - No other sections changed.
+  - Hero headline updated to question system with ONE emphasized word + question mark.
+  - Hero now uses a single primary CTA (no secondary button).
+  - Removed secondary/white CTA buttons across the page (one CTA per block).
+  - Request access intent selector changed from buttons to a single dropdown.
+  - Removed floating back-to-top button.
+  - No backend/API changes: demo flow remains URL → analyze.html?url=...
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
-  <meta name="description" content="AIVI reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you." />
+  <meta name="description" content="AIVI reveals how AI systems interpret, trust, and represent your website — before customers ever see you." />
 
   <style>
     :root{
@@ -79,8 +76,9 @@
       gap:.25rem;
       min-width:0;
     }
+    /* Slightly smaller than before to differentiate from the hero headline */
     h1.logo{
-      font-size:3.25rem; /* reduced slightly to differentiate from hero headline */
+      font-size:3.05rem;
       font-weight:800;
       letter-spacing:-1px;
       line-height:1;
@@ -126,22 +124,29 @@
     }
 
     .hero-headline{
-      font-size:clamp(2.25rem, 4vw, 3.25rem);
-      line-height:1.08;
-      letter-spacing:-.8px;
-      font-weight:900;
-      margin:.6rem 0 .9rem;
+      font-size:clamp(2.35rem, 4.3vw, 3.35rem);
+      line-height:1.03;
+      letter-spacing:-.9px;
+      font-weight:950;
+      margin:.7rem 0 .9rem;
+      text-transform:uppercase;
     }
+    .hero-headline .emph{
+      color:var(--accent);
+      font-weight:950;
+    }
+
     .hero-sub{
+     afont-size:clamp(1.05rem, 1.7vw, 1.25rem);
       font-size:clamp(1.05rem, 1.7vw, 1.25rem);
       color:var(--muted);
       max-width:860px;
       line-height:1.8;
-      margin-bottom:1.35rem; /* slightly tighter to bring CTA up */
+      margin-bottom:1.55rem;
       font-weight:600;
     }
 
-    /* Primary CTA Panel (front and center) */
+    /* Primary CTA Panel */
     .cta-panel{
       background:radial-gradient(1000px 260px at 50% -10%, rgba(49,130,206,.25) 0%, rgba(255,255,255,0) 60%),
                  linear-gradient(180deg, #f0f7ff 0%, #ffffff 72%);
@@ -149,17 +154,17 @@
       border-radius:16px;
       padding:1.35rem 1.35rem 1.15rem;
       box-shadow:var(--shadow-soft);
-      margin:1.05rem 0 1.8rem; /* more space below panel */
+      margin:1.35rem 0 2.2rem; /* more air under panel */
     }
     .cta-top{
       display:flex;
       flex-direction:column;
-      gap:.5rem;
+      gap:.55rem;
       margin-bottom:1rem;
     }
     .cta-title{
-      font-size:1.3rem; /* larger per annotated visual */
-      font-weight:900;
+      font-size:1.25rem; /* slightly larger to match your note */
+      font-weight:950;
       letter-spacing:-.2px;
     }
     .cta-note{
@@ -167,22 +172,22 @@
       font-size:.95rem;
       font-weight:600;
       display:flex;
-      align-items:center;
       gap:.55rem;
+      align-items:center;
       flex-wrap:wrap;
     }
-
-    .mini-free{
+    .cta-note .free-flag{
       font-weight:900;
       color:#16a34a;
       background:rgba(22,163,74,.10);
       border:1px solid rgba(22,163,74,.28);
-      padding:.18rem .55rem;
+      padding:.2rem .6rem;
       border-radius:999px;
       font-size:.85rem;
       line-height:1.2;
       display:inline-flex;
       align-items:center;
+      gap:.35rem;
     }
 
     .cta-form{
@@ -194,8 +199,8 @@
 
     /* URL input width reduced on desktop */
     .url-input{
-      flex:0 0 360px;             /* reduced width (not full container) */
-      width:360px;
+      flex:0 0 420px; /* slightly wider than before for your screenshot */
+      width:420px;
       max-width:100%;
       font-size:1.1rem;
       padding:1rem 1.1rem;
@@ -214,7 +219,7 @@
       border:none;
       border-radius:12px;
       cursor:pointer;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:-.2px;
       transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
       text-decoration:none;
@@ -228,19 +233,11 @@
     .btn-primary{
       background:var(--primary);
       color:#fff;
-      min-width:220px;
+      min-width:260px;
       box-shadow:0 10px 22px rgba(49,130,206,.22);
       font-size:1.05rem;
     }
     .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .btn-secondary{
-      background:#fff;
-      color:#111;
-      border:2px solid #111;
-      font-size:1rem;
-      padding:.95rem 1.1rem;
-    }
-    .btn-secondary:hover{transform:translateY(-1px)}
 
     .error{
       margin-top:.65rem;
@@ -252,11 +249,15 @@
     }
     .error.show{display:block}
 
-    /* Value points moved under URL input */
+    /* Value points under URL input */
     .value-points{
-      margin-top:1.05rem;
-      padding-top:1.05rem;
+      margin-top:.95rem;
+      padding-top:.9rem;
       border-top:1px solid rgba(226,232,240,.9);
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      align-items:flex-start;
     }
     .value-points ul{
       margin:0;
@@ -265,13 +266,22 @@
       font-weight:700;
       line-height:1.65;
       font-size:.95rem;
+      flex:1;
+      min-width:260px;
     }
-    .value-points li{margin:.42rem 0}
+    .value-points li{margin:.35rem 0}
+    .learn-link{
+      margin-top:.9rem;
+      font-weight:800;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .learn-link a{font-weight:900}
 
     /* Section headers */
     .title{
       font-size:2.1rem;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:-.6px;
       margin-bottom:.8rem;
     }
@@ -283,28 +293,22 @@
       line-height:1.85;
     }
 
-    /* Two-line header requirement */
+    /* Two-line statement */
     .two-line{
-      margin-top:2.8rem; /* increased spacing from CTA block */
-      margin-bottom:1.1rem;
+      margin-top:2.35rem;
+      margin-bottom:1.25rem;
     }
-    .two-line .l1{
-      font-size:1.9rem;
-      font-weight:900;
-      letter-spacing:-.5px;
-      line-height:1.15;
-    }
+    .two-line .l1,
     .two-line .l2{
-      font-size:1.9rem;
-      font-weight:900;
+      font-size:1.95rem;
+      font-weight:950;
       letter-spacing:-.5px;
-      line-height:1.15;
-      color:#111;
+      line-height:1.12;
     }
 
     /* Visual break callout */
     .callout{
-      margin-top:1.8rem;
+      margin-top:2.1rem;
       border-radius:16px;
       padding:1.35rem 1.35rem;
       border:1px solid rgba(49,130,206,.25);
@@ -314,11 +318,11 @@
     .callout p{
       font-size:1.05rem;
       color:#0f172a;
-      font-weight:800;
+      font-weight:900;
       line-height:1.6;
     }
-    .callout .line2{margin-top:.35rem;font-weight:900}
-    .callout .line3{margin-top:.35rem;color:#0f172a;font-weight:800}
+    .callout .line2{margin-top:.35rem;font-weight:950}
+    .callout .line3{margin-top:.35rem;color:#0f172a;font-weight:900}
 
     /* Pillars */
     .pillars{
@@ -345,7 +349,7 @@
     }
     .pillar h4{
       font-size:1.05rem;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:-.2px;
       margin-bottom:.35rem;
       color:#0f172a;
@@ -360,7 +364,7 @@
       margin-top:1.05rem;
       color:var(--muted);
       font-size:.98rem;
-      font-weight:800;
+      font-weight:850;
     }
 
     /* Pricing */
@@ -389,7 +393,7 @@
     .plan-top{display:flex;flex-direction:column;gap:.35rem}
     .plan h3{
       font-size:1.2rem;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:-.2px;
       margin:0;
     }
@@ -404,10 +408,10 @@
     }
     .price{
       font-size:1.25rem;
-      font-weight:900;
+      font-weight:950;
       color:#0f172a;
     }
-    .free-flag{
+    .free-flag-inline{
       font-weight:900;
       color:#16a34a;
       background:rgba(22,163,74,.10);
@@ -438,20 +442,16 @@
     }
     .btn-plan{
       flex:1;
-      min-width:180px;
+      min-width:200px;
       background:var(--primary);
       color:#fff;
-      padding:.9rem 1rem;
+      padding:.95rem 1rem;
       border-radius:12px;
-      font-weight:900;
+      font-weight:950;
       text-align:center;
       text-decoration:none;
     }
     .btn-plan:hover{background:var(--primary-dark);text-decoration:none}
-    .btn-plan.secondary{
-      background:#fff;color:#111;border:2px solid #111;
-    }
-    .btn-plan.secondary:hover{text-decoration:none}
 
     /* What it is / is not */
     .what{
@@ -475,7 +475,7 @@
     }
     .what-col h4{
       font-size:1.05rem;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:-.2px;
       margin-bottom:.55rem;
     }
@@ -503,32 +503,6 @@
       padding:1.4rem 1.3rem;
       margin-top:1.5rem;
     }
-    .intent-row{
-      display:flex;
-      gap:.6rem;
-      flex-wrap:wrap;
-      align-items:center;
-      margin:1rem 0 1.1rem;
-    }
-    .intent-pill{
-      border:1px solid rgba(49,130,206,.45);
-      color:var(--primary-dark);
-      background:rgba(49,130,206,.08);
-      padding:.5rem .85rem;
-      border-radius:999px;
-      font-weight:900;
-      font-size:.92rem;
-      cursor:pointer;
-      transition:transform .12s ease, background .2s ease, border-color .2s ease;
-      user-select:none;
-    }
-    .intent-pill:hover{transform:translateY(-1px);background:rgba(49,130,206,.12)}
-    .intent-pill.active{
-      background:var(--primary);
-      color:#fff;
-      border-color:var(--primary);
-    }
-
     .form-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -538,18 +512,21 @@
     .field{display:flex;flex-direction:column;gap:.35rem}
     .field label{
       font-size:.9rem;
-      font-weight:900;
+      font-weight:950;
       color:#0f172a;
     }
-    .field input{
+    .field input,
+    .field select{
       border:2px solid var(--border);
       border-radius:12px;
       padding:.95rem 1rem;
       font-size:1rem;
       font-weight:700;
       background:#fff;
+      color:#0f172a;
     }
-    .field input:focus{
+    .field input:focus,
+    .field select:focus{
       outline:none;
       border-color:var(--primary);
       box-shadow:0 0 0 4px rgba(49,130,206,.14);
@@ -582,39 +559,6 @@
     }
     .warn.show{display:block}
 
-    /* Floating Back to Top Button */
-    .back-to-top-float{
-      position:fixed;
-      top:50%;
-      transform:translateY(-50%);
-      right:calc(50% - var(--max-width)/2 + 1rem);
-      background:var(--primary);
-      color:#fff;
-      width:64px;
-      height:64px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:2rem;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 6px 20px rgba(49,130,206,.4);
-      transition:all .3s ease;
-      opacity:0;
-      visibility:hidden;
-      z-index:999;
-      text-decoration:none;
-      border:2px solid rgba(255,255,255,.2);
-    }
-    .back-to-top-float.visible{opacity:.95;visibility:visible}
-    .back-to-top-float:hover{
-      background:var(--primary-dark);
-      transform:translateY(-50%) scale(1.08);
-      box-shadow:0 8px 24px rgba(49,130,206,.5);
-      opacity:1;
-    }
-
     /* Footer */
     footer{
       margin-top:3rem;
@@ -631,7 +575,7 @@
     }
     .foot-brand h3{
       font-size:1.1rem;
-      font-weight:900;
+      font-weight:950;
       margin-bottom:.35rem;
       letter-spacing:-.2px;
     }
@@ -643,7 +587,7 @@
     }
     .foot-col h4{
       font-size:.95rem;
-      font-weight:900;
+      font-weight:950;
       margin-bottom:.6rem;
       color:#0f172a;
     }
@@ -657,7 +601,7 @@
     }
     .foot-links a{
       color:var(--muted);
-      font-weight:800;
+      font-weight:850;
       text-decoration:none;
     }
     .foot-links a:hover{color:#0f172a;text-decoration:none}
@@ -681,24 +625,21 @@
 
     /* Responsive */
     @media (max-width:1020px){
-      h1.logo{font-size:2.9rem}
+      h1.logo{font-size:2.75rem}
       .pillars-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
       .pricing-grid{grid-template-columns:1fr}
       .plan{min-height:auto}
       .what-grid{grid-template-columns:1fr}
       .footer-inner{grid-template-columns:1fr;gap:1.2rem}
-      .back-to-top-float{right:1rem}
       .url-input{flex:1; width:100%}
     }
     @media (max-width:640px){
       .header-row{align-items:flex-start}
-      h1.logo{font-size:2.6rem;white-space:normal}
+      h1.logo{font-size:2.35rem;white-space:normal}
       .btn-primary{min-width:100%}
       .cta-form{flex-direction:column}
       .url-input{width:100%}
       .form-grid{grid-template-columns:1fr}
-      .intent-row{gap:.5rem}
-      .intent-pill{width:100%;text-align:center}
       .value-points{flex-direction:column}
       .value-points ul{min-width:0}
     }
@@ -720,17 +661,20 @@
   <!-- Hero -->
   <div class="hero">
     <div class="hero-grid">
-      <div class="hero-headline">AI already has an opinion about your brand.<br/>AIVI shows you what it is.</div>
+      <div class="hero-headline">
+        DOES AI DESCRIBE YOUR<br/>
+        BRAND AS <span class="emph">TRUSTWORTHY</span>?
+      </div>
 
       <div class="hero-sub">
         The AI Visibility Index (AIVI) reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you.
       </div>
 
-      <!-- Front-and-center CTA (single-column hero) -->
+      <!-- Front-and-center CTA (single primary CTA) -->
       <div class="cta-panel" id="analyze">
         <div class="cta-top">
           <div class="cta-title">Reveal My AI Visibility</div>
-          <div class="cta-note"><span class="mini-free">Free</span> Free AIVI Snapshot (Analyze)</div>
+          <div class="cta-note"><span class="free-flag">Free</span> Free AIVI Snapshot (Analyze)</div>
         </div>
 
         <form id="analyze-form" class="cta-form" novalidate>
@@ -739,7 +683,6 @@
           <div id="error-message" class="error" role="alert"></div>
         </form>
 
-        <!-- Value points (beneath input) -->
         <div class="value-points" aria-label="Snapshot details">
           <ul>
             <li>High-level AIVI snapshot</li>
@@ -747,6 +690,10 @@
             <li>How AI currently understands your site / how your brand is reconstructed</li>
             <li>No signup, no credit card</li>
           </ul>
+        </div>
+
+        <div class="learn-link">
+          <a href="#how-it-works">Learn how the index works</a>
         </div>
       </div>
 
@@ -818,7 +765,7 @@
             <h3>AIVI — Index Reading</h3>
             <div class="price-line">
               <span class="price">$249 per domain</span>
-              <span class="free-flag">Free during early access</span>
+              <span class="free-flag-inline">Free during early access</span>
             </div>
           </div>
 
@@ -834,7 +781,6 @@
 
           <div class="plan-actions">
             <a class="btn-plan" href="#request" data-intent="index-reading">Request Index Reading</a>
-            <a class="btn-plan secondary" href="#analyze">Run Free Snapshot</a>
           </div>
         </div>
 
@@ -858,7 +804,6 @@
 
           <div class="plan-actions">
             <a class="btn-plan" href="#request" data-intent="monitoring">Request Monitoring</a>
-            <a class="btn-plan secondary" href="#analyze">Run Free Snapshot</a>
           </div>
         </div>
 
@@ -882,7 +827,6 @@
 
           <div class="plan-actions">
             <a class="btn-plan" href="#request" data-intent="enterprise">Request Enterprise Access</a>
-            <a class="btn-plan secondary" href="#contact-links">Contact</a>
           </div>
         </div>
       </div>
@@ -919,14 +863,14 @@
           </div>
         </div>
 
-        <div style="margin-top:1rem;color:var(--muted);font-weight:900;">
+        <div style="margin-top:1rem;color:var(--muted);font-weight:950;">
           AIVI does not tell you what to do. It shows you what AI already believes.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Request Access (single section; collects email) -->
+  <!-- Request Access -->
   <div class="request section" id="request">
     <div class="wrap">
       <div class="title">Request access</div>
@@ -935,14 +879,17 @@
       </div>
 
       <div class="request-card">
-        <div class="intent-row" aria-label="Choose request type">
-          <button type="button" class="intent-pill active" data-intent="index-reading">Index Reading ($249)</button>
-          <button type="button" class="intent-pill" data-intent="monitoring">Monitoring ($99/mo)</button>
-          <button type="button" class="intent-pill" data-intent="enterprise">Enterprise</button>
-        </div>
-
         <form id="request-form" novalidate>
           <div class="form-grid">
+            <div class="field" style="grid-column:1 / -1;">
+              <label for="reqIntent">Request type</label>
+              <select id="reqIntent" aria-label="Request type">
+                <option value="index-reading">Index Reading ($249)</option>
+                <option value="monitoring">Monitoring ($99/mo)</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+
             <div class="field">
               <label for="reqEmail">Work email</label>
               <input id="reqEmail" type="email" placeholder="name@company.com" autocomplete="email" />
@@ -959,7 +906,6 @@
 
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" style="min-width:260px;">Send Request</button>
-            <a class="btn btn-secondary" href="#analyze">Run Free Snapshot</a>
           </div>
 
           <div id="email-warning" class="warn" role="alert"></div>
@@ -977,9 +923,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Floating Back to Top Button -->
-  <a href="#top" class="back-to-top-float" id="backToTopFloat" aria-label="Back to top">↑</a>
 
   <!-- Footer -->
   <footer>
@@ -1074,38 +1017,7 @@
       });
     });
 
-    // Back-to-top float visibility
-    const backToTopBtn = document.getElementById('backToTopFloat');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 420) backToTopBtn.classList.add('visible');
-      else backToTopBtn.classList.remove('visible');
-    });
-
-    // Request access intent pills + pricing buttons
-    let selectedIntent = "index-reading";
-
-    function setIntent(intent){
-      selectedIntent = intent;
-
-      document.querySelectorAll(".intent-pill").forEach(p => {
-        p.classList.toggle("active", p.dataset.intent === intent);
-      });
-    }
-
-    document.querySelectorAll(".intent-pill").forEach(p => {
-      p.addEventListener("click", () => setIntent(p.dataset.intent));
-    });
-
-    document.querySelectorAll("[data-intent]").forEach(el => {
-      if (el.classList.contains("btn-plan")) {
-        el.addEventListener("click", () => {
-          const intent = el.getAttribute("data-intent");
-          if (intent) setIntent(intent);
-        });
-      }
-    });
-
-    // Email-domain filtering (level 1)
+    // Request access intent routing via mailto (manual delivery)
     const PERSONAL_DOMAINS = new Set([
       "gmail.com","yahoo.com","hotmail.com","outlook.com","live.com","icloud.com","me.com","aol.com",
       "proton.me","protonmail.com","pm.me","gmx.com","hey.com","mail.com","zoho.com"
@@ -1131,7 +1043,6 @@
       return { ok:true, msg:"" };
     }
 
-    // Request form: collects email + company + url, then opens mailto (manual delivery)
     document.getElementById("request-form").addEventListener("submit", (ev) => {
       ev.preventDefault();
 
@@ -1139,6 +1050,7 @@
       warn.classList.remove("show");
       warn.textContent = "";
 
+      const intent = document.getElementById("reqIntent").value;
       const email = document.getElementById("reqEmail").value.trim();
       const company = document.getElementById("reqCompany").value.trim();
       const site = document.getElementById("reqUrl").value.trim();
@@ -1161,8 +1073,8 @@
       }
 
       const intentLabel =
-        selectedIntent === "monitoring" ? "AIVI — Monitoring Access ($99/mo per domain)" :
-        selectedIntent === "enterprise" ? "Enterprise (Private access)" :
+        intent === "monitoring" ? "AIVI — Monitoring Access ($99/mo per domain)" :
+        intent === "enterprise" ? "Enterprise (Private access)" :
         "AIVI — Index Reading ($249 per domain — free during early access)";
 
       const subject = encodeURIComponent("AIVI Access Request — " + intentLabel);
@@ -1174,9 +1086,10 @@
         "Notes:\n"
       );
 
-      // Manual delivery: opens an email draft to Quontora with the user's details.
       window.location.href = "mailto:hello@quontora.com?subject=" + subject + "&body=" + body;
     });
   </script>
+
+  <!-- Version: v2025.12.17-1 -->
 </body>
 </html>
