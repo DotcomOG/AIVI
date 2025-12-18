@@ -41,7 +41,21 @@
 
       --radius:14px;
     }
+/* ROTATOR VISIBILITY FIX */
+#rotatorWindow{
+  display:inline-block;
+  vertical-align:baseline;
+  min-width:12ch;          /* prevents the window collapsing */
+  overflow:hidden;          /* masks the slide animation */
+}
 
+#rotatorWindow .rotator-word{
+  display:block;
+  white-space:nowrap;
+  color:var(--accent, #E53E3E);  /* red rotating word */
+  font-weight:900;
+  line-height:1;
+}
     *{margin:0;padding:0;box-sizing:border-box}
     body{
       font-family:Helvetica, Arial, sans-serif;
