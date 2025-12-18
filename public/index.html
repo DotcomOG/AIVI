@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- index.html - v2025.12.18-4 - Built by ChatGPT -->
+<!-- index.html - v2025.12.18-5 - Built by ChatGPT -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -17,6 +17,7 @@
       --radius:16px;
       --max:980px;
       --accent:#d24b2a;
+      --accentSoft: rgba(210,75,42,.08);
       --btn:#111111;
       --btnText:#ffffff;
       --link:#111111;
@@ -27,9 +28,14 @@
     body{
       margin:0;
       font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background:var(--bg);
       color:var(--text);
       line-height:1.35;
+
+      /* subtle color (no layout change) */
+      background:
+        radial-gradient(900px 420px at 18% -10%, var(--accentSoft), rgba(255,255,255,0) 60%),
+        radial-gradient(800px 360px at 90% 0%, rgba(17,17,17,.03), rgba(255,255,255,0) 55%),
+        var(--bg);
     }
 
     a{ color:var(--link); text-decoration:none; }
@@ -80,47 +86,38 @@
       display:block;
       margin-top:10px;
     }
-
     .heroLeft{
       padding:18px 0 0;
     }
 
+    /* HERO: now only TWO lines
+       Line 1: DOES AI DESCRIBE YOUR BRAND AS
+       Line 2: ROTATING WORD
+    */
     .heroHeadline{
       margin:0;
-      font-weight:800;
-      letter-spacing:.6px;
-      line-height:1.06;
-      font-size:44px;
-      text-transform:uppercase; /* make DOES AI DESCRIBE YOUR match headline style */
+      font-weight:900;
+      line-height:1.04;
+      text-transform:uppercase;
     }
 
-    @media (max-width: 520px){
-      .heroHeadline{ font-size:36px; }
-    }
-
-    .headlineRow{
-      display:block;
-    }
-
-    /* Top line in the headline (replaces tiny kicker) */
+    /* line 1 */
     .heroTopLine{
       display:block;
-      font-weight:800;
-      letter-spacing:.12em; /* keeps the “stamp” feel, but still big */
-      margin-bottom:10px;
-      color:var(--text);
+      /* tighter tracking (per request) */
+      letter-spacing:.04em;
+      /* keep it on one line on desktop */
+      white-space:nowrap;
+      /* responsive sizing so it doesn’t wrap into a 3rd line */
+      font-size:clamp(28px, 4.5vw, 44px);
+      margin:0 0 10px;
     }
 
-    @media (max-width: 520px){
-      .heroTopLine{ margin-bottom:8px; }
-    }
-
-    /* Rotating word “cylinder” */
+    /* line 2 rotator */
     .rotatorWrap{
       display:inline-flex;
       align-items:baseline;
       gap:10px;
-      margin-top:10px;
       max-width:100%;
     }
 
@@ -130,10 +127,6 @@
       overflow:hidden;
       padding-right:6px;
       max-width:100%;
-    }
-
-    @media (max-width: 520px){
-      .rotatorViewport{ height:54px; }
     }
 
     .rotatorStack{
@@ -147,22 +140,30 @@
       display:flex;
       align-items:flex-end;
       font-weight:900;
-      letter-spacing:.6px;
+      letter-spacing:.02em; /* tighter than before */
       color:var(--accent);
       white-space:nowrap;
       opacity:0;
       transform:translateY(10px);
       transition:opacity 450ms ease, transform 450ms ease;
       padding-bottom:2px;
-    }
-
-    @media (max-width: 520px){
-      .rotWord{ height:54px; }
+      font-size:clamp(30px, 4.8vw, 44px);
     }
 
     .rotWord.isVisible{
       opacity:1;
       transform:translateY(0);
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 520px){
+      .rotatorViewport{ height:54px; }
+      .rotWord{ height:54px; }
+      .heroTopLine{
+        white-space:normal;  /* allow wrap if absolutely needed on very small screens */
+        letter-spacing:.03em;
+        margin-bottom:8px;
+      }
     }
 
     .heroSub{
@@ -187,6 +188,8 @@
     .revealBox{
       margin-top:18px;
       width:100%;
+      /* subtle color without redesign */
+      background: linear-gradient(180deg, rgba(210,75,42,.06), rgba(255,255,255,0) 55%), #fff;
     }
 
     .cardTitle{
@@ -231,6 +234,7 @@
       border:1px solid var(--border);
       font-size:15px;
       outline:none;
+      background:#fff;
     }
     .urlInput:focus{
       border-color:#c9c9d1;
@@ -422,8 +426,7 @@
     <main class="hero">
       <section class="heroLeft">
         <h2 class="heroHeadline" aria-label="Does AI describe your brand as">
-          <span class="heroTopLine">DOES AI DESCRIBE YOUR</span>
-          <span class="headlineRow">BRAND AS</span>
+          <span class="heroTopLine">DOES AI DESCRIBE YOUR BRAND AS</span>
           <span class="rotatorWrap">
             <span id="rotatorViewport" class="rotatorViewport" aria-live="polite" aria-atomic="true">
               <span id="rotatorStack" class="rotatorStack">
@@ -586,9 +589,7 @@
 
   <script>
     (function(){
-      // Robust rotating word cylinder:
-      // - Uses offsetTop (not a fixed rowHeight) so every word shows correctly.
-      // - Recomputes after fonts/layout settle.
+      // Robust rotating word cylinder (keeps only one word visible; no peeking).
       const stack = document.getElementById('rotatorStack');
       const viewport = document.getElementById('rotatorViewport');
       if (!stack || !viewport) return;
@@ -668,6 +669,6 @@
     })();
   </script>
 
-  <!-- v2025.12.18-4 -->
+  <!-- v2025.12.18-5 -->
 </body>
 </html>
