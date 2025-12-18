@@ -717,106 +717,129 @@
       }
     });
 
-    // HERO ROTATOR (restored animation, no cut-off, always ends with "?")
-    (function(){
-      const words = [
-        "TRUSTWORTHY?",
-        "AUTHORITATIVE?",
-        "CLEAR?",
-        "RELIABLE?",
-        "CREDIBLE?",
-        "UNDERSTANDABLE?",
-        "CONSISTENT?"
-      ];
+  // HERO ROTATOR (no stacking, correct baseline, one word visible)
+  (function(){
+    const words = [
+      "TRUSTWORTHY?",
+      "AUTHORITATIVE?",
+      "CLEAR?",
+      "RELIABLE?",
+      "CREDIBLE?",
+      "UNDERSTANDABLE?",
+      "CONSISTENT?"
+    ];
 
-      const windowEl = document.getElementById("rotatorWindow");
-      const currentEl = document.getElementById("rotatorCurrent");
+    const windowEl = document.getElementById("rotatorWindow");
+    if (!windowEl) return;
 
-      if (!windowEl || !currentEl) return;
+    // Ensure window is the masking "viewport"
+    windowEl.style.position = "relative";
+    windowEl.style.overflow = "hidden";
 
-      let idx = 0;
-      let running = true;
+    // Create two layers once (no stacking)
+    const a = document.createElement("span");
+    const b = document.createElement("span");
+    a.className = "rotator-word";
+    b.className = "rotator-word";
 
-      // Ensure correct initial state
-      currentEl.textContent = words[idx];
+    // absolute overlay so they animate in the same spot
+    [a, b].forEach(el => {
+      el.style.position = "absolute";
+      el.style.left = "0";
+      el.style.top = "0";
+      el.style.right = "0";
+    });
 
-      // Measure helper to prevent clipping
-      const measure = document.createElement("span");
-      measure.className = "rotator-word measure";
-      document.body.appendChild(measure);
+    // Mount
+    windowEl.innerHTML = "";
+    windowEl.appendChild(a);
+    windowEl.appendChild(b);
 
-      function setWindowHeightToWord(text){
-        measure.textContent = text;
-        const h = Math.ceil(measure.getBoundingClientRect().height);
-        windowEl.style.height = h + "px";
-      }
+    // Hidden measurer to set viewport height (prevents clipping)
+    const measure = document.createElement("span");
+    measure.className = "rotator-word";
+    measure.style.position = "absolute";
+    measure.style.left = "-9999px";
+    measure.style.top = "-9999px";
+    measure.style.visibility = "hidden";
+    measure.style.whiteSpace = "nowrap";
+    document.body.appendChild(measure);
 
-      // Initial height lock
-      setWindowHeightToWord(words[idx]);
+    function setViewportHeight(text){
+      measure.textContent = text;
+      const h = Math.ceil(measure.getBoundingClientRect().height);
+      windowEl.style.height = h + "px";
+    }
 
-      // Update height on resize (prevents mobile cut-off)
-      window.addEventListener("resize", () => {
-        setWindowHeightToWord(words[idx]);
-      });
+    let idx = 0;
+    let front = a;
+    let back = b;
 
-      function tick(){
-        if (!running) return;
+    function setText(el, text){
+      el.textContent = text;
+    }
 
-        const outgoing = currentEl;
-        const nextIdx = (idx + 1) % words.length;
-        const nextText = words[nextIdx];
+    function resetEl(el){
+      el.style.transform = "translateY(0)";
+      el.style.opacity = "1";
+      el.style.transition = "none";
+    }
 
-        // Prepare incoming element
-        const incoming = document.createElement("span");
-        incoming.className = "rotator-word word-in";
-        incoming.textContent = nextText;
+    // Init
+    setText(front, words[idx]);
+    setText(back, "");
+    resetEl(front);
+    resetEl(back);
+    setViewportHeight(words[idx]);
 
-        // Lock window height to incoming so it never clips
-        setWindowHeightToWord(nextText);
+    window.addEventListener("resize", () => setViewportHeight(words[idx]));
 
-        // Animate outgoing up
-        outgoing.classList.remove("word-in");
-        outgoing.classList.add("word-out");
+    function animateNext(){
+      const nextIdx = (idx + 1) % words.length;
+      const nextText = words[nextIdx];
 
-        // Place incoming over the top
-        incoming.style.position = "absolute";
-        incoming.style.left = "0";
-        incoming.style.top = "0";
-        incoming.style.right = "0";
+      // Prepare back word below, invisible
+      setText(back, nextText);
+      setViewportHeight(nextText);
 
-        // Make window relative for absolute layering
-        windowEl.style.position = "relative";
-        windowEl.appendChild(incoming);
+      back.style.transition = "none";
+      back.style.transform = "translateY(65%)";
+      back.style.opacity = "0";
 
-        // Cleanup after animation
-        const done = () => {
-          outgoing.removeEventListener("animationend", done);
-          // Replace current with incoming as the new baseline element
-          windowEl.innerHTML = "";
-          incoming.classList.remove("word-in");
-          incoming.style.position = "static";
-          incoming.id = "rotatorCurrent";
-          windowEl.appendChild(incoming);
+      // Force reflow so transitions apply reliably
+      void back.offsetHeight;
 
-          // Advance index + continue
-          idx = nextIdx;
-        };
+      // Animate both: front goes up/out, back comes in
+      front.style.transition = "transform .42s cubic-bezier(.2,.9,.2,1), opacity .42s cubic-bezier(.2,.9,.2,1)";
+      back.style.transition  = "transform .42s cubic-bezier(.2,.9,.2,1), opacity .42s cubic-bezier(.2,.9,.2,1)";
 
-        outgoing.addEventListener("animationend", done);
-      }
+      front.style.transform = "translateY(-65%)";
+      front.style.opacity = "0";
 
-      // Start cycling
-      const interval = setInterval(tick, 1800);
+      back.style.transform = "translateY(0%)";
+      back.style.opacity = "1";
 
-      // Safety: stop if page hidden (reduces weird timing)
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) running = false;
-        else running = true;
-      });
+      // Swap after animation completes
+      setTimeout(() => {
+        idx = nextIdx;
 
-      // Expose for debugging if needed
-      window.__AIVI_ROTATOR_STOP__ = () => clearInterval(interval);
-    })();
+        // Put the new front back to stable state at top
+        resetEl(back);
+
+        // Clear old front so it doesn't flash
+        front.style.transition = "none";
+        front.style.opacity = "0";
+        front.style.transform = "translateY(0)";
+
+        // swap refs
+        const tmp = front;
+        front = back;
+        back = tmp;
+      }, 460);
+    }
+
+    setInterval(animateNext, 1800);
+  })();
   </script>
 
   <!-- Version: v2025.12.18-1 -->
