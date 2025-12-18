@@ -1,674 +1,971 @@
 <!DOCTYPE html>
-<!-- index.html - v2025.12.18-5 - Built by ChatGPT -->
+<!--
+  AIVIndex.io — Index Page (AIVI)
+  Version: v2025.12.18-1
+  Built by: ChatGPT
+  Last updated: 2025-12-18 (America/New_York)
+
+  Scope (this update):
+  - Hero headline updated to: "DOES AI DESCRIBE YOUR / BRAND AS ______?" with rotating single emphasized word.
+  - More whitespace + clearer section spacing.
+  - CTA panel refined: single primary CTA (no secondary button inside panel).
+  - Added controlled color (soft tints + accents) without crowding.
+  - Mobile layout tightened (hero + CTA + callouts stack cleanly).
+  - Version comment added at bottom as well.
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Visibility Index (AIVI)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
+  <meta name="description" content="AIVI reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you." />
 
   <style>
     :root{
+      --max-width:1200px;
+      --pad-h:2rem;
+
+      --primary:#2563EB;
+      --primary-2:#3182CE;
+      --accent:#E53E3E;
+
+      --text:#0b1220;
+      --muted:#475569;
+      --muted-2:#64748b;
+
+      --border:#e2e8f0;
       --bg:#ffffff;
-      --text:#111111;
-      --muted:#5f6368;
-      --border:#e6e6e9;
-      --card:#ffffff;
-      --shadow:0 12px 30px rgba(0,0,0,.08);
+
+      --tint-hero:#ffffff;
+      --tint-panel:#f4f9ff;
+      --tint-soft:#f7fafc;
+      --tint-soft-2:#f1f5f9;
+
+      --shadow:0 14px 40px rgba(2,6,23,.10);
+      --shadow-soft:0 10px 28px rgba(37,99,235,.16), 0 2px 6px rgba(2,6,23,.05);
+
       --radius:16px;
-      --max:980px;
-      --accent:#d24b2a;
-      --accentSoft: rgba(210,75,42,.08);
-      --btn:#111111;
-      --btnText:#ffffff;
-      --link:#111111;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{margin:0;padding:0;box-sizing:border-box}
     body{
-      margin:0;
-      font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family:Helvetica, Arial, sans-serif;
+      background:var(--bg);
       color:var(--text);
-      line-height:1.35;
-
-      /* subtle color (no layout change) */
-      background:
-        radial-gradient(900px 420px at 18% -10%, var(--accentSoft), rgba(255,255,255,0) 60%),
-        radial-gradient(800px 360px at 90% 0%, rgba(17,17,17,.03), rgba(255,255,255,0) 55%),
-        var(--bg);
+      line-height:1.6;
     }
+    a{color:var(--primary);text-decoration:none}
+    a:hover{text-decoration:underline}
 
-    a{ color:var(--link); text-decoration:none; }
-    a:hover{ text-decoration:underline; }
-
-    .wrap{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:28px 20px 56px;
-    }
+    .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-h)}
+    .section{padding:4.25rem 0}
+    .section-tight{padding:3.25rem 0}
 
     /* Header */
-    .topbar{
+    header{
+      padding:2.25rem 0 0;
+    }
+    .header-row{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:16px;
-      margin-bottom:26px;
+      gap:1rem;
     }
     .brand{
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:.4rem;
+      min-width:0;
     }
-    .brand h1{
-      font-size:20px;
+    .brand-top{
+      display:flex;
+      align-items:flex-start;
+      gap:1.25rem;
+      flex-wrap:wrap;
+    }
+    .logo{
+      font-size:2.05rem;
+      font-weight:900;
+      letter-spacing:-.6px;
+      line-height:1.1;
       margin:0;
-      font-weight:700;
-      letter-spacing:.2px;
     }
-    .tagline{
+    .logo .blue{color:var(--primary-2)}
+    .subhead{
+      font-size:1rem;
+      font-weight:800;
+      color:var(--muted);
       display:flex;
       align-items:center;
-      gap:8px;
-      color:var(--muted);
-      font-size:14px;
-      margin:0;
+      gap:.55rem;
+      margin-top:.15rem;
     }
-    .bolt{ color:var(--accent); font-weight:800; }
-    .powered{
-      font-size:13px;
-      color:var(--muted);
-      margin-top:2px;
+    .subhead .bolt{font-size:1.05rem}
+    .meta-right{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:.5rem;
+      padding-top:.25rem;
+      white-space:nowrap;
     }
-
-    /* Hero (single column) */
-    .hero{
-      display:block;
-      margin-top:10px;
-    }
-    .heroLeft{
-      padding:18px 0 0;
-    }
-
-    /* HERO: now only TWO lines
-       Line 1: DOES AI DESCRIBE YOUR BRAND AS
-       Line 2: ROTATING WORD
-    */
-    .heroHeadline{
-      margin:0;
+    .toplink{
+      font-size:.95rem;
       font-weight:900;
-      line-height:1.04;
+      color:#0f172a;
+    }
+    .powered-by{
+      font-size:.9rem;
+      color:var(--muted-2);
+    }
+    .powered-by a{
+      color:var(--primary);
+      font-weight:900;
+      text-decoration:none;
+    }
+    .powered-by a:hover{text-decoration:underline}
+
+    /* Hero */
+    .hero{
+      background:radial-gradient(900px 360px at 20% -10%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
+                 radial-gradient(900px 360px at 85% 0%, rgba(229,62,62,.06) 0%, rgba(255,255,255,0) 60%),
+                 linear-gradient(180deg, var(--tint-hero) 0%, #ffffff 100%);
+      padding:2.75rem 0 0;
+    }
+
+    .hero-inner{
+      padding:0 0 2.75rem;
+    }
+
+    .hero-headline{
+      margin-top:1.25rem;
+      font-weight:900;
+      letter-spacing:-1.2px;
+      line-height:1.05;
       text-transform:uppercase;
     }
-
-    /* line 1 */
-    .heroTopLine{
+    .hero-headline .line1{
+      font-size:clamp(2.15rem, 4.2vw, 3.35rem);
       display:block;
-      /* tighter tracking (per request) */
-      letter-spacing:.04em;
-      /* keep it on one line on desktop */
-      white-space:nowrap;
-      /* responsive sizing so it doesn’t wrap into a 3rd line */
-      font-size:clamp(28px, 4.5vw, 44px);
-      margin:0 0 10px;
     }
-
-    /* line 2 rotator */
-    .rotatorWrap{
-      display:inline-flex;
-      align-items:baseline;
-      gap:10px;
-      max-width:100%;
-    }
-
-    .rotatorViewport{
-      position:relative;
-      height:60px;
-      overflow:hidden;
-      padding-right:6px;
-      max-width:100%;
-    }
-
-    .rotatorStack{
-      display:block;
-      will-change:transform;
-      transition:transform 650ms cubic-bezier(.2,.9,.2,1);
-    }
-
-    .rotWord{
-      height:60px;
+    .hero-headline .line2{
+      font-size:clamp(2.15rem, 4.2vw, 3.35rem);
       display:flex;
-      align-items:flex-end;
-      font-weight:900;
-      letter-spacing:.02em; /* tighter than before */
-      color:var(--accent);
-      white-space:nowrap;
+      align-items:baseline;
+      gap:.55rem;
+      flex-wrap:wrap;
+    }
+    .hero-headline .static2{
+      display:inline-block;
+    }
+
+    /* Rotator (single word visible only) */
+    .rotator{
+      position:relative;
+      display:inline-flex;
+      height:1.12em;
+      overflow:hidden;
+      vertical-align:baseline;
+      align-items:baseline;
+      min-width:10ch;
+    }
+    .rotator .word{
+      position:absolute;
+      left:0;
+      top:0;
+      transform:translateY(110%);
       opacity:0;
-      transform:translateY(10px);
-      transition:opacity 450ms ease, transform 450ms ease;
-      padding-bottom:2px;
-      font-size:clamp(30px, 4.8vw, 44px);
+      transition:transform .45s ease, opacity .45s ease;
+      color:var(--accent);
+      font-weight:900; /* only emphasized word */
+      white-space:nowrap;
     }
-
-    .rotWord.isVisible{
+    .rotator .word.active{
+      transform:translateY(0%);
       opacity:1;
-      transform:translateY(0);
+    }
+    .rotator .word.exit{
+      transform:translateY(-110%);
+      opacity:0;
     }
 
-    /* Mobile adjustments */
-    @media (max-width: 520px){
-      .rotatorViewport{ height:54px; }
-      .rotWord{ height:54px; }
-      .heroTopLine{
-        white-space:normal;  /* allow wrap if absolutely needed on very small screens */
-        letter-spacing:.03em;
-        margin-bottom:8px;
-      }
+    .hero-sub{
+      margin-top:1.15rem;
+      font-size:1.08rem;
+      color:var(--muted);
+      max-width:900px;
+      line-height:1.85;
+      font-weight:700;
     }
 
-    .heroSub{
-      margin:14px 0 0;
-      font-size:16px;
-      color:var(--text);
-      max-width:56ch;
-      text-transform:none;
-    }
-    .heroSub .muted{ color:var(--muted); }
-
-    /* Cards */
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
+    /* CTA panel */
+    .cta-panel{
+      margin-top:2rem;
+      background:radial-gradient(1000px 280px at 50% -10%, rgba(37,99,235,.22) 0%, rgba(255,255,255,0) 62%),
+                 linear-gradient(180deg, var(--tint-panel) 0%, #ffffff 80%);
+      border:2px solid rgba(37,99,235,.28);
       border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
+      padding:1.6rem 1.6rem 1.35rem;
+      box-shadow:var(--shadow-soft);
     }
-
-    /* Full-width “Reveal My…” box */
-    .revealBox{
-      margin-top:18px;
-      width:100%;
-      /* subtle color without redesign */
-      background: linear-gradient(180deg, rgba(210,75,42,.06), rgba(255,255,255,0) 55%), #fff;
-    }
-
-    .cardTitle{
+    .cta-top{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
+      gap:1rem;
+      flex-wrap:wrap;
+      margin-bottom:1.15rem;
     }
-    .cardTitleLeft{
+    .cta-title{
+      font-size:1.1rem;
       font-weight:900;
-      font-size:14px;
-      line-height:1.2;
+      letter-spacing:-.2px;
     }
-    .pill{
+    .cta-badge{
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid var(--border);
-      padding:6px 10px;
-      border-radius:999px;
-      background:#fafafb;
-      white-space:nowrap;
-    }
-    .pill b{ color:var(--accent); font-weight:800; }
-
-    .formRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .urlInput{
-      flex: 1 1 360px;
-      max-width: 520px;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      font-size:15px;
-      outline:none;
+      gap:.5rem;
+      font-weight:900;
+      font-size:.9rem;
+      color:#0f172a;
       background:#fff;
+      border:1px solid rgba(37,99,235,.20);
+      padding:.45rem .65rem;
+      border-radius:999px;
+      box-shadow:0 6px 16px rgba(2,6,23,.06);
     }
-    .urlInput:focus{
-      border-color:#c9c9d1;
-      box-shadow:0 0 0 3px rgba(210,75,42,.10);
+    .cta-badge .free{
+      font-weight:900;
+      color:#16a34a;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.28);
+      padding:.12rem .55rem;
+      border-radius:999px;
+      font-size:.82rem;
+    }
+
+    .cta-form{
+      display:flex;
+      gap:.85rem;
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+    .url-input{
+      flex:1 1 520px;
+      min-width:260px;
+      font-size:1.05rem;
+      padding:1rem 1.05rem;
+      border:2px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .url-input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(37,99,235,.14);
     }
 
     .btn{
-      appearance:none;
-      border:0;
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:15px;
-      font-weight:800;
-      background:var(--btn);
-      color:var(--btnText);
+      border:none;
+      border-radius:14px;
       cursor:pointer;
+      font-weight:900;
+      letter-spacing:-.2px;
+      transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding:1rem 1.25rem;
       white-space:nowrap;
     }
-    .btn:hover{ filter:brightness(1.05); }
-    .btn:active{ transform:translateY(1px); }
+    .btn-primary{
+      background:#0f172a;
+      color:#fff;
+      min-width:220px;
+      box-shadow:0 10px 22px rgba(2,6,23,.18);
+      font-size:1rem;
+    }
+    .btn-primary:hover{background:#0b1220;transform:translateY(-1px)}
 
-    .smallNote{
-      margin:10px 0 0;
-      font-size:13px;
+    .helper-line{
+      margin-top:.85rem;
       color:var(--muted);
+      font-weight:700;
+      font-size:.95rem;
     }
 
-    .bullets{
-      margin:12px 0 0;
-      padding-left:18px;
-      color:var(--text);
-      font-size:14px;
+    .value-points{
+      margin-top:1.1rem;
+      padding-top:1.05rem;
+      border-top:1px solid rgba(226,232,240,.9);
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      align-items:flex-start;
     }
-    .bullets li{ margin:6px 0; }
-    .bullets .muted{ color:var(--muted); }
-
-    /* Mini explainer cards under hero */
-    .miniRow{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-    }
-    @media (max-width: 820px){
-      .miniRow{ grid-template-columns:1fr; }
-    }
-    .miniCard{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      background:#fff;
-    }
-    .miniCard h3{
-      margin:0 0 6px;
-      font-size:16px;
-      font-weight:900;
-      text-transform:none;
-    }
-    .miniCard p{
+    .value-points ul{
       margin:0;
+      padding-left:1.2rem;
       color:var(--muted);
-      font-size:14px;
-      line-height:1.4;
-      text-transform:none;
+      font-weight:800;
+      line-height:1.7;
+      font-size:.95rem;
+      flex:1;
+      min-width:260px;
+    }
+    .value-points li{margin:.45rem 0}
+
+    .error{
+      margin-top:.8rem;
+      font-size:.95rem;
+      color:var(--primary);
+      font-weight:900;
+      display:none;
+      width:100%;
+    }
+    .error.show{display:block}
+
+    /* Callouts (two boxes) */
+    .callouts{
+      margin-top:1.85rem;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1.2rem;
+    }
+    .callout{
+      border-radius:18px;
+      padding:1.25rem 1.25rem;
+      border:1px solid rgba(37,99,235,.22);
+      background:linear-gradient(135deg, rgba(37,99,235,.10) 0%, rgba(255,255,255,1) 68%);
+      box-shadow:0 10px 26px rgba(2,6,23,.06);
+    }
+    .callout.alt{
+      border:1px solid rgba(229,62,62,.18);
+      background:linear-gradient(135deg, rgba(229,62,62,.07) 0%, rgba(255,255,255,1) 68%);
+    }
+    .callout h3{
+      font-size:1.05rem;
+      font-weight:900;
+      letter-spacing:-.2px;
+      margin-bottom:.45rem;
+    }
+    .callout p{
+      font-size:.98rem;
+      color:var(--muted);
+      font-weight:750;
+      line-height:1.75;
     }
 
-    /* Sections */
-    .section{
-      margin-top:30px;
-      padding-top:18px;
+    /* Pillars */
+    .pillars{
+      background:linear-gradient(180deg, var(--tint-soft) 0%, #ffffff 100%);
       border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
     }
-    .section h2{
-      margin:0 0 10px;
-      font-size:22px;
-      letter-spacing:.2px;
-      text-transform:none;
-    }
-    .section p{
-      margin:8px 0;
-      color:var(--text);
-      font-size:15px;
-      max-width:78ch;
-      text-transform:none;
-    }
-    .section p.muted{ color:var(--muted); }
-
-    .layers{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:12px;
-    }
-    @media (max-width: 820px){
-      .layers{ grid-template-columns:1fr; }
-    }
-    .layer{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      background:#fff;
-    }
-    .layer .icon{
-      font-size:14px;
-      color:var(--accent);
+    .title{
+      font-size:2.05rem;
       font-weight:900;
-      margin-bottom:6px;
+      letter-spacing:-.6px;
+      margin-bottom:.75rem;
     }
-    .layer h4{
-      margin:0 0 6px;
-      font-size:16px;
-      font-weight:900;
-      text-transform:none;
-    }
-    .layer p{
-      margin:0;
+    .kicker{
       color:var(--muted);
-      font-size:14px;
-      line-height:1.4;
-      text-transform:none;
+      font-size:1.03rem;
+      font-weight:750;
+      max-width:940px;
+      line-height:1.85;
+    }
+    .pillars-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:1.15rem;
+      margin-top:1.75rem;
+    }
+    .pillar{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:1.25rem 1.15rem;
+      box-shadow:0 10px 24px rgba(2,6,23,.05);
+    }
+    .pillar .p-icon{
+      width:34px;height:34px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(37,99,235,.10);
+      border:1px solid rgba(37,99,235,.18);
+      margin-bottom:.7rem;
+      font-weight:900;
+    }
+    .pillar.alt .p-icon{
+      background:rgba(229,62,62,.08);
+      border:1px solid rgba(229,62,62,.16);
+    }
+    .pillar h4{
+      font-size:1.05rem;
+      font-weight:900;
+      letter-spacing:-.2px;
+      margin-bottom:.35rem;
+      color:#0f172a;
+    }
+    .pillar p{
+      font-size:.95rem;
+      color:var(--muted);
+      font-weight:750;
+      line-height:1.65;
+    }
+    .pillars-footer{
+      margin-top:1.2rem;
+      color:var(--muted);
+      font-size:.98rem;
+      font-weight:850;
     }
 
-    .twoCol{
+    /* Pricing (kept from your file, but spacing increased) */
+    .pricing{background:var(--bg)}
+    .pricing-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-      margin-top:12px;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:1.2rem;
+      margin-top:2rem;
     }
-    @media (max-width: 820px){
-      .twoCol{ grid-template-columns:1fr; }
+    .plan{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow);
+      padding:1.35rem 1.25rem 1.2rem;
+      display:flex;
+      flex-direction:column;
+      gap:.8rem;
+      min-height:420px;
     }
+    .plan.featured{
+      border:2px solid rgba(37,99,235,.40);
+      background:linear-gradient(180deg,#f0f7ff 0%, #ffffff 64%);
+    }
+    .plan-top{display:flex;flex-direction:column;gap:.35rem}
+    .plan h3{
+      font-size:1.18rem;
+      font-weight:900;
+      letter-spacing:-.2px;
+      margin:0;
+    }
+    .price-line{
+      font-size:1rem;
+      color:#0f172a;
+      font-weight:900;
+      display:flex;
+      gap:.5rem;
+      align-items:baseline;
+      flex-wrap:wrap;
+    }
+    .price{
+      font-size:1.22rem;
+      font-weight:900;
+      color:#0f172a;
+    }
+    .free-flag{
+      font-weight:900;
+      color:#16a34a;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.28);
+      padding:.18rem .55rem;
+      border-radius:999px;
+      font-size:.85rem;
+    }
+    .plan p{
+      color:var(--muted);
+      font-weight:750;
+      font-size:.95rem;
+      line-height:1.75;
+    }
+    .plan ul{margin:.35rem 0 0 1.1rem}
+    .plan li{
+      margin:.45rem 0;
+      color:var(--muted);
+      font-weight:750;
+      line-height:1.6;
+      font-size:.95rem;
+    }
+    .plan-actions{
+      margin-top:auto;
+      display:flex;
+      gap:.6rem;
+      flex-wrap:wrap;
+    }
+    .btn-plan{
+      flex:1;
+      min-width:180px;
+      background:var(--primary);
+      color:#fff;
+      padding:.95rem 1rem;
+      border-radius:14px;
+      font-weight:900;
+      text-align:center;
+      text-decoration:none;
+    }
+    .btn-plan:hover{background:var(--primary-2);text-decoration:none}
 
     /* Footer */
-    .footer{
-      margin-top:38px;
-      padding-top:18px;
+    footer{
+      margin-top:3.25rem;
       border-top:1px solid var(--border);
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-      justify-content:space-between;
-      align-items:flex-start;
-      color:var(--muted);
-      font-size:13px;
-      text-transform:none;
+      background:var(--tint-soft);
     }
-    .footerCols{
-      display:flex;
-      gap:22px;
-      flex-wrap:wrap;
+    .footer-inner{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:2.25rem var(--pad-h) 1.4rem;
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:1.6rem;
     }
-    .footer h5{
-      margin:0 0 6px;
-      font-size:13px;
-      color:var(--text);
+    .foot-brand h3{
+      font-size:1.05rem;
       font-weight:900;
-      text-transform:none;
+      margin-bottom:.35rem;
+      letter-spacing:-.2px;
     }
-    .footer ul{
+    .foot-brand p{
+      color:var(--muted);
+      font-weight:750;
+      line-height:1.75;
+      font-size:.95rem;
+    }
+    .foot-col h4{
+      font-size:.95rem;
+      font-weight:900;
+      margin-bottom:.6rem;
+      color:#0f172a;
+    }
+    .foot-links{
+      list-style:none;
       margin:0;
       padding:0;
-      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:.5rem;
     }
-    .footer li{ margin:6px 0; }
-    .footer a{ color:var(--muted); }
-    .footer a:hover{ color:var(--text); }
-    .legal{
-      max-width:68ch;
+    .foot-links a{
       color:var(--muted);
+      font-weight:850;
+      text-decoration:none;
+    }
+    .foot-links a:hover{color:#0f172a;text-decoration:none}
+    .foot-bottom{
+      border-top:1px solid var(--border);
+      padding:1rem var(--pad-h);
+      max-width:var(--max-width);
+      margin:0 auto;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:750;
+      line-height:1.6;
+    }
+    .disclaimer{
+      margin-top:.75rem;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:850;
+      line-height:1.6;
+    }
+
+    /* Responsive */
+    @media (max-width:1020px){
+      .pillars-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .pricing-grid{grid-template-columns:1fr}
+      .plan{min-height:auto}
+      .footer-inner{grid-template-columns:1fr;gap:1.2rem}
+      .callouts{grid-template-columns:1fr}
+      .meta-right{align-items:flex-start}
+      .header-row{flex-direction:column;align-items:flex-start}
+    }
+    @media (max-width:640px){
+      header{padding-top:1.75rem}
+      .wrap{padding:0 1.25rem}
+      .hero{padding-top:2.15rem}
+      .hero-headline .line2{gap:.45rem}
+      .rotator{min-width:12ch}
+      .cta-panel{padding:1.25rem 1.15rem}
+      .btn-primary{min-width:100%}
+      .cta-form{flex-direction:column}
+      .url-input{width:100%}
+      .value-points{flex-direction:column}
+      .value-points ul{min-width:0}
+      .section{padding:3.5rem 0}
     }
   </style>
 </head>
 
-<body>
-  <div class="wrap">
+<body id="top">
 
-    <header class="topbar">
-      <div class="brand">
-        <h1>AI Visibility Index</h1>
-        <p class="tagline"><span class="bolt">⚡</span> Visibility for the Age of AI</p>
-        <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+  <!-- Header -->
+  <header>
+    <div class="wrap">
+      <div class="header-row">
+        <div class="brand">
+          <div class="brand-top">
+            <div>
+              <div class="logo">AI Visibility <span class="blue">Index</span></div>
+              <div class="subhead"><span class="bolt">⚡</span> Visibility for the Age of AI</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta-right">
+          <a class="toplink" href="#how-it-works">Learn how the index works</a>
+          <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
+        </div>
       </div>
+    </div>
+  </header>
 
-      <div style="text-align:right; margin-top:2px;">
-        <a href="#how" style="font-size:13px; color:var(--muted);">Learn how the index works</a>
-      </div>
-    </header>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="wrap hero-inner">
 
-    <main class="hero">
-      <section class="heroLeft">
-        <h2 class="heroHeadline" aria-label="Does AI describe your brand as">
-          <span class="heroTopLine">DOES AI DESCRIBE YOUR BRAND AS</span>
-          <span class="rotatorWrap">
-            <span id="rotatorViewport" class="rotatorViewport" aria-live="polite" aria-atomic="true">
-              <span id="rotatorStack" class="rotatorStack">
-                <span class="rotWord">TRUSTWORTHY?</span>
-                <span class="rotWord">AUTHORITATIVE?</span>
-                <span class="rotWord">CLEAR?</span>
-                <span class="rotWord">RELIABLE?</span>
-                <span class="rotWord">CREDIBLE?</span>
-                <span class="rotWord">UNDERSTANDABLE?</span>
-                <span class="rotWord">CONSISTENT?</span>
-              </span>
-            </span>
+      <div class="hero-headline" aria-label="Hero question">
+        <span class="line1">DOES AI DESCRIBE YOUR</span>
+        <span class="line2">
+          <span class="static2">BRAND AS</span>
+          <span class="rotator" aria-live="polite" aria-atomic="true">
+            <span class="word active" id="rotatorWord">TRUSTWORTHY?</span>
           </span>
-        </h2>
+        </span>
+      </div>
 
-        <p class="heroSub">
-          <strong>The AI Visibility Index (AIVI)</strong> measures how AI systems currently interpret, trust, and represent your website
-          <span class="muted">before customers ever see it.</span>
-        </p>
+      <div class="hero-sub">
+        The AI Visibility Index (AIVI) measures how AI systems currently interpret, trust, and represent your website — before customers ever see you.
+      </div>
 
-        <div class="miniRow">
-          <div class="miniCard">
-            <h3>You’re not optimizing for AI, yet.</h3>
-            <p>AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers, summaries, and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.</p>
+      <!-- CTA Panel -->
+      <div class="cta-panel" id="analyze">
+        <div class="cta-top">
+          <div>
+            <div class="cta-title">Reveal My AI Visibility</div>
           </div>
-          <div class="miniCard">
-            <h3>This is not SEO.</h3>
-            <p>This is AI perception. If AI cannot clearly understand you, it cannot confidently recommend you.</p>
+          <div class="cta-badge" aria-label="Free snapshot badge">
+            <span class="free">Free</span>
+            <span>AIVI Snapshot (Analyze)</span>
           </div>
         </div>
-      </section>
 
-      <!-- FULL-WIDTH: Reveal My AI Visibility -->
-      <section class="card revealBox" aria-label="Free AIVI snapshot">
-        <div class="cardTitle">
-          <div class="cardTitleLeft">Reveal My AI Visibility</div>
-          <div class="pill"><b>Free</b> AIVI Snapshot (Analyze)</div>
-        </div>
+        <form id="analyze-form" class="cta-form" novalidate>
+          <input id="url" type="text" class="url-input" placeholder="Enter a website URL" aria-label="Website URL" />
+          <button type="submit" class="btn btn-primary">Reveal My AI Visibility</button>
+          <div id="error-message" class="error" role="alert"></div>
+        </form>
 
-        <form id="analyzeForm" novalidate>
-          <div class="formRow">
-            <input
-              id="urlInput"
-              class="urlInput"
-              type="url"
-              inputmode="url"
-              autocomplete="url"
-              placeholder="Enter a website URL"
-              aria-label="Website URL"
-              required
-            />
-            <button class="btn" type="submit">Reveal My AI Visibility</button>
-          </div>
+        <div class="helper-line">Get a current AI visibility snapshot. No signup, no credit card.</div>
 
-          <div class="smallNote" id="formNote">
-            Get a current AI visibility snapshot. No signup, no credit card.
-          </div>
-
-          <ul class="bullets">
+        <div class="value-points" aria-label="Snapshot details">
+          <ul>
             <li>High-level AIVI snapshot</li>
             <li>Initial strengths and visibility gaps</li>
             <li>How AI currently understands your site, how your brand is reconstructed</li>
-            <li class="muted">Delivered as a snapshot measurement, not monitoring or alerts</li>
+            <li>Delivered as a snapshot measurement, not monitoring or alerts</li>
           </ul>
-        </form>
-      </section>
-    </main>
+        </div>
+      </div>
 
-    <section id="how" class="section">
-      <h2>How AI “sees” a website</h2>
-      <p class="muted">
-        AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading that reflects how AI is likely to understand and represent your website today.
-      </p>
+      <!-- Two boxes -->
+      <div class="callouts" aria-label="Key callouts">
+        <div class="callout">
+          <h3>You’re not optimizing for AI, yet.</h3>
+          <p>
+            AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers,
+            summaries, and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.
+          </p>
+        </div>
+        <div class="callout alt">
+          <h3>This is not SEO.</h3>
+          <p>
+            This is AI perception. If AI cannot clearly understand you, it cannot confidently recommend you.
+          </p>
+        </div>
+      </div>
 
-      <div class="layers">
-        <div class="layer">
-          <div class="icon">▣</div>
+    </div>
+  </div>
+
+  <!-- Pillars -->
+  <div class="pillars section" id="how-it-works">
+    <div class="wrap">
+      <div class="title">How AI “sees” a website</div>
+      <div class="kicker">
+        AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading
+        that reflects how AI is likely to understand and represent your website today.
+      </div>
+
+      <div class="pillars-grid" role="list" aria-label="AIVI layers">
+        <div class="pillar" role="listitem">
+          <div class="p-icon">▣</div>
           <h4>Structural Legibility</h4>
           <p>Can AI reliably parse, navigate, and segment your site?</p>
         </div>
-
-        <div class="layer">
-          <div class="icon">▣</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">◐</div>
           <h4>Semantic Clarity</h4>
           <p>Does AI understand your offering, or fill in the gaps with assumptions?</p>
         </div>
-
-        <div class="layer">
-          <div class="icon">▣</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">▦</div>
           <h4>Authority Recognition</h4>
           <p>Does AI treat your content as reference-worthy, or disposable?</p>
         </div>
-
-        <div class="layer">
-          <div class="icon">⚠︎</div>
+        <div class="pillar alt" role="listitem">
+          <div class="p-icon">▲</div>
           <h4>Representation Risk</h4>
           <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers.</p>
         </div>
       </div>
-    </section>
 
-    <section class="section" id="what">
-      <h2>What AIVI is, and is not</h2>
-      <p class="muted">
-        AIVI is an observational index. It measures how AI systems interpret and represent a website based on observable signals.
-      </p>
-
-      <div class="twoCol">
-        <div class="miniCard">
-          <h3>What AIVI is</h3>
-          <p>
-            An Index reading that summarizes observable AI perception signals and provides a clear, interpretable view of how AI is likely to understand and represent your website.
-          </p>
-        </div>
-
-        <div class="miniCard">
-          <h3>What AIVI is not</h3>
-          <p>
-            Not an SEO tool. No keywords, backlinks, or rank tracking. Not a content grader. Not a prompt test. Not a checklist. Not a guarantee engine.
-          </p>
-        </div>
+      <div class="pillars-footer">
+        Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
       </div>
-
-      <p style="margin-top:12px;">
-        <strong>AIVI does not tell you what to do.</strong> It shows you what AI already believes.
-      </p>
-    </section>
-
-    <footer class="footer" aria-label="Footer">
-      <div class="legal">
-        <div style="font-weight:900; color:var(--text); margin-bottom:6px;">AI Visibility Index (AIVI)</div>
-        <div>
-          AIVI summarizes observable AI perception signals to help teams understand how AI systems interpret, trust, and represent a website.
-        </div>
-        <div style="margin-top:8px;">
-          © 2025 AI Visibility Index (AIVI). A product of Quontora.
-        </div>
-      </div>
-
-      <div class="footerCols">
-        <div>
-          <h5>Product</h5>
-          <ul>
-            <li><a href="#analyzeForm">Free AIVI Snapshot</a></li>
-            <li><a href="#how">How the index works</a></li>
-            <li><a href="#what">What AIVI is / is not</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5>Resources</h5>
-          <ul>
-            <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-            <li><a href="mailto:hello@quontora.com">Contact</a></li>
-          </ul>
-        </div>
-      </div>
-    </footer>
-
+    </div>
   </div>
 
+  <!-- Pricing (unchanged logic; spacing improved) -->
+  <div class="pricing section" id="pricing">
+    <div class="wrap">
+      <div class="title">Access to the AI Visibility Index</div>
+      <div class="kicker">
+        AIVI is currently available through request-based access while the index methodology continues to mature.
+        Each analysis is delivered as an index reading, not automated output.
+      </div>
+
+      <div class="pricing-grid">
+        <div class="plan featured">
+          <div class="plan-top">
+            <h3>AIVI — Index Reading</h3>
+            <div class="price-line">
+              <span class="price">$249 per domain</span>
+              <span class="free-flag">Free during early access</span>
+            </div>
+          </div>
+
+          <ul>
+            <li>AI Visibility Index Snapshot™</li>
+            <li>Visibility Tier classification</li>
+            <li>Representation Risk assessment</li>
+            <li>Full AI Visibility Report</li>
+            <li>Executive-ready findings (shareable)</li>
+          </ul>
+
+          <p><b>Delivery:</b> request-based, manual delivery</p>
+
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="index-reading">Request Index Reading</a>
+          </div>
+        </div>
+
+        <div class="plan">
+          <div class="plan-top">
+            <h3>AIVI — Monitoring Access</h3>
+            <div class="price-line">
+              <span class="price">$99 / month per domain</span>
+            </div>
+          </div>
+
+          <ul>
+            <li>Periodic index re-readings</li>
+            <li>Change detection across core perception layers</li>
+            <li>Visibility Tier movement tracking</li>
+            <li>Representation risk trend signals</li>
+          </ul>
+
+          <p><b>Monitoring:</b> observes perception drift, not performance metrics.</p>
+
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="monitoring">Request Monitoring</a>
+          </div>
+        </div>
+
+        <div class="plan">
+          <div class="plan-top">
+            <h3>Enterprise</h3>
+            <div class="price-line">
+              <span class="price">Private access</span>
+            </div>
+          </div>
+
+          <ul>
+            <li>Organization-level index coverage</li>
+            <li>Comparative context</li>
+            <li>Executive briefings</li>
+            <li>Availability is limited</li>
+          </ul>
+
+          <p>For organizations where AI visibility is a material risk.</p>
+
+          <div class="plan-actions">
+            <a class="btn-plan" href="#request" data-intent="enterprise">Request Enterprise Access</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request access (kept from your prior structure; no changes here yet) -->
+  <div class="section" id="request">
+    <div class="wrap">
+      <div class="title">Request access</div>
+      <div class="kicker">
+        Request-based delivery while AIVI is in active development. You’ll receive next steps by email.
+      </div>
+
+      <!-- Intentionally left as-is for now (next step after hero/CTA approval) -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="foot-brand">
+        <h3>AI Visibility Index (AIVI)</h3>
+        <p>
+          AIVI summarizes observable AI perception signals to help teams understand how AI systems interpret, trust, and represent a website.
+        </p>
+        <div class="disclaimer">
+          AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
+        </div>
+      </div>
+
+      <div class="foot-col">
+        <h4>Product</h4>
+        <ul class="foot-links">
+          <li><a href="#analyze">Free AIVI Snapshot</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#how-it-works">Learn how the index works</a></li>
+          <li><a href="#request">Request access</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h4>Resources</h4>
+        <ul class="foot-links">
+          <li><a href="/index/whitepaper.html">Whitepaper</a></li>
+          <li><a href="/index/technical.html">Technical</a></li>
+          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+          <li><a href="mailto:hello@quontora.com?subject=AIVI%20Question">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div>© 2025 AI Visibility Index (AIVI). A product of Quontora.</div>
+      <div style="margin-top:.35rem;">
+        Request-based access during early development. Pricing and availability may change.
+      </div>
+    </div>
+  </footer>
+
   <script>
+    // Basic URL validation
+    function isValidURL(input){
+      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
+    }
+
+    // Hero word rotator (one word visible at a time)
     (function(){
-      // Robust rotating word cylinder (keeps only one word visible; no peeking).
-      const stack = document.getElementById('rotatorStack');
-      const viewport = document.getElementById('rotatorViewport');
-      if (!stack || !viewport) return;
+      const words = [
+        "TRUSTWORTHY?",
+        "AUTHORITATIVE?",
+        "CLEAR?",
+        "RELIABLE?",
+        "CREDIBLE?",
+        "UNDERSTANDABLE?",
+        "CONSISTENT?"
+      ];
+      const el = document.getElementById("rotatorWord");
+      if (!el) return;
 
-      const words = Array.from(stack.querySelectorAll('.rotWord'));
-      if (!words.length) return;
+      let idx = 0;
+      let busy = false;
 
-      let i = 0;
-      let timer = null;
+      function swap(){
+        if (busy) return;
+        busy = true;
 
-      function setViewportHeight(){
-        const h = Math.round(words[0].getBoundingClientRect().height || 60);
-        if (h > 0) viewport.style.height = h + "px";
-      }
+        const current = el;
+        current.classList.remove("active");
+        current.classList.add("exit");
 
-      function setVisible(nextIndex){
-        words.forEach((w, idx) => {
-          if (idx === nextIndex) w.classList.add('isVisible');
-          else w.classList.remove('isVisible');
+        idx = (idx + 1) % words.length;
+
+        const next = document.createElement("span");
+        next.className = "word";
+        next.textContent = words[idx];
+        current.parentElement.appendChild(next);
+
+        // allow DOM paint
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            next.classList.add("active");
+          });
         });
 
-        const top = words[nextIndex].offsetTop || 0;
-        stack.style.transform = `translateY(${-top}px)`;
-        setViewportHeight();
+        setTimeout(() => {
+          current.remove();
+          next.id = "rotatorWord";
+          next.classList.remove("exit");
+          busy = false;
+        }, 520);
       }
 
-      function start(){
-        if (timer) clearInterval(timer);
-        timer = setInterval(() => {
-          i = (i + 1) % words.length;
-          setVisible(i);
-        }, 2200);
-      }
-
-      function init(){
-        setVisible(0);
-        start();
-      }
-
-      init();
-      setTimeout(init, 250);
-      setTimeout(init, 900);
-      window.addEventListener('resize', () => setVisible(i));
-
-      // Form behavior
-      const form = document.getElementById('analyzeForm');
-      const input = document.getElementById('urlInput');
-      const note = document.getElementById('formNote');
-
-      function normalizeUrl(raw){
-        if (!raw) return "";
-        let v = String(raw).trim();
-        if (!v) return "";
-        if (!/^https?:\/\//i.test(v)) v = "https://" + v;
-        try{
-          const u = new URL(v);
-          return u.toString();
-        }catch(e){
-          return "";
-        }
-      }
-
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const normalized = normalizeUrl(input.value);
-        if (!normalized){
-          note.textContent = "Please enter a valid website URL.";
-          note.style.color = "var(--accent)";
-          return;
-        }
-        note.textContent = "Redirecting to analysis…";
-        note.style.color = "var(--muted)";
-
-        const target = `analyze.html?url=${encodeURIComponent(normalized)}`;
-        window.location.href = target;
-      });
+      setInterval(swap, 1800);
     })();
+
+    // Analyze: free snapshot
+    document.addEventListener("DOMContentLoaded", () => {
+      const analyzeForm = document.getElementById("analyze-form");
+      const urlInput = document.getElementById("url");
+      const errorDiv = document.getElementById("error-message");
+
+      if (analyzeForm && urlInput && errorDiv) {
+        analyzeForm.addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+
+          let url = (urlInput.value || "").trim();
+          errorDiv.classList.remove("show");
+
+          if (!url) {
+            errorDiv.textContent = "Please enter a website URL";
+            errorDiv.classList.add("show");
+            return;
+          }
+          if (!isValidURL(url)) {
+            errorDiv.textContent = "Please enter a valid domain (e.g., example.com)";
+            errorDiv.classList.add("show");
+            return;
+          }
+          if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+          window.location.href = "analyze.html?url=" + encodeURIComponent(url);
+        });
+      }
+    });
+
+    // Smooth anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click",ev=>{
+        const href = a.getAttribute("href");
+        if (!href) return;
+        const id = href.substring(1);
+        const t = document.getElementById(id);
+        if (t) {
+          ev.preventDefault();
+          t.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      });
+    });
   </script>
 
-  <!-- v2025.12.18-5 -->
+  <!-- Version: v2025.12.18-1 -->
 </body>
 </html>
