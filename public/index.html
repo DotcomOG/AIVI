@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- index.html - v2025.12.18-2 - Built by ChatGPT -->
+<!-- index.html - v2025.12.18-3 - Built by ChatGPT -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -75,7 +75,7 @@
       margin-top:2px;
     }
 
-    /* Hero layout (single column) */
+    /* Hero (single column) */
     .hero{
       display:block;
       margin-top:10px;
@@ -85,8 +85,9 @@
       padding:18px 0 0;
     }
 
+    /* Make the first line less tiny (per your screenshot feedback) */
     .heroKicker{
-      font-size:13px;
+      font-size:14px;          /* was 13px */
       color:var(--muted);
       margin:0 0 10px;
       letter-spacing:.12em;
@@ -120,37 +121,38 @@
 
     .rotatorViewport{
       position:relative;
-      height:56px;              /* slightly taller to avoid clipping */
+      height:60px;             /* stable window; JS will translate by offsetTop */
       overflow:hidden;          /* hides non-active words */
       padding-right:6px;
       max-width:100%;
     }
 
     @media (max-width: 520px){
-      .rotatorViewport{ height:50px; }
+      .rotatorViewport{ height:54px; }
     }
 
     .rotatorStack{
+      display:block;            /* IMPORTANT: transforms behave consistently */
       will-change:transform;
       transition:transform 650ms cubic-bezier(.2,.9,.2,1);
     }
 
     .rotWord{
-      height:56px;
+      height:60px;
       display:flex;
-      align-items:flex-end;     /* keeps baseline feel */
+      align-items:flex-end;
       font-weight:900;
       letter-spacing:.6px;
       color:var(--accent);
-      white-space:nowrap;       /* you asked for no peeking / no wrap */
+      white-space:nowrap;
       opacity:0;
       transform:translateY(10px);
       transition:opacity 450ms ease, transform 450ms ease;
-      padding-bottom:2px;       /* prevents bottom crop on some fonts */
+      padding-bottom:2px;
     }
 
     @media (max-width: 520px){
-      .rotWord{ height:50px; }
+      .rotWord{ height:54px; }
     }
 
     .rotWord.isVisible{
@@ -217,7 +219,7 @@
 
     .urlInput{
       flex: 1 1 360px;
-      max-width: 520px; /* keep shorter than full width on desktop */
+      max-width: 520px;
       padding:12px 12px;
       border-radius:12px;
       border:1px solid var(--border);
@@ -410,7 +412,7 @@
         <h2 class="heroHeadline" aria-label="Does AI describe your brand as">
           <span class="headlineRow">BRAND AS</span>
           <span class="rotatorWrap">
-            <span class="rotatorViewport" aria-live="polite" aria-atomic="true">
+            <span id="rotatorViewport" class="rotatorViewport" aria-live="polite" aria-atomic="true">
               <span id="rotatorStack" class="rotatorStack">
                 <span class="rotWord">TRUSTWORTHY?</span>
                 <span class="rotWord">AUTHORITATIVE?</span>
@@ -571,18 +573,23 @@
 
   <script>
     (function(){
-      // Rotating word cylinder: one word visible at a time; no peeking.
+      // Robust rotating word cylinder:
+      // - Uses offsetTop (not a fixed rowHeight) so every word shows correctly.
+      // - Recomputes after fonts/layout settle.
       const stack = document.getElementById('rotatorStack');
-      if (!stack) return;
+      const viewport = document.getElementById('rotatorViewport');
+      if (!stack || !viewport) return;
 
       const words = Array.from(stack.querySelectorAll('.rotWord'));
       if (!words.length) return;
 
       let i = 0;
+      let timer = null;
 
-      function rowHeight(){
-        // Use current rendered height for consistent motion
-        return words[0].getBoundingClientRect().height || 56;
+      function setViewportHeight(){
+        // Keep the window aligned to current word height (prevents “missing line” issues)
+        const h = Math.round(words[0].getBoundingClientRect().height || 60);
+        if (h > 0) viewport.style.height = h + "px";
       }
 
       function setVisible(nextIndex){
@@ -590,20 +597,31 @@
           if (idx === nextIndex) w.classList.add('isVisible');
           else w.classList.remove('isVisible');
         });
-        const h = rowHeight();
-        stack.style.transform = `translateY(${-nextIndex * h}px)`;
+
+        // Translate by the element’s actual offsetTop (most reliable)
+        const top = words[nextIndex].offsetTop || 0;
+        stack.style.transform = `translateY(${-top}px)`;
+        setViewportHeight();
       }
 
-      // Initialize
-      setVisible(0);
+      function start(){
+        if (timer) clearInterval(timer);
+        timer = setInterval(() => {
+          i = (i + 1) % words.length;
+          setVisible(i);
+        }, 2200);
+      }
 
-      // Rotate
-      setInterval(() => {
-        i = (i + 1) % words.length;
-        setVisible(i);
-      }, 2200);
+      // Init after layout is stable
+      function init(){
+        setVisible(0);
+        start();
+      }
 
-      // Recompute on resize to avoid any clipping / misalignment
+      // Run now, then again after a short delay (font/render settling), and on resize.
+      init();
+      setTimeout(init, 250);
+      setTimeout(init, 900);
       window.addEventListener('resize', () => setVisible(i));
 
       // Form behavior
@@ -635,13 +653,12 @@
         note.textContent = "Redirecting to analysis…";
         note.style.color = "var(--muted)";
 
-        // index.html → analyze.html
         const target = `analyze.html?url=${encodeURIComponent(normalized)}`;
         window.location.href = target;
       });
     })();
   </script>
 
-  <!-- v2025.12.18-2 -->
+  <!-- v2025.12.18-3 -->
 </body>
 </html>
