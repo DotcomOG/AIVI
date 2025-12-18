@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.18-1
+  Version: v2025.12.18-2
   Last updated: 2025-12-18 (America/New_York)
 
   FIXES IN THIS VERSION (HERO ONLY):
-  1) Restored rotating hero word animation (one word at a time, no “ghost” words visible).
-  2) Fixed baseline alignment of the rotating word with the headline.
-  3) Prevented long words from being cut off on desktop + mobile (responsive sizing + safe wrapping).
-  4) Ensured every rotating word includes a trailing question mark.
+  1) Replaced the current hero rotator with the proven “stack-in-viewport” hero header from v2025.12.18-5.
+  2) Restored true rotating animation (no static word, no stacking, no cut-off).
+  3) Preserved your existing page layout and all non-hero sections unchanged.
+  4) Mobile behavior: Line 1 can wrap only when necessary; rotating word stays visible and unclipped.
 -->
 <html lang="en">
 <head>
@@ -41,21 +41,23 @@
 
       --radius:14px;
     }
-/* ROTATOR VISIBILITY FIX */
-#rotatorWindow{
-  display:inline-block;
-  vertical-align:baseline;
-  min-width:12ch;          /* prevents the window collapsing */
-  overflow:hidden;          /* masks the slide animation */
-}
 
-#rotatorWindow .rotator-word{
-  display:block;
-  white-space:nowrap;
-  color:var(--accent, #E53E3E);  /* red rotating word */
-  font-weight:900;
-  line-height:1;
-}
+    /* Keep any existing legacy rotator styles (harmless) */
+    /* ROTATOR VISIBILITY FIX */
+    #rotatorWindow{
+      display:inline-block;
+      vertical-align:baseline;
+      min-width:12ch;
+      overflow:hidden;
+    }
+    #rotatorWindow .rotator-word{
+      display:block;
+      white-space:nowrap;
+      color:var(--accent, #E53E3E);
+      font-weight:900;
+      line-height:1;
+    }
+
     *{margin:0;padding:0;box-sizing:border-box}
     body{
       font-family:Helvetica, Arial, sans-serif;
@@ -150,82 +152,68 @@
       padding:0 var(--pad-h);
     }
 
-    /* HERO HEADLINE: fixed alignment + no cut-off + restored animation */
-    .hero-headline{
+    /* ===== HERO HEADER (REPLACED) ===== */
+    /* Container */
+    .heroHeadline{
       margin:.4rem 0 .85rem;
-      color:#0b1220;
-      text-transform:uppercase;
       font-weight:900;
-      letter-spacing:-.7px;
-    }
-    .hero-line1{
-      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
-      line-height:1.02;
-    }
-    .hero-line2{
-      display:flex;
-      align-items:baseline;     /* baseline alignment fix */
-      gap:.6rem;
-      flex-wrap:wrap;           /* prevents cut-off */
-      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
-      line-height:1.02;
-      margin-top:.22rem;
-      min-width:0;
-    }
-    .hero-line2 .brand-as{
-      white-space:nowrap;
+      line-height:1.04;
+      text-transform:uppercase;
+      color:#0b1220;
     }
 
-    /* Rotator wrapper */
-    .rotator{
-      position:relative;
+    /* Line 1: keep to one line on desktop; allow wrap on very small screens */
+    .heroTopLine{
+      display:block;
+      letter-spacing:.04em;
+      white-space:nowrap;
+      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
+      line-height:1.02;
+      margin:0 0 10px;
+    }
+
+    /* Line 2 rotator */
+    .rotatorWrap{
       display:inline-flex;
-      align-items:baseline;     /* baseline alignment fix */
-      min-width:min(18ch, 100%);
+      align-items:baseline;
+      gap:10px;
       max-width:100%;
     }
 
-    /* “Window” prevents ghost words; only one word visible */
-    .rotator-window{
+    .rotatorViewport{
       position:relative;
-      display:inline-block;
-      overflow:hidden;          /* hard mask; no background words visible */
+      height:60px;
+      overflow:hidden;
+      padding-right:6px;
       max-width:100%;
-      padding-bottom:.06em;     /* keeps descenders from clipping */
     }
 
-    /* Current/next layers */
-    .rotator-word{
-      display:inline-block;
-      white-space:nowrap;       /* desktop: keep one word on one line */
-      max-width:100%;
+    .rotatorStack{
+      display:block;
+      will-change:transform;
+      transition:transform 650ms cubic-bezier(.2,.9,.2,1);
+    }
+
+    .rotWord{
+      height:60px;
+      display:flex;
+      align-items:flex-end;
+      font-weight:900;
+      letter-spacing:.02em;
       color:var(--accent);
-      will-change:transform, opacity;
-    }
-    .rotator-word.measure{
-      position:absolute;
-      left:-9999px;
-      top:-9999px;
-      visibility:hidden;
       white-space:nowrap;
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity 450ms ease, transform 450ms ease;
+      padding-bottom:2px;
+      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
     }
 
-    /* Animation states (vertical “cylinder” feel) */
-    .word-in{
-      animation:wordIn .42s cubic-bezier(.2,.9,.2,1) both;
+    .rotWord.isVisible{
+      opacity:1;
+      transform:translateY(0);
     }
-    .word-out{
-      animation:wordOut .42s cubic-bezier(.2,.9,.2,1) both;
-    }
-
-    @keyframes wordIn{
-      from{transform:translateY(65%);opacity:0}
-      to{transform:translateY(0%);opacity:1}
-    }
-    @keyframes wordOut{
-      from{transform:translateY(0%);opacity:1}
-      to{transform:translateY(-65%);opacity:0}
-    }
+    /* ===== END HERO HEADER (REPLACED) ===== */
 
     .hero-sub{
       font-size:clamp(1.05rem, 1.6vw, 1.22rem);
@@ -525,10 +513,8 @@
       .header-links{align-items:flex-start}
       h1.logo{white-space:normal}
 
-      /* Mobile: allow the rotating word to wrap if needed (prevents cut-off) */
-      .rotator-word{white-space:normal; word-break:break-word}
-      .rotator{min-width:0}
-      .rotator-window{max-width:100%}
+      /* Mobile: let line 1 wrap if it must */
+      .heroTopLine{ white-space:normal; letter-spacing:.03em; margin-bottom:8px; }
 
       .btn-primary{min-width:100%}
       .cta-form{flex-direction:column}
@@ -560,19 +546,23 @@
   <div class="hero">
     <div class="hero-grid">
 
-      <div class="hero-headline" aria-label="Hero headline">
-        <div class="hero-line1">Does AI describe your</div>
-        <div class="hero-line2">
-          <span class="brand-as">brand as</span>
-
-          <!-- Rotating word -->
-          <span class="rotator" aria-live="polite">
-            <span class="rotator-window" id="rotatorWindow">
-              <span class="rotator-word" id="rotatorCurrent">TRUSTWORTHY?</span>
+      <!-- HERO (replaced) -->
+      <h2 class="heroHeadline" aria-label="Does AI describe your brand as">
+        <span class="heroTopLine">DOES AI DESCRIBE YOUR BRAND AS</span>
+        <span class="rotatorWrap">
+          <span id="rotatorViewport" class="rotatorViewport" aria-live="polite" aria-atomic="true">
+            <span id="rotatorStack" class="rotatorStack">
+              <span class="rotWord">TRUSTWORTHY?</span>
+              <span class="rotWord">AUTHORITATIVE?</span>
+              <span class="rotWord">CLEAR?</span>
+              <span class="rotWord">RELIABLE?</span>
+              <span class="rotWord">CREDIBLE?</span>
+              <span class="rotWord">UNDERSTANDABLE?</span>
+              <span class="rotWord">CONSISTENT?</span>
             </span>
           </span>
-        </div>
-      </div>
+        </span>
+      </h2>
 
       <div class="hero-sub">
         The AI Visibility Index (AIVI) measures how AI systems currently interpret, trust, and represent your website — before customers ever see you.
@@ -729,133 +719,56 @@
           window.location.href = "analyze.html?url=" + encodeURIComponent(url);
         });
       }
+
+      // HERO ROTATOR (restored; one word visible; no cut-off)
+      (function(){
+        const stack = document.getElementById('rotatorStack');
+        const viewport = document.getElementById('rotatorViewport');
+        if (!stack || !viewport) return;
+
+        const words = Array.from(stack.querySelectorAll('.rotWord'));
+        if (!words.length) return;
+
+        let i = 0;
+        let timer = null;
+
+        function setViewportHeight(){
+          const h = Math.round(words[0].getBoundingClientRect().height || 60);
+          if (h > 0) viewport.style.height = h + "px";
+        }
+
+        function setVisible(nextIndex){
+          words.forEach((w, idx) => {
+            if (idx === nextIndex) w.classList.add('isVisible');
+            else w.classList.remove('isVisible');
+          });
+
+          const top = words[nextIndex].offsetTop || 0;
+          stack.style.transform = `translateY(${-top}px)`;
+          setViewportHeight();
+        }
+
+        function start(){
+          if (timer) clearInterval(timer);
+          timer = setInterval(() => {
+            i = (i + 1) % words.length;
+            setVisible(i);
+          }, 2200);
+        }
+
+        function init(){
+          setVisible(0);
+          start();
+        }
+
+        init();
+        setTimeout(init, 250);
+        setTimeout(init, 900);
+        window.addEventListener('resize', () => setVisible(i));
+      })();
     });
-
-  // HERO ROTATOR (no stacking, correct baseline, one word visible)
-  (function(){
-    const words = [
-      "TRUSTWORTHY?",
-      "AUTHORITATIVE?",
-      "CLEAR?",
-      "RELIABLE?",
-      "CREDIBLE?",
-      "UNDERSTANDABLE?",
-      "CONSISTENT?"
-    ];
-
-    const windowEl = document.getElementById("rotatorWindow");
-    if (!windowEl) return;
-
-    // Ensure window is the masking "viewport"
-    windowEl.style.position = "relative";
-    windowEl.style.overflow = "hidden";
-
-    // Create two layers once (no stacking)
-    const a = document.createElement("span");
-    const b = document.createElement("span");
-    a.className = "rotator-word";
-    b.className = "rotator-word";
-
-    // absolute overlay so they animate in the same spot
-    [a, b].forEach(el => {
-      el.style.position = "absolute";
-      el.style.left = "0";
-      el.style.top = "0";
-      el.style.right = "0";
-    });
-
-    // Mount
-    windowEl.innerHTML = "";
-    windowEl.appendChild(a);
-    windowEl.appendChild(b);
-
-    // Hidden measurer to set viewport height (prevents clipping)
-    const measure = document.createElement("span");
-    measure.className = "rotator-word";
-    measure.style.position = "absolute";
-    measure.style.left = "-9999px";
-    measure.style.top = "-9999px";
-    measure.style.visibility = "hidden";
-    measure.style.whiteSpace = "nowrap";
-    document.body.appendChild(measure);
-
-    function setViewportHeight(text){
-      measure.textContent = text;
-      const h = Math.ceil(measure.getBoundingClientRect().height);
-      windowEl.style.height = h + "px";
-    }
-
-    let idx = 0;
-    let front = a;
-    let back = b;
-
-    function setText(el, text){
-      el.textContent = text;
-    }
-
-    function resetEl(el){
-      el.style.transform = "translateY(0)";
-      el.style.opacity = "1";
-      el.style.transition = "none";
-    }
-
-    // Init
-    setText(front, words[idx]);
-    setText(back, "");
-    resetEl(front);
-    resetEl(back);
-    setViewportHeight(words[idx]);
-
-    window.addEventListener("resize", () => setViewportHeight(words[idx]));
-
-    function animateNext(){
-      const nextIdx = (idx + 1) % words.length;
-      const nextText = words[nextIdx];
-
-      // Prepare back word below, invisible
-      setText(back, nextText);
-      setViewportHeight(nextText);
-
-      back.style.transition = "none";
-      back.style.transform = "translateY(65%)";
-      back.style.opacity = "0";
-
-      // Force reflow so transitions apply reliably
-      void back.offsetHeight;
-
-      // Animate both: front goes up/out, back comes in
-      front.style.transition = "transform .42s cubic-bezier(.2,.9,.2,1), opacity .42s cubic-bezier(.2,.9,.2,1)";
-      back.style.transition  = "transform .42s cubic-bezier(.2,.9,.2,1), opacity .42s cubic-bezier(.2,.9,.2,1)";
-
-      front.style.transform = "translateY(-65%)";
-      front.style.opacity = "0";
-
-      back.style.transform = "translateY(0%)";
-      back.style.opacity = "1";
-
-      // Swap after animation completes
-      setTimeout(() => {
-        idx = nextIdx;
-
-        // Put the new front back to stable state at top
-        resetEl(back);
-
-        // Clear old front so it doesn't flash
-        front.style.transition = "none";
-        front.style.opacity = "0";
-        front.style.transform = "translateY(0)";
-
-        // swap refs
-        const tmp = front;
-        front = back;
-        back = tmp;
-      }, 460);
-    }
-
-    setInterval(animateNext, 1800);
-  })();
   </script>
 
-  <!-- Version: v2025.12.18-1 -->
+  <!-- Version: v2025.12.18-2 -->
 </body>
 </html>
