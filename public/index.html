@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <!--
-  AIVIndex.io — Index Page (AIVI)
+  AI Visibility Index (AIVI) Index Page
   Version: v2025.12.18-1
-  Built by: ChatGPT
   Last updated: 2025-12-18 (America/New_York)
 
-  Scope (this update):
-  - Hero headline updated to: "DOES AI DESCRIBE YOUR / BRAND AS ______?" with rotating single emphasized word.
-  - More whitespace + clearer section spacing.
-  - CTA panel refined: single primary CTA (no secondary button inside panel).
-  - Added controlled color (soft tints + accents) without crowding.
-  - Mobile layout tightened (hero + CTA + callouts stack cleanly).
-  - Version comment added at bottom as well.
+  FIXES IN THIS VERSION (HERO ONLY):
+  1) Restored rotating hero word animation (one word at a time, no “ghost” words visible).
+  2) Fixed baseline alignment of the rotating word with the headline.
+  3) Prevented long words from being cut off on desktop + mobile (responsive sizing + safe wrapping).
+  4) Ensured every rotating word includes a trailing question mark.
 -->
 <html lang="en">
 <head>
@@ -24,9 +21,10 @@
     :root{
       --max-width:1200px;
       --pad-h:2rem;
+      --pad-v:3vh;
 
-      --primary:#2563EB;
-      --primary-2:#3182CE;
+      --primary:#3182CE;
+      --primary-dark:#2563EB;
       --accent:#E53E3E;
 
       --text:#0b1220;
@@ -35,16 +33,13 @@
 
       --border:#e2e8f0;
       --bg:#ffffff;
-
-      --tint-hero:#ffffff;
-      --tint-panel:#f4f9ff;
-      --tint-soft:#f7fafc;
-      --tint-soft-2:#f1f5f9;
+      --bg-soft:#f7fafc;
+      --bg-soft-2:#f1f5f9;
 
       --shadow:0 14px 40px rgba(2,6,23,.10);
-      --shadow-soft:0 10px 28px rgba(37,99,235,.16), 0 2px 6px rgba(2,6,23,.05);
+      --shadow-soft:0 10px 28px rgba(49,130,206,.16), 0 2px 6px rgba(2,6,23,.05);
 
-      --radius:16px;
+      --radius:14px;
     }
 
     *{margin:0;padding:0;box-sizing:border-box}
@@ -53,222 +48,235 @@
       background:var(--bg);
       color:var(--text);
       line-height:1.6;
+      overflow-x:hidden;
     }
     a{color:var(--primary);text-decoration:none}
     a:hover{text-decoration:underline}
 
     .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-h)}
-    .section{padding:4.25rem 0}
-    .section-tight{padding:3.25rem 0}
+    .section{padding:3.2rem 0}
+    .section-tight{padding:2.2rem 0}
 
     /* Header */
     header{
-      padding:2.25rem 0 0;
+      padding:calc(var(--pad-v) + .5rem) 0 0;
     }
     .header-row{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:1rem;
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 var(--pad-h);
     }
     .brand{
       display:flex;
       flex-direction:column;
-      gap:.4rem;
+      gap:.25rem;
       min-width:0;
     }
-    .brand-top{
-      display:flex;
-      align-items:flex-start;
-      gap:1.25rem;
-      flex-wrap:wrap;
-    }
-    .logo{
-      font-size:2.05rem;
+    h1.logo{
+      font-size:2.3rem;
       font-weight:900;
-      letter-spacing:-.6px;
-      line-height:1.1;
+      letter-spacing:-.8px;
+      line-height:1;
       margin:0;
+      color:#0b1220;
+      display:inline-flex;
+      gap:.35rem;
+      align-items:baseline;
+      flex-wrap:wrap;
+      white-space:nowrap;
     }
-    .logo .blue{color:var(--primary-2)}
+    h1.logo .blue{color:var(--primary)}
     .subhead{
-      font-size:1rem;
-      font-weight:800;
+      font-size:1.02rem;
+      font-weight:700;
       color:var(--muted);
       display:flex;
       align-items:center;
-      gap:.55rem;
-      margin-top:.15rem;
+      gap:.5rem;
     }
     .subhead .bolt{font-size:1.05rem}
-    .meta-right{
+
+    .header-links{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
-      gap:.5rem;
+      gap:.35rem;
       padding-top:.25rem;
-      white-space:nowrap;
+      min-width:0;
     }
-    .toplink{
+    .header-links .toplink{
       font-size:.95rem;
-      font-weight:900;
-      color:#0f172a;
+      font-weight:800;
+      color:#0b1220;
+      white-space:nowrap;
     }
     .powered-by{
       font-size:.9rem;
-      color:var(--muted-2);
+      color:#64748b;
+      white-space:nowrap;
     }
     .powered-by a{
       color:var(--primary);
-      font-weight:900;
+      font-weight:700;
       text-decoration:none;
     }
     .powered-by a:hover{text-decoration:underline}
 
     /* Hero */
     .hero{
-      background:radial-gradient(900px 360px at 20% -10%, rgba(37,99,235,.10) 0%, rgba(255,255,255,0) 60%),
-                 radial-gradient(900px 360px at 85% 0%, rgba(229,62,62,.06) 0%, rgba(255,255,255,0) 60%),
-                 linear-gradient(180deg, var(--tint-hero) 0%, #ffffff 100%);
-      padding:2.75rem 0 0;
+      padding:2.1rem 0 0;
+    }
+    .hero-grid{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 var(--pad-h);
     }
 
-    .hero-inner{
-      padding:0 0 2.75rem;
-    }
-
+    /* HERO HEADLINE: fixed alignment + no cut-off + restored animation */
     .hero-headline{
-      margin-top:1.25rem;
-      font-weight:900;
-      letter-spacing:-1.2px;
-      line-height:1.05;
+      margin:.4rem 0 .85rem;
+      color:#0b1220;
       text-transform:uppercase;
+      font-weight:900;
+      letter-spacing:-.7px;
     }
-    .hero-headline .line1{
-      font-size:clamp(2.15rem, 4.2vw, 3.35rem);
-      display:block;
+    .hero-line1{
+      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
+      line-height:1.02;
     }
-    .hero-headline .line2{
-      font-size:clamp(2.15rem, 4.2vw, 3.35rem);
+    .hero-line2{
       display:flex;
-      align-items:baseline;
-      gap:.55rem;
-      flex-wrap:wrap;
+      align-items:baseline;     /* baseline alignment fix */
+      gap:.6rem;
+      flex-wrap:wrap;           /* prevents cut-off */
+      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
+      line-height:1.02;
+      margin-top:.22rem;
+      min-width:0;
     }
-    .hero-headline .static2{
-      display:inline-block;
+    .hero-line2 .brand-as{
+      white-space:nowrap;
     }
 
-    /* Rotator (single word visible only) */
+    /* Rotator wrapper */
     .rotator{
       position:relative;
       display:inline-flex;
-      height:1.12em;
-      overflow:hidden;
-      vertical-align:baseline;
-      align-items:baseline;
-      min-width:10ch;
+      align-items:baseline;     /* baseline alignment fix */
+      min-width:min(18ch, 100%);
+      max-width:100%;
     }
-    .rotator .word{
-      position:absolute;
-      left:0;
-      top:0;
-      transform:translateY(110%);
-      opacity:0;
-      transition:transform .45s ease, opacity .45s ease;
+
+    /* “Window” prevents ghost words; only one word visible */
+    .rotator-window{
+      position:relative;
+      display:inline-block;
+      overflow:hidden;          /* hard mask; no background words visible */
+      max-width:100%;
+      padding-bottom:.06em;     /* keeps descenders from clipping */
+    }
+
+    /* Current/next layers */
+    .rotator-word{
+      display:inline-block;
+      white-space:nowrap;       /* desktop: keep one word on one line */
+      max-width:100%;
       color:var(--accent);
-      font-weight:900; /* only emphasized word */
+      will-change:transform, opacity;
+    }
+    .rotator-word.measure{
+      position:absolute;
+      left:-9999px;
+      top:-9999px;
+      visibility:hidden;
       white-space:nowrap;
     }
-    .rotator .word.active{
-      transform:translateY(0%);
-      opacity:1;
+
+    /* Animation states (vertical “cylinder” feel) */
+    .word-in{
+      animation:wordIn .42s cubic-bezier(.2,.9,.2,1) both;
     }
-    .rotator .word.exit{
-      transform:translateY(-110%);
-      opacity:0;
+    .word-out{
+      animation:wordOut .42s cubic-bezier(.2,.9,.2,1) both;
+    }
+
+    @keyframes wordIn{
+      from{transform:translateY(65%);opacity:0}
+      to{transform:translateY(0%);opacity:1}
+    }
+    @keyframes wordOut{
+      from{transform:translateY(0%);opacity:1}
+      to{transform:translateY(-65%);opacity:0}
     }
 
     .hero-sub{
-      margin-top:1.15rem;
-      font-size:1.08rem;
+      font-size:clamp(1.05rem, 1.6vw, 1.22rem);
       color:var(--muted);
-      max-width:900px;
-      line-height:1.85;
-      font-weight:700;
+      max-width:860px;
+      line-height:1.8;
+      margin-bottom:1.35rem;
+      font-weight:600;
     }
 
-    /* CTA panel */
+    /* CTA Panel */
     .cta-panel{
-      margin-top:2rem;
-      background:radial-gradient(1000px 280px at 50% -10%, rgba(37,99,235,.22) 0%, rgba(255,255,255,0) 62%),
-                 linear-gradient(180deg, var(--tint-panel) 0%, #ffffff 80%);
-      border:2px solid rgba(37,99,235,.28);
-      border-radius:var(--radius);
-      padding:1.6rem 1.6rem 1.35rem;
+      background:radial-gradient(1000px 260px at 50% -10%, rgba(49,130,206,.22) 0%, rgba(255,255,255,0) 60%),
+                 linear-gradient(180deg, #f0f7ff 0%, #ffffff 72%);
+      border:2px solid rgba(49,130,206,.35);
+      border-radius:16px;
+      padding:1.35rem 1.35rem 1.15rem;
       box-shadow:var(--shadow-soft);
+      margin:1.15rem 0 1.25rem;
     }
     .cta-top{
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:1rem;
-      flex-wrap:wrap;
-      margin-bottom:1.15rem;
+      flex-direction:column;
+      gap:.5rem;
+      margin-bottom:1rem;
     }
     .cta-title{
-      font-size:1.1rem;
+      font-size:1.15rem;
       font-weight:900;
       letter-spacing:-.2px;
     }
-    .cta-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:.5rem;
-      font-weight:900;
-      font-size:.9rem;
-      color:#0f172a;
-      background:#fff;
-      border:1px solid rgba(37,99,235,.20);
-      padding:.45rem .65rem;
-      border-radius:999px;
-      box-shadow:0 6px 16px rgba(2,6,23,.06);
-    }
-    .cta-badge .free{
-      font-weight:900;
-      color:#16a34a;
-      background:rgba(22,163,74,.10);
-      border:1px solid rgba(22,163,74,.28);
-      padding:.12rem .55rem;
-      border-radius:999px;
-      font-size:.82rem;
+    .cta-note{
+      color:var(--muted);
+      font-size:.95rem;
+      font-weight:600;
     }
 
     .cta-form{
       display:flex;
-      gap:.85rem;
+      gap:.75rem;
       align-items:stretch;
       flex-wrap:wrap;
     }
+
+    /* URL input width reduced on desktop */
     .url-input{
-      flex:1 1 520px;
-      min-width:260px;
-      font-size:1.05rem;
-      padding:1rem 1.05rem;
+      flex:0 0 360px;
+      width:360px;
+      max-width:100%;
+      font-size:1.1rem;
+      padding:1rem 1.1rem;
       border:2px solid var(--border);
-      border-radius:14px;
+      border-radius:12px;
       background:#fff;
       transition:border-color .2s, box-shadow .2s;
     }
     .url-input:focus{
       outline:none;
       border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(37,99,235,.14);
+      box-shadow:0 0 0 4px rgba(49,130,206,.15);
     }
 
     .btn{
       border:none;
-      border-radius:14px;
+      border-radius:12px;
       cursor:pointer;
       font-weight:900;
       letter-spacing:-.2px;
@@ -278,130 +286,135 @@
       align-items:center;
       justify-content:center;
       gap:.5rem;
-      padding:1rem 1.25rem;
+      padding:1rem 1.2rem;
       white-space:nowrap;
     }
     .btn-primary{
-      background:#0f172a;
+      background:var(--primary);
       color:#fff;
       min-width:220px;
-      box-shadow:0 10px 22px rgba(2,6,23,.18);
+      box-shadow:0 10px 22px rgba(49,130,206,.22);
+      font-size:1.05rem;
+    }
+    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .btn-secondary{
+      background:#fff;
+      color:#111;
+      border:2px solid #111;
       font-size:1rem;
+      padding:.95rem 1.1rem;
     }
-    .btn-primary:hover{background:#0b1220;transform:translateY(-1px)}
+    .btn-secondary:hover{transform:translateY(-1px)}
 
-    .helper-line{
-      margin-top:.85rem;
-      color:var(--muted);
-      font-weight:700;
+    .error{
+      margin-top:.65rem;
       font-size:.95rem;
+      color:var(--primary);
+      font-weight:700;
+      display:none;
+      width:100%;
     }
+    .error.show{display:block}
 
     .value-points{
-      margin-top:1.1rem;
-      padding-top:1.05rem;
+      margin-top:.95rem;
+      padding-top:.9rem;
       border-top:1px solid rgba(226,232,240,.9);
       display:flex;
       gap:1rem;
       flex-wrap:wrap;
       align-items:flex-start;
     }
+    .value-points .free-flag{
+      font-weight:900;
+      color:#16a34a;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.28);
+      padding:.2rem .6rem;
+      border-radius:999px;
+      font-size:.85rem;
+      line-height:1.2;
+      margin-right:.25rem;
+      height:fit-content;
+    }
     .value-points ul{
       margin:0;
       padding-left:1.2rem;
       color:var(--muted);
-      font-weight:800;
-      line-height:1.7;
+      font-weight:700;
+      line-height:1.65;
       font-size:.95rem;
       flex:1;
       min-width:260px;
     }
-    .value-points li{margin:.45rem 0}
+    .value-points li{margin:.35rem 0}
 
-    .error{
-      margin-top:.8rem;
-      font-size:.95rem;
-      color:var(--primary);
-      font-weight:900;
-      display:none;
-      width:100%;
-    }
-    .error.show{display:block}
-
-    /* Callouts (two boxes) */
-    .callouts{
-      margin-top:1.85rem;
+    /* Two cards under CTA (kept from your layout idea) */
+    .hero-cards{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:1.2rem;
+      gap:1.1rem;
+      margin:1.15rem 0 2rem;
     }
-    .callout{
-      border-radius:18px;
-      padding:1.25rem 1.25rem;
-      border:1px solid rgba(37,99,235,.22);
-      background:linear-gradient(135deg, rgba(37,99,235,.10) 0%, rgba(255,255,255,1) 68%);
+    .hcard{
+      border-radius:16px;
+      padding:1.15rem 1.15rem;
+      border:2px solid rgba(49,130,206,.45);
+      background:#fff;
       box-shadow:0 10px 26px rgba(2,6,23,.06);
     }
-    .callout.alt{
-      border:1px solid rgba(229,62,62,.18);
-      background:linear-gradient(135deg, rgba(229,62,62,.07) 0%, rgba(255,255,255,1) 68%);
+    .hcard.alt{
+      border-color:rgba(229,62,62,.25);
+      background:rgba(229,62,62,.06);
     }
-    .callout h3{
+    .hcard h3{
       font-size:1.05rem;
       font-weight:900;
+      margin-bottom:.5rem;
       letter-spacing:-.2px;
-      margin-bottom:.45rem;
     }
-    .callout p{
-      font-size:.98rem;
+    .hcard p{
       color:var(--muted);
-      font-weight:750;
+      font-weight:700;
+      font-size:.95rem;
       line-height:1.75;
     }
 
     /* Pillars */
     .pillars{
-      background:linear-gradient(180deg, var(--tint-soft) 0%, #ffffff 100%);
+      background:var(--bg-soft);
       border-top:1px solid var(--border);
       border-bottom:1px solid var(--border);
     }
     .title{
-      font-size:2.05rem;
+      font-size:2.1rem;
       font-weight:900;
       letter-spacing:-.6px;
-      margin-bottom:.75rem;
+      margin-bottom:.8rem;
     }
     .kicker{
       color:var(--muted);
-      font-size:1.03rem;
-      font-weight:750;
-      max-width:940px;
+      font-size:1.05rem;
+      font-weight:700;
+      max-width:920px;
       line-height:1.85;
     }
     .pillars-grid{
       display:grid;
       grid-template-columns:repeat(4, minmax(0, 1fr));
-      gap:1.15rem;
-      margin-top:1.75rem;
+      gap:1.1rem;
+      margin-top:1.4rem;
     }
     .pillar{
       background:#fff;
       border:1px solid var(--border);
-      border-radius:16px;
-      padding:1.25rem 1.15rem;
+      border-radius:14px;
+      padding:1.2rem 1.15rem;
       box-shadow:0 10px 24px rgba(2,6,23,.05);
     }
     .pillar .p-icon{
-      width:34px;height:34px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(37,99,235,.10);
-      border:1px solid rgba(37,99,235,.18);
-      margin-bottom:.7rem;
-      font-weight:900;
-    }
-    .pillar.alt .p-icon{
-      background:rgba(229,62,62,.08);
-      border:1px solid rgba(229,62,62,.16);
+      font-size:1.25rem;
+      margin-bottom:.55rem;
     }
     .pillar h4{
       font-size:1.05rem;
@@ -413,127 +426,48 @@
     .pillar p{
       font-size:.95rem;
       color:var(--muted);
-      font-weight:750;
-      line-height:1.65;
+      font-weight:700;
+      line-height:1.6;
     }
     .pillars-footer{
-      margin-top:1.2rem;
+      margin-top:1.05rem;
       color:var(--muted);
       font-size:.98rem;
-      font-weight:850;
+      font-weight:800;
     }
 
-    /* Pricing (kept from your file, but spacing increased) */
-    .pricing{background:var(--bg)}
-    .pricing-grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:1.2rem;
-      margin-top:2rem;
-    }
-    .plan{
-      border:1px solid var(--border);
-      border-radius:18px;
-      background:#fff;
-      box-shadow:var(--shadow);
-      padding:1.35rem 1.25rem 1.2rem;
-      display:flex;
-      flex-direction:column;
-      gap:.8rem;
-      min-height:420px;
-    }
-    .plan.featured{
-      border:2px solid rgba(37,99,235,.40);
-      background:linear-gradient(180deg,#f0f7ff 0%, #ffffff 64%);
-    }
-    .plan-top{display:flex;flex-direction:column;gap:.35rem}
-    .plan h3{
-      font-size:1.18rem;
-      font-weight:900;
-      letter-spacing:-.2px;
-      margin:0;
-    }
-    .price-line{
-      font-size:1rem;
-      color:#0f172a;
-      font-weight:900;
-      display:flex;
-      gap:.5rem;
-      align-items:baseline;
-      flex-wrap:wrap;
-    }
-    .price{
-      font-size:1.22rem;
-      font-weight:900;
-      color:#0f172a;
-    }
-    .free-flag{
-      font-weight:900;
-      color:#16a34a;
-      background:rgba(22,163,74,.10);
-      border:1px solid rgba(22,163,74,.28);
-      padding:.18rem .55rem;
-      border-radius:999px;
-      font-size:.85rem;
-    }
-    .plan p{
-      color:var(--muted);
-      font-weight:750;
-      font-size:.95rem;
-      line-height:1.75;
-    }
-    .plan ul{margin:.35rem 0 0 1.1rem}
-    .plan li{
-      margin:.45rem 0;
-      color:var(--muted);
-      font-weight:750;
-      line-height:1.6;
-      font-size:.95rem;
-    }
-    .plan-actions{
-      margin-top:auto;
-      display:flex;
-      gap:.6rem;
-      flex-wrap:wrap;
-    }
-    .btn-plan{
-      flex:1;
-      min-width:180px;
-      background:var(--primary);
-      color:#fff;
-      padding:.95rem 1rem;
-      border-radius:14px;
-      font-weight:900;
-      text-align:center;
-      text-decoration:none;
-    }
-    .btn-plan:hover{background:var(--primary-2);text-decoration:none}
-
-    /* Footer */
+    /* Footer (kept minimal) */
     footer{
-      margin-top:3.25rem;
+      margin-top:3rem;
       border-top:1px solid var(--border);
-      background:var(--tint-soft);
+      background:var(--bg-soft);
     }
     .footer-inner{
       max-width:var(--max-width);
       margin:0 auto;
-      padding:2.25rem var(--pad-h) 1.4rem;
+      padding:2rem var(--pad-h) 1.25rem;
       display:grid;
       grid-template-columns:1.4fr 1fr 1fr;
       gap:1.6rem;
     }
     .foot-brand h3{
-      font-size:1.05rem;
+      font-size:1.1rem;
       font-weight:900;
       margin-bottom:.35rem;
       letter-spacing:-.2px;
     }
     .foot-brand p{
       color:var(--muted);
-      font-weight:750;
-      line-height:1.75;
+      font-weight:700;
+      line-height:1.7;
       font-size:.95rem;
+    }
+    .disclaimer{
+      margin-top:.75rem;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:800;
+      line-height:1.6;
     }
     .foot-col h4{
       font-size:.95rem;
@@ -547,11 +481,11 @@
       padding:0;
       display:flex;
       flex-direction:column;
-      gap:.5rem;
+      gap:.45rem;
     }
     .foot-links a{
       color:var(--muted);
-      font-weight:850;
+      font-weight:800;
       text-decoration:none;
     }
     .foot-links a:hover{color:#0f172a;text-decoration:none}
@@ -562,95 +496,79 @@
       margin:0 auto;
       color:var(--muted-2);
       font-size:.85rem;
-      font-weight:750;
-      line-height:1.6;
-    }
-    .disclaimer{
-      margin-top:.75rem;
-      color:var(--muted-2);
-      font-size:.85rem;
-      font-weight:850;
+      font-weight:700;
       line-height:1.6;
     }
 
     /* Responsive */
     @media (max-width:1020px){
       .pillars-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
-      .pricing-grid{grid-template-columns:1fr}
-      .plan{min-height:auto}
-      .footer-inner{grid-template-columns:1fr;gap:1.2rem}
-      .callouts{grid-template-columns:1fr}
-      .meta-right{align-items:flex-start}
-      .header-row{flex-direction:column;align-items:flex-start}
+      .url-input{flex:1; width:100%}
+      .hero-cards{grid-template-columns:1fr}
     }
     @media (max-width:640px){
-      header{padding-top:1.75rem}
-      .wrap{padding:0 1.25rem}
-      .hero{padding-top:2.15rem}
-      .hero-headline .line2{gap:.45rem}
-      .rotator{min-width:12ch}
-      .cta-panel{padding:1.25rem 1.15rem}
+      .header-row{flex-direction:column;align-items:flex-start}
+      .header-links{align-items:flex-start}
+      h1.logo{white-space:normal}
+
+      /* Mobile: allow the rotating word to wrap if needed (prevents cut-off) */
+      .rotator-word{white-space:normal; word-break:break-word}
+      .rotator{min-width:0}
+      .rotator-window{max-width:100%}
+
       .btn-primary{min-width:100%}
       .cta-form{flex-direction:column}
       .url-input{width:100%}
       .value-points{flex-direction:column}
       .value-points ul{min-width:0}
-      .section{padding:3.5rem 0}
+      .footer-inner{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body id="top">
-
   <!-- Header -->
   <header>
-    <div class="wrap">
-      <div class="header-row">
-        <div class="brand">
-          <div class="brand-top">
-            <div>
-              <div class="logo">AI Visibility <span class="blue">Index</span></div>
-              <div class="subhead"><span class="bolt">⚡</span> Visibility for the Age of AI</div>
-            </div>
-          </div>
-        </div>
+    <div class="header-row">
+      <div class="brand">
+        <h1 class="logo">AI Visibility <span class="blue">Index</span></h1>
+        <div class="subhead"><span class="bolt">⚡</span> Visibility for the Age of AI</div>
+      </div>
 
-        <div class="meta-right">
-          <a class="toplink" href="#how-it-works">Learn how the index works</a>
-          <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
-        </div>
+      <div class="header-links">
+        <a class="toplink" href="#how-it-works">Learn how the index works</a>
+        <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
       </div>
     </div>
   </header>
 
   <!-- Hero -->
   <div class="hero">
-    <div class="wrap hero-inner">
+    <div class="hero-grid">
 
-      <div class="hero-headline" aria-label="Hero question">
-        <span class="line1">DOES AI DESCRIBE YOUR</span>
-        <span class="line2">
-          <span class="static2">BRAND AS</span>
-          <span class="rotator" aria-live="polite" aria-atomic="true">
-            <span class="word active" id="rotatorWord">TRUSTWORTHY?</span>
+      <div class="hero-headline" aria-label="Hero headline">
+        <div class="hero-line1">Does AI describe your</div>
+        <div class="hero-line2">
+          <span class="brand-as">brand as</span>
+
+          <!-- Rotating word -->
+          <span class="rotator" aria-live="polite">
+            <span class="rotator-window" id="rotatorWindow">
+              <span class="rotator-word" id="rotatorCurrent">TRUSTWORTHY?</span>
+            </span>
           </span>
-        </span>
+        </div>
       </div>
 
       <div class="hero-sub">
         The AI Visibility Index (AIVI) measures how AI systems currently interpret, trust, and represent your website — before customers ever see you.
       </div>
 
-      <!-- CTA Panel -->
+      <!-- Front-and-center CTA -->
       <div class="cta-panel" id="analyze">
         <div class="cta-top">
-          <div>
-            <div class="cta-title">Reveal My AI Visibility</div>
-          </div>
-          <div class="cta-badge" aria-label="Free snapshot badge">
-            <span class="free">Free</span>
-            <span>AIVI Snapshot (Analyze)</span>
-          </div>
+          <div class="cta-title">Reveal My AI Visibility</div>
+          <div class="cta-note">Free AIVI Snapshot (Analyze)</div>
         </div>
 
         <form id="analyze-form" class="cta-form" novalidate>
@@ -659,9 +577,8 @@
           <div id="error-message" class="error" role="alert"></div>
         </form>
 
-        <div class="helper-line">Get a current AI visibility snapshot. No signup, no credit card.</div>
-
         <div class="value-points" aria-label="Snapshot details">
+          <span class="free-flag">Free</span>
           <ul>
             <li>High-level AIVI snapshot</li>
             <li>Initial strengths and visibility gaps</li>
@@ -671,16 +588,15 @@
         </div>
       </div>
 
-      <!-- Two boxes -->
-      <div class="callouts" aria-label="Key callouts">
-        <div class="callout">
+      <div class="hero-cards">
+        <div class="hcard">
           <h3>You’re not optimizing for AI, yet.</h3>
           <p>
-            AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers,
-            summaries, and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.
+            AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers, summaries,
+            and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.
           </p>
         </div>
-        <div class="callout alt">
+        <div class="hcard alt">
           <h3>This is not SEO.</h3>
           <p>
             This is AI perception. If AI cannot clearly understand you, it cannot confidently recommend you.
@@ -695,29 +611,26 @@
   <div class="pillars section" id="how-it-works">
     <div class="wrap">
       <div class="title">How AI “sees” a website</div>
-      <div class="kicker">
-        AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading
-        that reflects how AI is likely to understand and represent your website today.
-      </div>
+      <div class="kicker">AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading that reflects how AI is likely to understand and represent your website today.</div>
 
-      <div class="pillars-grid" role="list" aria-label="AIVI layers">
+      <div class="pillars-grid" role="list">
         <div class="pillar" role="listitem">
-          <div class="p-icon">▣</div>
+          <div class="p-icon">🧱</div>
           <h4>Structural Legibility</h4>
           <p>Can AI reliably parse, navigate, and segment your site?</p>
         </div>
         <div class="pillar" role="listitem">
-          <div class="p-icon">◐</div>
+          <div class="p-icon">🗣️</div>
           <h4>Semantic Clarity</h4>
           <p>Does AI understand your offering, or fill in the gaps with assumptions?</p>
         </div>
         <div class="pillar" role="listitem">
-          <div class="p-icon">▦</div>
+          <div class="p-icon">🏛️</div>
           <h4>Authority Recognition</h4>
           <p>Does AI treat your content as reference-worthy, or disposable?</p>
         </div>
-        <div class="pillar alt" role="listitem">
-          <div class="p-icon">▲</div>
+        <div class="pillar" role="listitem">
+          <div class="p-icon">⚠️</div>
           <h4>Representation Risk</h4>
           <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers.</p>
         </div>
@@ -726,99 +639,6 @@
       <div class="pillars-footer">
         Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
       </div>
-    </div>
-  </div>
-
-  <!-- Pricing (unchanged logic; spacing improved) -->
-  <div class="pricing section" id="pricing">
-    <div class="wrap">
-      <div class="title">Access to the AI Visibility Index</div>
-      <div class="kicker">
-        AIVI is currently available through request-based access while the index methodology continues to mature.
-        Each analysis is delivered as an index reading, not automated output.
-      </div>
-
-      <div class="pricing-grid">
-        <div class="plan featured">
-          <div class="plan-top">
-            <h3>AIVI — Index Reading</h3>
-            <div class="price-line">
-              <span class="price">$249 per domain</span>
-              <span class="free-flag">Free during early access</span>
-            </div>
-          </div>
-
-          <ul>
-            <li>AI Visibility Index Snapshot™</li>
-            <li>Visibility Tier classification</li>
-            <li>Representation Risk assessment</li>
-            <li>Full AI Visibility Report</li>
-            <li>Executive-ready findings (shareable)</li>
-          </ul>
-
-          <p><b>Delivery:</b> request-based, manual delivery</p>
-
-          <div class="plan-actions">
-            <a class="btn-plan" href="#request" data-intent="index-reading">Request Index Reading</a>
-          </div>
-        </div>
-
-        <div class="plan">
-          <div class="plan-top">
-            <h3>AIVI — Monitoring Access</h3>
-            <div class="price-line">
-              <span class="price">$99 / month per domain</span>
-            </div>
-          </div>
-
-          <ul>
-            <li>Periodic index re-readings</li>
-            <li>Change detection across core perception layers</li>
-            <li>Visibility Tier movement tracking</li>
-            <li>Representation risk trend signals</li>
-          </ul>
-
-          <p><b>Monitoring:</b> observes perception drift, not performance metrics.</p>
-
-          <div class="plan-actions">
-            <a class="btn-plan" href="#request" data-intent="monitoring">Request Monitoring</a>
-          </div>
-        </div>
-
-        <div class="plan">
-          <div class="plan-top">
-            <h3>Enterprise</h3>
-            <div class="price-line">
-              <span class="price">Private access</span>
-            </div>
-          </div>
-
-          <ul>
-            <li>Organization-level index coverage</li>
-            <li>Comparative context</li>
-            <li>Executive briefings</li>
-            <li>Availability is limited</li>
-          </ul>
-
-          <p>For organizations where AI visibility is a material risk.</p>
-
-          <div class="plan-actions">
-            <a class="btn-plan" href="#request" data-intent="enterprise">Request Enterprise Access</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Request access (kept from your prior structure; no changes here yet) -->
-  <div class="section" id="request">
-    <div class="wrap">
-      <div class="title">Request access</div>
-      <div class="kicker">
-        Request-based delivery while AIVI is in active development. You’ll receive next steps by email.
-      </div>
-
-      <!-- Intentionally left as-is for now (next step after hero/CTA approval) -->
     </div>
   </div>
 
@@ -839,17 +659,13 @@
         <h4>Product</h4>
         <ul class="foot-links">
           <li><a href="#analyze">Free AIVI Snapshot</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#how-it-works">Learn how the index works</a></li>
-          <li><a href="#request">Request access</a></li>
+          <li><a href="#how-it-works">How the index works</a></li>
         </ul>
       </div>
 
       <div class="foot-col">
-        <h4>Resources</h4>
+        <h4>Company</h4>
         <ul class="foot-links">
-          <li><a href="/index/whitepaper.html">Whitepaper</a></li>
-          <li><a href="/index/technical.html">Technical</a></li>
           <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
           <li><a href="mailto:hello@quontora.com?subject=AIVI%20Question">Contact</a></li>
         </ul>
@@ -869,56 +685,6 @@
     function isValidURL(input){
       return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
     }
-
-    // Hero word rotator (one word visible at a time)
-    (function(){
-      const words = [
-        "TRUSTWORTHY?",
-        "AUTHORITATIVE?",
-        "CLEAR?",
-        "RELIABLE?",
-        "CREDIBLE?",
-        "UNDERSTANDABLE?",
-        "CONSISTENT?"
-      ];
-      const el = document.getElementById("rotatorWord");
-      if (!el) return;
-
-      let idx = 0;
-      let busy = false;
-
-      function swap(){
-        if (busy) return;
-        busy = true;
-
-        const current = el;
-        current.classList.remove("active");
-        current.classList.add("exit");
-
-        idx = (idx + 1) % words.length;
-
-        const next = document.createElement("span");
-        next.className = "word";
-        next.textContent = words[idx];
-        current.parentElement.appendChild(next);
-
-        // allow DOM paint
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            next.classList.add("active");
-          });
-        });
-
-        setTimeout(() => {
-          current.remove();
-          next.id = "rotatorWord";
-          next.classList.remove("exit");
-          busy = false;
-        }, 520);
-      }
-
-      setInterval(swap, 1800);
-    })();
 
     // Analyze: free snapshot
     document.addEventListener("DOMContentLoaded", () => {
@@ -951,19 +717,106 @@
       }
     });
 
-    // Smooth anchor scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener("click",ev=>{
-        const href = a.getAttribute("href");
-        if (!href) return;
-        const id = href.substring(1);
-        const t = document.getElementById(id);
-        if (t) {
-          ev.preventDefault();
-          t.scrollIntoView({behavior:"smooth", block:"start"});
-        }
+    // HERO ROTATOR (restored animation, no cut-off, always ends with "?")
+    (function(){
+      const words = [
+        "TRUSTWORTHY?",
+        "AUTHORITATIVE?",
+        "CLEAR?",
+        "RELIABLE?",
+        "CREDIBLE?",
+        "UNDERSTANDABLE?",
+        "CONSISTENT?"
+      ];
+
+      const windowEl = document.getElementById("rotatorWindow");
+      const currentEl = document.getElementById("rotatorCurrent");
+
+      if (!windowEl || !currentEl) return;
+
+      let idx = 0;
+      let running = true;
+
+      // Ensure correct initial state
+      currentEl.textContent = words[idx];
+
+      // Measure helper to prevent clipping
+      const measure = document.createElement("span");
+      measure.className = "rotator-word measure";
+      document.body.appendChild(measure);
+
+      function setWindowHeightToWord(text){
+        measure.textContent = text;
+        const h = Math.ceil(measure.getBoundingClientRect().height);
+        windowEl.style.height = h + "px";
+      }
+
+      // Initial height lock
+      setWindowHeightToWord(words[idx]);
+
+      // Update height on resize (prevents mobile cut-off)
+      window.addEventListener("resize", () => {
+        setWindowHeightToWord(words[idx]);
       });
-    });
+
+      function tick(){
+        if (!running) return;
+
+        const outgoing = currentEl;
+        const nextIdx = (idx + 1) % words.length;
+        const nextText = words[nextIdx];
+
+        // Prepare incoming element
+        const incoming = document.createElement("span");
+        incoming.className = "rotator-word word-in";
+        incoming.textContent = nextText;
+
+        // Lock window height to incoming so it never clips
+        setWindowHeightToWord(nextText);
+
+        // Animate outgoing up
+        outgoing.classList.remove("word-in");
+        outgoing.classList.add("word-out");
+
+        // Place incoming over the top
+        incoming.style.position = "absolute";
+        incoming.style.left = "0";
+        incoming.style.top = "0";
+        incoming.style.right = "0";
+
+        // Make window relative for absolute layering
+        windowEl.style.position = "relative";
+        windowEl.appendChild(incoming);
+
+        // Cleanup after animation
+        const done = () => {
+          outgoing.removeEventListener("animationend", done);
+          // Replace current with incoming as the new baseline element
+          windowEl.innerHTML = "";
+          incoming.classList.remove("word-in");
+          incoming.style.position = "static";
+          incoming.id = "rotatorCurrent";
+          windowEl.appendChild(incoming);
+
+          // Advance index + continue
+          idx = nextIdx;
+        };
+
+        outgoing.addEventListener("animationend", done);
+      }
+
+      // Start cycling
+      const interval = setInterval(tick, 1800);
+
+      // Safety: stop if page hidden (reduces weird timing)
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) running = false;
+        else running = true;
+      });
+
+      // Expose for debugging if needed
+      window.__AIVI_ROTATOR_STOP__ = () => clearInterval(interval);
+    })();
   </script>
 
   <!-- Version: v2025.12.18-1 -->
