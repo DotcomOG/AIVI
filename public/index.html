@@ -181,34 +181,25 @@
     }
 
     /* 3D CYLINDER REEL */
-    .reelWrap{
-      display:inline-block;
-      position:relative;
-      height:60px;
-      min-width:16ch;              /* JS will override to exact max word width */
-      max-width:100%;
-      overflow:hidden;
-      vertical-align:baseline;
-      perspective:900px;
-      -webkit-font-smoothing:antialiased;
-      transform:translateZ(0);
+.reelWrap{
+  display:inline-block;
+  position:relative;
+  height:60px;
+  min-width:16ch;
+  max-width:100%;
+  overflow:hidden;
+  vertical-align:baseline;
+  perspective:900px;
+  -webkit-font-smoothing:antialiased;
+  transform:translateZ(0);
 
-      background:#fff;             /* force pure white behind words */
-      padding:0 8px 0 10px;         /* prevents left clipping + adds right breathing room */
-    }
+  background:#fff;
+  box-sizing:border-box;
 
-    .reel{
-      position:absolute;
-      left:0; top:0;
-      width:100%;
-      height:100%;
-      transform-style:preserve-3d;
-      transform-origin:50% 50%;
-      will-change:transform;
-
-      animation:none;              /* stepped in JS (pause 2s per word) */
-      transition:transform 700ms cubic-bezier(.2,.9,.2,1);
-    }
+  /* KEY: real safe inset inside the clipped window (prevents left letter clipping) */
+  padding-left:14px;
+  padding-right:14px;
+}
 
 .reelFace{
   position:absolute;
@@ -219,11 +210,15 @@
 
   display:flex;
   align-items:flex-end;
-  justify-content:flex-start;   /* key: LEFT align */
+
+  /* KEY: every word starts at the same X position */
+  justify-content:flex-start;
 
   white-space:nowrap;
   box-sizing:border-box;
-  padding:0 12px 2px 0;         /* right breathing room, no left padding */
+
+  /* Match the reelWrap inset so the word never touches the clip edge */
+  padding:0 0 2px 0;
 
   color:var(--accent);
   font-weight:900;
