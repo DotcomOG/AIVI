@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.12.23-3 -->
+  <!-- analyze.html - v2025.12.12-2 -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-12-23 -->
+  <!-- Last updated: 2025-12-12 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -57,10 +57,23 @@
     .llm-insights{margin:.4rem 0 1.2rem}
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
+
+    .llm-logo{display:flex;align-items:center;justify-content:flex-start;min-height:32px;height:auto}
     .llm-logo img{height:28px;width:auto;display:block;object-fit:contain;max-width:110px}
-    .llm-logo img.engine-copilot{height:26px;max-width:96px} /* Fix Copilot sizing */
-    .llm-logo img.engine-gemini{height:26px;max-width:110px}
+    .llm-logo img.engine-copilot{
+      height:52px;
+      max-width:220px;
+      background:#fff;
+      padding:2px 4px;
+      border-radius:6px;
+    }
+    .llm-logo img.engine-gemini{
+      height:52px;
+      max-width:220px;
+      background:#fff;
+      padding:2px 4px;
+      border-radius:6px;
+    }
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
@@ -217,7 +230,7 @@
     const LOGO_SOURCES = {
       ChatGPT: '/img/chatgpt-logo.png',
       Claude: '/img/claude.jpeg',
-      Gemini: '/img/gemini.jpeg',
+      Gemini: '/img/gemini-icon.svg',
       Copilot: '/img/copilot.jpeg',
       Perplexity: '/img/perplexity-logo.png',
     };
@@ -313,47 +326,41 @@
       }
     }
 
-    // Progress simulation (fixed: caps at 96 and keeps moving until completion)
+    // Progress simulation (fixed: no “stuck at 95%”)
     function startProgress() {
       document.getElementById('progress-overlay').style.display = 'flex';
       const startTime = Date.now();
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
-      const etaEl = document.getElementById('progress-eta');
 
+      let hardCap = 99;      // keep moving up to 99 while waiting
+      let fastWindow = 35000; // get to ~92% in ~35s
       let lastShown = 0;
-      const cap = 96;
 
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
 
-        // 0..12s -> 0..70
-        // 12..35s -> 70..92
-        // >35s -> slowly approaches 96 (keeps moving, never hits 99)
-        let p;
-        if (elapsed <= 12000) {
-          const t = elapsed / 12000;
-          p = 70 * (1 - Math.pow(1 - t, 3)); // easeOutCubic
-        } else if (elapsed <= 35000) {
-          const t = (elapsed - 12000) / (35000 - 12000);
-          const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2; // easeInOutQuad
-          p = 70 + (92 - 70) * eased;
+        let progress;
+        if (elapsed <= fastWindow) {
+          const ratio = elapsed / fastWindow;         // 0..1
+          progress = Math.min(92, Math.floor(ratio * 92));
         } else {
-          const t = elapsed - 35000;
-          p = 92 + 4 * (1 - Math.exp(-t / 120000)); // asymptote to 96 over minutes
+          // creep from 92 -> 99 slowly (never “stuck”)
+          const extra = elapsed - fastWindow;
+          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500)); // +1 every 2.5s
         }
 
-        p = Math.min(p, cap);
-        p = Math.max(p, lastShown); // never go backwards
-        lastShown = p;
+        if (progress < lastShown) progress = lastShown;
+        lastShown = progress;
 
-        progressFill.style.width = p.toFixed(2) + '%';
-        progressPct.textContent = Math.floor(p) + '%';
+        progressFill.style.width = progress + '%';
+        progressPct.textContent = progress + '%';
 
-        if (p >= 60) {
-          etaEl.innerHTML = 'Processing content structure and visibility signals...<br>Almost done!';
+        if (progress >= 60) {
+          document.getElementById('progress-eta').innerHTML =
+            'Processing content structure and visibility signals...<br>Almost done!';
         }
-      }, 140);
+      }, 120);
 
       return interval;
     }
@@ -490,7 +497,5 @@
       }
     });
   </script>
-
-  <!-- Version: v2025.12.23-3 -->
 </body>
 </html>
