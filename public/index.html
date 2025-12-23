@@ -219,11 +219,11 @@
 
   display:flex;
   align-items:flex-end;
-  justify-content:center;
+  justify-content:flex-start;   /* key: LEFT align */
 
   white-space:nowrap;
   box-sizing:border-box;
-  padding:0 12px 2px; /* left/right breathing room + keep baseline */
+  padding:0 12px 2px 0;         /* right breathing room, no left padding */
 
   color:var(--accent);
   font-weight:900;
