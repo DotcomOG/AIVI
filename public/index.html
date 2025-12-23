@@ -185,13 +185,14 @@
       display:inline-block;
       position:relative;
       height:60px;                 /* face height */
-      min-width:16ch;              /* prevents “jumping” width */
+      min-width:16ch;              /* JS will overwrite to exact max word width */
       max-width:100%;
       overflow:hidden;
       vertical-align:baseline;
       perspective:900px;
       -webkit-font-smoothing:antialiased;
       transform:translateZ(0);
+      background:#fff;             /* ensure pure white behind the word */
     }
 
     .reel{
@@ -202,7 +203,9 @@
       transform-style:preserve-3d;
       transform-origin:50% 50%;
       will-change:transform;
-      animation: reelSpin 6.0s linear infinite;
+      /* IMPORTANT: no infinite CSS animation (we step + pause in JS for a true 2s stop per word) */
+      animation:none;
+      transition:transform 700ms cubic-bezier(.2,.9,.2,1);
     }
 
     .reelFace{
@@ -239,12 +242,6 @@
         rgba(2,6,23,.10)
       );
       mix-blend-mode:multiply;
-    }
-
-    /* rotate DOWN, and avoid the 0/360 identical-endpoint stutter */
-    @keyframes reelSpin{
-      from{ transform: rotateX(0deg); }
-      to  { transform: rotateX(359.999deg); }
     }
     /* ===== END HERO HEADER (REPLACED) ===== */
 
@@ -746,7 +743,12 @@
         });
       }
 
-      // HERO 3D CYLINDER REEL (continuous, smooth loop, rotates DOWN)
+      // HERO 3D CYLINDER REEL
+      // Requirements:
+      // 1) No cropping: viewport auto-sizes to the widest word
+      // 2) White background behind word (matches page)
+      // 3) Rotation pauses 2s per word, then rolls to next
+      // 4) Loop is continuous (no visible speed-up or “fast forward” at wrap)
       (function(){
         const reel = document.getElementById("heroReel");
         if (!reel) return;
@@ -764,36 +766,13 @@
           "CONSISTENT?"
         ];
 
+        // Build faces
         reel.innerHTML = "";
-
         const faceH = Math.round((wrap.getBoundingClientRect().height || 60));
         const n = words.length;
-
         const step = 360 / n;
         const r = (faceH / 2) / Math.tan(Math.PI / n);
 
-        // Fit width to the longest word (prevents clipping)
-        const meas = document.createElement("span");
-        meas.style.position = "absolute";
-        meas.style.visibility = "hidden";
-        meas.style.whiteSpace = "nowrap";
-        meas.style.fontWeight = "900";
-        meas.style.letterSpacing = ".02em";
-        meas.style.fontSize = getComputedStyle(wrap).getPropertyValue("font-size") || "3rem";
-        meas.style.lineHeight = "1.02";
-        meas.style.paddingBottom = "2px";
-        wrap.appendChild(meas);
-
-        let maxW = 0;
-        words.forEach(w => {
-          meas.textContent = w;
-          maxW = Math.max(maxW, Math.ceil(meas.getBoundingClientRect().width));
-        });
-
-        wrap.removeChild(meas);
-        if (maxW > 0) wrap.style.width = (maxW + 6) + "px";
-
-        // Build faces
         words.forEach((w, i) => {
           const face = document.createElement("span");
           face.className = "reelFace";
@@ -802,10 +781,77 @@
           reel.appendChild(face);
         });
 
-        // Keep motion steady (no JS resets)
-        const secondsPerFace = 1.05;   // slower + “slot” feel
-        const dur = Math.max(6.2, n * secondsPerFace);
-        reel.style.animationDuration = dur.toFixed(2) + "s";
+        // Measure widest word using the same typography (prevents cropping)
+        const meas = document.createElement("span");
+        meas.className = "reelFace";
+        meas.style.position = "absolute";
+        meas.style.visibility = "hidden";
+        meas.style.transform = "none";
+        meas.style.left = "-9999px";
+        meas.style.top = "-9999px";
+        meas.style.width = "auto";
+        meas.style.height = "auto";
+        document.body.appendChild(meas);
+
+        let maxW = 0;
+        words.forEach(w => {
+          meas.textContent = w;
+          maxW = Math.max(maxW, Math.ceil(meas.getBoundingClientRect().width));
+        });
+
+        document.body.removeChild(meas);
+
+        if (maxW > 0) {
+          const wpx = (maxW + 10); // tiny padding so the last character never kisses the edge
+          wrap.style.width = wpx + "px";
+          wrap.style.minWidth = wpx + "px";
+        }
+
+        // Step + pause rotation (downward roll) with a continuous wrap (no speed-up)
+        const pauseMs = 2000;     // stop time per word
+        const rollMs  = 700;      // roll time between words (matches CSS transition)
+        let idx = 0;
+        let turns = 0;
+        let timer = null;
+
+        function setAngle(index){
+          // Roll DOWN: increasing rotation
+          const angle = (turns * 360) + (index * step);
+          reel.style.transform = `rotateX(${angle}deg)`;
+        }
+
+        function scheduleNext(){
+          timer = setTimeout(() => {
+            idx += 1;
+            if (idx >= n) {
+              idx = 0;
+              turns += 1; // keeps direction + motion continuous (no jump)
+            }
+            setAngle(idx);
+
+            // After roll completes, pause again
+            scheduleNext();
+          }, pauseMs + rollMs);
+        }
+
+        // Start: show first word, pause, then roll
+        setAngle(0);
+        timer = setTimeout(() => {
+          idx = 1;
+          setAngle(1);
+          scheduleNext();
+        }, pauseMs);
+
+        // Keep sizing/geometry stable on resize (no layout changes elsewhere)
+        window.addEventListener("resize", () => {
+          // Re-apply current angle (prevents any transient snap)
+          setAngle(idx);
+        });
+
+        // Cleanup if needed (defensive)
+        window.addEventListener("beforeunload", () => {
+          if (timer) clearTimeout(timer);
+        });
       })();
     });
   </script>
