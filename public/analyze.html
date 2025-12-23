@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.12.16-1 -->
+  <!-- analyze.html - v2025.12.23-1 -->
+  <!-- Built by ChatGPT -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-12-16 (America/New_York) -->
+  <!-- Last updated: 2025-12-23 (America/New_York) -->
   <!-- FIXES:
        1) Progress overlay no longer appears “stuck at 99%” (status keeps moving until render).
-       2) AI Engine “logos” are now deterministic inline marks (no broken image assets).
+       2) AI Engine logos now load from /img assets (no broken marks).
        3) Rename returned report headings: "What's Working"->"Strong Signals", "Needs Attention"->"Visibility Gaps".
   -->
 
@@ -63,10 +64,10 @@
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
 
-    /* Deterministic “engine mark” (fixes broken logos) */
+    /* Engine logos */
     .llm-logo{display:flex;align-items:center;justify-content:flex-start;height:32px}
     .engine-mark{display:inline-flex;align-items:center;gap:.55rem;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:10px;background:#fff}
-    .engine-dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,#000 0%,#3182CE 100%)}
+    .engine-icon{width:18px;height:18px;display:block;object-fit:contain}
     .engine-stack{display:flex;flex-direction:column;line-height:1}
     .engine-text{font-size:.86rem;font-weight:800;letter-spacing:.2px;color:#111}
     .engine-sub{font-size:.72rem;font-weight:700;color:#666;margin-top:2px}
@@ -229,15 +230,26 @@
       const mark = document.createElement('div');
       mark.className = 'engine-mark';
 
-      const dot = document.createElement('span');
-      dot.className = 'engine-dot';
+      const icon = document.createElement('img');
+      icon.className = 'engine-icon';
+
+      const sources = {
+        'ChatGPT': '/img/chatgpt-logo.png',
+        'Claude': '/img/claude.jpeg',
+        'Gemini': '/img/gemini-icon.svg',
+        'Copilot': '/img/copilot.jpeg',
+        'Perplexity': '/img/perplexity-logo.png'
+      };
+      const label = String(engine || 'Engine');
+      icon.src = sources[label] || '';
+      icon.alt = label;
 
       const stack = document.createElement('div');
       stack.className = 'engine-stack';
 
       const t = document.createElement('div');
       t.className = 'engine-text';
-      t.textContent = String(engine || 'Engine');
+      t.textContent = label;
 
       const s = document.createElement('div');
       s.className = 'engine-sub';
@@ -246,7 +258,7 @@
       stack.appendChild(t);
       stack.appendChild(s);
 
-      mark.appendChild(dot);
+      mark.appendChild(icon);
       mark.appendChild(stack);
 
       wrap.appendChild(mark);
@@ -557,6 +569,7 @@
     });
   </script>
 
-  <!-- Version: v2025.12.16-1 -->
+  <!-- Built by ChatGPT -->
+  <!-- Version: v2025.12.23-1 -->
 </body>
 </html>
