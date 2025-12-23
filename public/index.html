@@ -211,26 +211,29 @@
     }
 
     .reelFace{
-      position:absolute;
-      left:0; top:0;
-      width:100%;
-      height:60px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:flex-start;
-      white-space:nowrap;
+  position:absolute;
+  top:0;
+  left:50%;
+  width:100%;
+  height:60px;
 
-      color:var(--accent);
-      font-weight:900;
-      letter-spacing:.02em;
-      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
-      line-height:1.02;
-      padding-bottom:2px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
 
-      backface-visibility:hidden;
-      transform-style:preserve-3d;
-    }
+  white-space:nowrap;
+  color:var(--accent);
+  font-weight:900;
+  letter-spacing:.02em;
+  font-size:clamp(2.05rem, 4.4vw, 3.6rem);
+  line-height:1.02;
+  padding-bottom:2px;
 
+  backface-visibility:hidden;
+  transform-style:preserve-3d;
+  transform-origin:50% 50%;
+  translate:-50% 0;
+}
     /* keep white clean; no shading overlay */
     .reelShade{ display:none; }
     /* ===== END HERO HEADER (REPLACED) ===== */
