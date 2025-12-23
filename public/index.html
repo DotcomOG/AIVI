@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.18-2
-  Last updated: 2025-12-18 (America/New_York)
+  Version: v2025.12.18-3
+  Last updated: 2025-12-23 (America/New_York)
 
   FIXES IN THIS VERSION (HERO ONLY):
-  1) Replaced the current hero rotator with the proven “stack-in-viewport” hero header from v2025.12.18-5.
-  2) Restored true rotating animation (no static word, no stacking, no cut-off).
-  3) Preserved your existing page layout and all non-hero sections unchanged.
-  4) Mobile behavior: Line 1 can wrap only when necessary; rotating word stays visible and unclipped.
+  1) Hero rotator uses a 3D cylinder reel with per-word pause.
+  2) Reel viewport auto-sizes to the widest word (prevents cropping).
+  3) Reel background is forced to pure white to match the page.
+  4) Added safe left padding so the first letters never clip.
 -->
 <html lang="en">
 <head>
@@ -184,15 +184,17 @@
     .reelWrap{
       display:inline-block;
       position:relative;
-      height:60px;                 /* face height */
-      min-width:16ch;              /* JS will overwrite to exact max word width */
+      height:60px;
+      min-width:16ch;              /* JS will override to exact max word width */
       max-width:100%;
       overflow:hidden;
       vertical-align:baseline;
       perspective:900px;
       -webkit-font-smoothing:antialiased;
       transform:translateZ(0);
-      background:#fff;             /* ensure pure white behind the word */
+
+      background:#fff;             /* force pure white behind words */
+      padding:0 8px 0 10px;         /* prevents left clipping + adds right breathing room */
     }
 
     .reel{
@@ -203,8 +205,8 @@
       transform-style:preserve-3d;
       transform-origin:50% 50%;
       will-change:transform;
-      /* IMPORTANT: no infinite CSS animation (we step + pause in JS for a true 2s stop per word) */
-      animation:none;
+
+      animation:none;              /* stepped in JS (pause 2s per word) */
       transition:transform 700ms cubic-bezier(.2,.9,.2,1);
     }
 
@@ -212,7 +214,7 @@
       position:absolute;
       left:0; top:0;
       width:100%;
-      height:60px;                 /* same as reelWrap height */
+      height:60px;
       display:flex;
       align-items:flex-end;
       justify-content:flex-start;
@@ -229,20 +231,8 @@
       transform-style:preserve-3d;
     }
 
-    /* subtle “cylinder” shading */
-    .reelShade{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background: linear-gradient(
-        to bottom,
-        rgba(2,6,23,.10),
-        rgba(2,6,23,0) 30%,
-        rgba(2,6,23,0) 70%,
-        rgba(2,6,23,.10)
-      );
-      mix-blend-mode:multiply;
-    }
+    /* keep white clean; no shading overlay */
+    .reelShade{ display:none; }
     /* ===== END HERO HEADER (REPLACED) ===== */
 
     .hero-sub{
@@ -743,12 +733,7 @@
         });
       }
 
-      // HERO 3D CYLINDER REEL
-      // Requirements:
-      // 1) No cropping: viewport auto-sizes to the widest word
-      // 2) White background behind word (matches page)
-      // 3) Rotation pauses 2s per word, then rolls to next
-      // 4) Loop is continuous (no visible speed-up or “fast forward” at wrap)
+      // HERO 3D CYLINDER REEL (pause 2s per word, no cropping, pure white background)
       (function(){
         const reel = document.getElementById("heroReel");
         if (!reel) return;
@@ -781,7 +766,7 @@
           reel.appendChild(face);
         });
 
-        // Measure widest word using the same typography (prevents cropping)
+        // Measure widest word (same typography) to set wrap width and prevent cropping
         const meas = document.createElement("span");
         meas.className = "reelFace";
         meas.style.position = "absolute";
@@ -801,18 +786,21 @@
 
         document.body.removeChild(meas);
 
+        // Include padding baked into .reelWrap (left+right = 18px)
+        const padPx = 18;
         if (maxW > 0) {
-          const wpx = (maxW + 10); // tiny padding so the last character never kisses the edge
+          const wpx = maxW + padPx;
           wrap.style.width = wpx + "px";
           wrap.style.minWidth = wpx + "px";
         }
 
-        // Step + pause rotation (downward roll) with a continuous wrap (no speed-up)
-        const pauseMs = 2000;     // stop time per word
-        const rollMs  = 700;      // roll time between words (matches CSS transition)
+        // Step + pause rotation (downward roll), continuous loop without jump
+        const pauseMs = 2000; // stop time per word
+        const rollMs  = 700;  // must match CSS transition duration
         let idx = 0;
         let turns = 0;
-        let timer = null;
+        let t1 = null;
+        let t2 = null;
 
         function setAngle(index){
           // Roll DOWN: increasing rotation
@@ -820,42 +808,34 @@
           reel.style.transform = `rotateX(${angle}deg)`;
         }
 
-        function scheduleNext(){
-          timer = setTimeout(() => {
+        function advance(){
+          // Wait for the pause, then roll to next
+          t1 = setTimeout(() => {
             idx += 1;
             if (idx >= n) {
               idx = 0;
-              turns += 1; // keeps direction + motion continuous (no jump)
+              turns += 1; // preserves direction and avoids any reverse “snap”
             }
             setAngle(idx);
 
-            // After roll completes, pause again
-            scheduleNext();
-          }, pauseMs + rollMs);
+            // After the roll finishes, schedule the next pause+roll
+            t2 = setTimeout(() => {
+              advance();
+            }, rollMs);
+          }, pauseMs);
         }
 
-        // Start: show first word, pause, then roll
         setAngle(0);
-        timer = setTimeout(() => {
-          idx = 1;
-          setAngle(1);
-          scheduleNext();
-        }, pauseMs);
+        advance();
 
-        // Keep sizing/geometry stable on resize (no layout changes elsewhere)
-        window.addEventListener("resize", () => {
-          // Re-apply current angle (prevents any transient snap)
-          setAngle(idx);
-        });
-
-        // Cleanup if needed (defensive)
         window.addEventListener("beforeunload", () => {
-          if (timer) clearTimeout(timer);
+          if (t1) clearTimeout(t1);
+          if (t2) clearTimeout(t2);
         });
       })();
     });
   </script>
 
-  <!-- Version: v2025.12.18-2 -->
+  <!-- Version: v2025.12.18-3 -->
 </body>
 </html>
