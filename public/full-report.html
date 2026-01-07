@@ -1,172 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SnipeRank — Full AI SEO Analysis Report</title>
-  <style>
-    :root{
-      --max: 780px; --muted:#6b7280; --border:#e5e7eb; --black:#0f172a;
-      --accent:#dc3545; --accent-dark:#b02a37; --bg:#ffffff;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--black);background:var(--bg);}
-    .wrap{max-width:var(--max);margin:40px auto;padding:0 20px}
-    h1{font-size:40px;line-height:1.1;margin:0 0 6px;background:linear-gradient(135deg,#000 0%,#3182CE 100%);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .sub{color:var(--muted);margin:2px 0 20px}
-    .card{border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px}
-    .score{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-    .score-num{font-size:28px;font-weight:800}
-    .pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
-    .pill{border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between}
-    .badge{font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:#fafafa}
-    .section{margin-top:22px}
-    .section h3{margin:0 0 8px}
-    ul{margin:8px 0 0 18px}
-    li{margin:6px 0;line-height:1.6}
-    .muted{color:var(--muted)}
-    .btn{background:var(--accent);color:#fff;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}
-    .btn:disabled{opacity:.6;cursor:default}
-    .note{background:#fff8e1;border:1px solid #ffe08a;color:#7a5b00;padding:10px;border-radius:8px;margin:14px 0}
-    .err{color:#b91c1c}
-    .footer{margin:40px 0 10px;color:var(--muted);text-align:center;font-size:13px}
-    .spinner{width:16px;height:16px;border:2px solid #ddd;border-top-color:#666;border-radius:50%;display:inline-block;animation:spin 1s linear infinite;vertical-align:middle}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>SnipeRank</h1>
-    <div class="sub">Full AI SEO Analysis Report • Powered by <a href="https://quontora.com" target="_blank" rel="noopener">quontora</a></div>
 
-    <div id="notice" class="note" style="display:none"></div>
+// public/full-report.js — Loads full analysis from /api/full
+async function runFullReport() {
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get("url");
+  const name = params.get("name") || "";
+  const email = params.get("email") || "";
 
-    <div class="card">
-      <div class="score">
-        <div>
-          <div class="muted">Analysis for</div>
-          <div id="target-url" style="font-weight:700">—</div>
-        </div>
-        <div class="score-num" id="score">Generating…</div>
-        <button id="copyBtn" class="btn" type="button">Copy Comprehensive Summary</button>
-      </div>
-      <div class="pillars" id="pillars"></div>
-    </div>
+  document.getElementById("name").value = decodeURIComponent(name);
+  document.getElementById("email").value = decodeURIComponent(email);
+  document.getElementById("fullResultUrl").textContent = decodeURIComponent(url);
 
-    <div id="report-content" class="section">
-      <p class="muted"><span class="spinner"></span> Generating comprehensive report…</p>
-    </div>
+  try {
+    const res = await fetch(`/api/full?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
 
-    <div class="section">
-      <a class="btn" href="https://calendly.com/quontora" target="_blank" rel="noopener">Schedule Strategy Session</a>
-    </div>
-
-    <div class="footer">© 2025 SnipeRank by quontora.com</div>
-  </div>
-
-  <script>
-    // === CONFIG: point frontend to the Render backend (working) ===
-    const API_BASE = "https://sniperank-v2-dev.onrender.com";
-
-    const qs = new URLSearchParams(location.search);
-    const targetUrl = qs.get("url") || "";
-    document.getElementById("target-url").textContent = targetUrl || "—";
-
-    const noticeEl = document.getElementById("notice");
-    const pillarsEl = document.getElementById("pillars");
-    const reportEl  = document.getElementById("report-content");
-
-    function setNotice(msg){ noticeEl.textContent = msg; noticeEl.style.display = "block"; }
-
-    function renderScore(score){
-      document.getElementById("score").textContent = `${score}/100`;
-      // derive simple 4 pillars from score (visual only)
-      const q = Math.max(0, Math.min(25, Math.round(score/4)));
-      const data = [
-        ["Content Clarity & Structure", q],
-        ["AI Engine Optimization", q],
-        ["Technical Implementation", q],
-        ["Competitive Positioning", q]
-      ];
-      pillarsEl.innerHTML = "";
-      for (const [label,val] of data){
-        const d = document.createElement("div");
-        d.className = "pill";
-        d.innerHTML = `<span>${label}</span><span class="badge">${val}/25</span>`;
-        pillarsEl.appendChild(d);
-      }
+    if (data.error) {
+      document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Analysis failed. Try again.</p>";
+      return;
     }
 
-    function renderLists(data){
-      const working = (data.whatsWorking || []).map(x => `<li>${x}</li>`).join("");
-      const needs   = (data.needsAttention || []).map(x => `<li>${x}</li>`).join("");
-      const engines = (data.engineInsights || []).map(x => `<li>${x}</li>`).join("");
+    // Your API returns a score, but let's handle if it doesn't
+    document.getElementById("fullScore").textContent = `Score: ${data.score || 'N/A'}`;
 
-      reportEl.innerHTML = `
-        <div class="section">
-          <h3>Priority Opportunities</h3>
-          <ul>${needs}</ul>
-        </div>
-        <div class="section">
-          <h3>✅ What’s Working</h3>
-          <ul>${working}</ul>
-        </div>
-        <div class="section">
-          <h3>🤖 AI Engine Insights</h3>
-          <ul>${engines}</ul>
-        </div>
-      `;
-    }
+    // Match the API response structure (whatsWorking, needsAttention, engineInsights)
+    (data.whatsWorking || []).forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      document.getElementById("fullStrengths").appendChild(li);
+    });
 
-    async function loadFullReport(){
-      if(!targetUrl){
-        reportEl.innerHTML = `<p class="err">No URL provided.</p>`;
-        return;
-      }
-      try{
-        const res = await fetch(`${API_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`);
-        const data = await res.json();
+    (data.needsAttention || []).forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      document.getElementById("fullOpportunities").appendChild(li);
+    });
 
-        if (!data || data.error){
-          reportEl.innerHTML = `<p class="err">Error loading comprehensive analysis. Please try again.</p>`;
-          return;
-        }
+    (data.engineInsights || []).forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      document.getElementById("fullEngineInsights").appendChild(li);
+    });
+  } catch (err) {
+    console.error(err);
+    document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report.</p>";
+  }
+}
 
-        if (data.success !== true){
-          setNotice('⚠️ Showing Lite analysis (temporary). The comprehensive AI report service was unavailable.');
-        }
-
-        renderScore(data.score || 50);
-        renderLists(data);
-
-        // copy summary button
-        document.getElementById("copyBtn").onclick = async () => {
-          const lines = [
-            `Comprehensive AI SEO Analysis`,
-            `Website: ${targetUrl}`,
-            `Overall Score: ${document.getElementById("score").textContent}`,
-            ``,
-            `Top Opportunities:`,
-            ...(data.needsAttention || []).slice(0,8).map(x => `- ${x}`),
-            ``,
-            `AI Engine Insights:`,
-            ...(data.engineInsights || []).map(x => `- ${x}`),
-            ``,
-            `Generated by SnipeRank`
-          ].join("\n");
-          try{ await navigator.clipboard.writeText(lines); 
-               const b = document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1500);
-          }catch{ window.prompt("Copy the summary:", lines); }
-        };
-
-      }catch(err){
-        console.error(err);
-        reportEl.innerHTML = `<p class="err">Error loading comprehensive analysis. Please try again.</p>`;
-      }
-    }
-
-    loadFullReport();
-  </script>
-</body>
-</html>
+runFullReport();
