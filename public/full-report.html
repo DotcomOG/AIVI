@@ -535,9 +535,44 @@
     </div>
   </div>
 
-  <div class="footer">
-    <p>Comprehensive AI Visibility Analysis by <a href="https://quontora.com" target="_blank" rel="noopener">SnipeRank</a></p>
+<footer class="sr-footer" role="contentinfo">
+  <div class="sr-footer-inner">
+    <div class="sr-footer-top">
+      <div class="sr-footer-brand">
+        <div class="sr-footer-title">
+          SnipeRank, powered by <a href="https://aivindex.ai" target="_blank" rel="noopener">AIVI™</a>
+        </div>
+        <div class="sr-footer-subtitle">
+          AI Visibility diagnostics by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
+        </div>
+      </div>
+
+      <nav class="sr-footer-links" aria-label="Footer navigation">
+        <a href="https://aivindex.ai" target="_blank" rel="noopener">AIVI™</a>
+        <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
+        <a href="https://quontora.com/contact" target="_blank" rel="noopener">Contact</a>
+        <a href="https://quontora.com/privacy" target="_blank" rel="noopener">Privacy</a>
+        <a href="https://quontora.com/terms" target="_blank" rel="noopener">Terms</a>
+      </nav>
+    </div>
+
+    <div class="sr-footer-divider"></div>
+
+    <div class="sr-footer-bottom">
+      <div class="sr-footer-meta">
+        <span id="sr-footer-year"></span> Quontora. All rights reserved.
+      </div>
+      <div class="sr-footer-disclaimer">
+        AIVI™ is a diagnostic index. Results are directional and may vary by model, query, and crawl conditions.
+      </div>
+    </div>
   </div>
+</footer>
+
+<script>
+  // Footer year only
+  document.getElementById("sr-footer-year").textContent = new Date().getFullYear();
+</script>
 
   <script>
     // Robust URL parameter intake (supports common legacy keys)
