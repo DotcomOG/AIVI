@@ -1,49 +1,231 @@
+<!--
+  full-report.html - v2.2.0 - October 24, 2025
+  
+  CHANGELOG:
+  - Added loading lightbox overlay copied from analyze.html
+  - Modified progress timing from 30 seconds to 2+ minutes for comprehensive analysis
+  - Updated progress messages for full report context ("deep AI analysis", "comprehensive insights")
+  - Fixed API response field mapping to handle both old and new server.js formats
+  - Added support for multiple response field names (whatsWorking/ai_strengths, needsAttention/ai_opportunities, etc.)
+  - Enhanced error handling with specific error messages
+  - Added fallback message when no data is returned
+  - Integrated progress overlay with API call lifecycle (start on load, stop on completion)
+  
+  DEPENDENCIES:
+  - TailwindCSS (CDN)
+  - /api/full endpoint (expects url parameter)
+  - Formspree form handler (https://formspree.io/f/mayzkzed)
+  
+  FEATURES:
+  - Loading overlay with percentage progress bar (0-95% over ~2 minutes)
+  - URL parameter reading (url, name, email)
+  - API response compatibility with multiple field formats
+  - Form pre-population with user data
+  - Error handling and user feedback
+  
+  BUG FIXES:
+  - Fixed "Error loading report" issue by handling multiple API response formats
+  - Added null checks for URL parameter
+  - Improved error messaging for different failure scenarios
+  
+  INTEGRATION:
+  - Called from analyze.html form submission
+  - Expects URL parameters: ?url=...&name=...&email=...
+  - Server.js must have /api/full endpoint that returns JSON with whatsWorking, needsAttention, engineInsights fields
+  
+  PERFORMANCE:
+  - Progress simulation caps at 95% until API completes
+  - Smooth transitions and responsive design
+  - Optimized for 2-5 minute loading experience
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Full AI SEO Report – SnipeRank</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Progress Overlay Styles (copied from analyze.html) */
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-title{font-weight:700;font-size:18px}
+    .progress-pct{color:#666;font-size:16px;font-weight:600}
+    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
+    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+  </style>
+</head>
+<body class="bg-white text-black font-sans">
 
-// public/full-report.js — Loads full analysis from /api/full
-async function runFullReport() {
-  const params = new URLSearchParams(window.location.search);
-  const url = params.get("url");
-  const name = params.get("name") || "";
-  const email = params.get("email") || "";
+  <header class="text-center py-8">
+    <h1 class="text-4xl font-bold">SnipeRank</h1>
+    <h2 class="text-xl font-medium mt-1">Full AI SEO Analysis Report</h2>
+  </header>
 
-  document.getElementById("name").value = decodeURIComponent(name);
-  document.getElementById("email").value = decodeURIComponent(email);
-  document.getElementById("fullResultUrl").textContent = decodeURIComponent(url);
+  <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+    <div id="fullResultUrl" class="text-xl font-semibold text-center"></div>
+    <div id="fullScore" class="text-center text-2xl font-bold my-4"></div>
 
-  try {
-    const res = await fetch(`/api/full?url=${encodeURIComponent(url)}`);
-    const data = await res.json();
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">What's Working</h2>
+      <ul id="fullStrengths" class="list-disc list-inside space-y-3"></ul>
+    </section>
 
-    if (data.error) {
-      document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Analysis failed. Try again.</p>";
-      return;
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">Needs Attention</h2>
+      <ul id="fullOpportunities" class="list-disc list-inside space-y-3"></ul>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
+      <ul id="fullEngineInsights" class="list-disc list-inside space-y-3"></ul>
+    </section>
+
+    <section class="mt-12 border-t border-gray-300 pt-8">
+      <h3 class="text-2xl font-semibold mb-4 text-center">Request a Free Consultation</h3>
+      <form method="POST" action="https://formspree.io/f/mayzkzed" class="space-y-4 max-w-xl mx-auto">
+        <input type="text" id="name" name="name" placeholder="Your Full Name" class="w-full p-2 rounded border text-black" required />
+        <input type="email" id="email" name="email" placeholder="Your Email Address" class="w-full p-2 rounded border text-black" required />
+        <input type="tel" name="phone" placeholder="Phone (required)" class="w-full p-2 rounded border text-black" required />
+        <input type="text" name="company" placeholder="Company / Organization (Optional)" class="w-full p-2 rounded border text-black" />
+        <textarea name="notes" placeholder="Your message (Optional)" class="w-full p-2 rounded border text-black h-32"></textarea>
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full">Submit</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Progress Overlay (copied from analyze.html, modified for 5 min timing) -->
+  <div id="progress-overlay" class="overlay">
+    <div class="progress-panel">
+      <div class="progress-header">
+        <div class="progress-title">Generating your comprehensive report...</div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-eta" id="progress-eta">
+        Performing deep AI analysis across multiple engines.<br>
+        This typically takes <strong>2-5 minutes</strong> for comprehensive insights.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Progress functions (copied from analyze.html, modified for longer duration)
+    function startProgress() {
+      document.getElementById('progress-overlay').style.display = 'flex';
+      const expectedDuration = 120000; // 2 minutes to reach ~95%
+      const startTime = Date.now();
+      const progressFill = document.getElementById('progress-fill');
+      const progressPct = document.getElementById('progress-pct');
+      
+      const interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const ratio = Math.min(elapsed / expectedDuration, 1);
+        const progress = ratio * 95; // Cap at 95% until done
+        
+        progressFill.style.width = progress + '%';
+        progressPct.textContent = Math.floor(progress) + '%';
+        
+        if (progress >= 95) clearInterval(interval);
+        if (progress > 30) {
+          document.getElementById('progress-eta').innerHTML = 'Analyzing content depth and AI optimization signals...<br>Generating detailed recommendations...';
+        }
+        if (progress > 70) {
+          document.getElementById('progress-eta').innerHTML = 'Finalizing AI engine insights and recommendations...<br>Almost complete!';
+        }
+      }, 100);
+      return interval;
     }
 
-    // Your API returns a score, but let's handle if it doesn't
-    document.getElementById("fullScore").textContent = `Score: ${data.score || 'N/A'}`;
+    function stopProgress() {
+      const progressFill = document.getElementById('progress-fill');
+      const progressPct = document.getElementById('progress-pct');
+      progressFill.style.transition = 'width 0.5s ease';
+      progressFill.style.width = '100%';
+      progressPct.textContent = '100%';
+      setTimeout(() => {
+        document.getElementById('progress-overlay').style.display = 'none';
+      }, 800);
+    }
 
-    // Match the API response structure (whatsWorking, needsAttention, engineInsights)
-    (data.whatsWorking || []).forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      document.getElementById("fullStrengths").appendChild(li);
-    });
+    async function runFullReport() {
+      const params = new URLSearchParams(window.location.search);
+      const url = params.get("url");
+      const name = params.get("name") || "";
+      const email = params.get("email") || "";
 
-    (data.needsAttention || []).forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      document.getElementById("fullOpportunities").appendChild(li);
-    });
+      if (!url) {
+        document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>No URL provided.</p>";
+        return;
+      }
 
-    (data.engineInsights || []).forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      document.getElementById("fullEngineInsights").appendChild(li);
-    });
-  } catch (err) {
-    console.error(err);
-    document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report.</p>";
-  }
-}
+      document.getElementById("name").value = decodeURIComponent(name);
+      document.getElementById("email").value = decodeURIComponent(email);
+      document.getElementById("fullResultUrl").textContent = decodeURIComponent(url);
 
-runFullReport();
+      // Start the progress overlay
+      const progressTimer = startProgress();
+
+      try {
+        const res = await fetch(`/api/full?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        // Handle different response formats
+        if (data.error) {
+          clearInterval(progressTimer);
+          stopProgress();
+          document.body.innerHTML += `<p class='text-red-500 text-center mt-8'>Analysis failed: ${data.error}</p>`;
+          return;
+        }
+
+        // Display score if available
+        if (data.score) {
+          document.getElementById("fullScore").textContent = `Score: ${data.score}`;
+        }
+
+        // Handle multiple possible field names for backward compatibility
+        const strengths = data.whatsWorking || data.ai_strengths || [];
+        const opportunities = data.needsAttention || data.ai_opportunities || [];
+        const insights = data.engineInsights || data.engine_insights || [];
+
+        strengths.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          document.getElementById("fullStrengths").appendChild(li);
+        });
+
+        opportunities.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          document.getElementById("fullOpportunities").appendChild(li);
+        });
+
+        insights.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          document.getElementById("fullEngineInsights").appendChild(li);
+        });
+
+        // If no data loaded, show message
+        if (strengths.length === 0 && opportunities.length === 0 && insights.length === 0) {
+          document.body.innerHTML += "<p class='text-yellow-600 text-center mt-8'>Analysis completed but no detailed results available.</p>";
+        }
+
+      } catch (err) {
+        console.error(err);
+        document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report. Please try again.</p>";
+      } finally {
+        clearInterval(progressTimer);
+        stopProgress();
+      }
+    }
+
+    // Auto-run when page loads
+    document.addEventListener("DOMContentLoaded", runFullReport);
+  </script>
+</body>
+</html>
