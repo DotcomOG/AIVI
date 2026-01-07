@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <!--
   AI Visibility Index (AIVI) Index Page
-  Version: v2025.12.18-6
-  Last updated: 2025-12-23 (America/New_York)
+  Version: v2026.01.07-1
 
-  FIXES IN THIS VERSION (HERO ONLY):
-  1) Replaced the fragile 3D cylinder with a production-safe 2D “slot” loop (continuous, no rewind glitch).
-  2) Downward motion, with a true 2-second pause on each word.
-  3) No clipping on the left or right; background stays pure white to match the page.
-  4) All words align to the same left start position (based on the longest word).
+Last updated: 2026-01-07 (America/New_York)
 -->
 <html lang="en">
 <head>
@@ -433,7 +428,7 @@
       font-weight:800;
     }
 
-    /* Footer (kept minimal) */
+    /* Footer */
     footer{
       margin-top:3rem;
       border-top:1px solid var(--border);
@@ -581,7 +576,7 @@
 
       <div class="hero-cards">
         <div class="hcard">
-          <h3>You’re not optimizing for AI, yet.</h3>
+          <h3>You're not optimizing for AI, yet.</h3>
           <p>
             AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers, summaries,
             and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.
@@ -601,7 +596,7 @@
   <!-- Pillars -->
   <div class="pillars section" id="how-it-works">
     <div class="wrap">
-      <div class="title">How AI “sees” a website</div>
+      <div class="title">How AI "sees" a website</div>
       <div class="kicker">AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading that reflects how AI is likely to understand and represent your website today.</div>
 
       <div class="pillars-grid" role="list">
@@ -664,7 +659,7 @@
     </div>
 
     <div class="foot-bottom">
-      <div>© 2025 AI Visibility Index (AIVI). A product of Quontora.</div>
+      <div>© <span id="footer-year"></span> AI Visibility Index (AIVI). A product of Quontora.</div>
       <div style="margin-top:.35rem;">
         Request-based access during early development. Pricing and availability may change.
       </div>
@@ -672,6 +667,9 @@
   </footer>
 
   <script>
+    // Footer year
+    document.getElementById("footer-year").textContent = new Date().getFullYear();
+
     // Basic URL validation
     function isValidURL(input){
       return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
@@ -706,7 +704,7 @@
         });
       }
 
-      // HERO SLOT ROTATOR (2D, continuous loop, downwards, 2s pause) — HERO ONLY
+      // HERO SLOT ROTATOR (2D, continuous loop, downwards, 2s pause)
       (function(){
         const viewport = document.getElementById("slotViewport");
         const stack = document.getElementById("slotStack");
@@ -737,7 +735,6 @@
         });
 
         function measureAndLockWidth(){
-          // Measure the widest word using a temporary slotItem (same styles)
           const probe = document.createElement("span");
           probe.className = "slotItem";
           probe.style.position = "absolute";
@@ -759,7 +756,6 @@
 
           document.body.removeChild(probe);
 
-          // Include viewport padding so nothing clips
           const cs = window.getComputedStyle(viewport);
           const padL = parseFloat(cs.paddingLeft) || 0;
           const padR = parseFloat(cs.paddingRight) || 0;
@@ -771,11 +767,10 @@
           }
         }
 
-        // Timing
         const pauseMs = 2000;
         const rollMs  = 650;
 
-        let index = 0; // current visible item (in first half)
+        let index = 0;
         let ticking = false;
 
         function setY(y, animate){
@@ -789,15 +784,10 @@
 
           const itemH = Math.round(items[0].getBoundingClientRect().height || 60);
 
-          // Pause on current item
           setTimeout(() => {
-            // Move DOWN to next item: translateY negative increases (moves content up visually),
-            // but the viewport reveals the next item below -> this reads as "rolling down".
             index += 1;
-
             setY(-index * itemH, true);
 
-            // After the roll finishes, if we reached the duplicated half, snap back (no visible jump)
             setTimeout(() => {
               if (index >= baseWords.length) {
                 index = 0;
@@ -820,7 +810,6 @@
 
         init();
         window.addEventListener("resize", () => {
-          // Re-lock width on resize; keep current visual position
           const itemH = Math.round((items[0]?.getBoundingClientRect().height) || 60);
           measureAndLockWidth();
           setY(-index * itemH, false);
@@ -829,7 +818,6 @@
     });
   </script>
 
-  <!-- Built by ChatGPT -->
-  <!-- Version: v2025.12.18-6 -->
+  <!-- Version: v2026.01.07-1 -->
 </body>
 </html>
