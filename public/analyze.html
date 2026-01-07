@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.12.12-2 -->
+  <!-- analyze.html - v2026.01.07-1 -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-12-12 -->
+  <!-- Last updated: 2026-01-07 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -17,6 +17,10 @@
       --sr-radius:16px; --sr-border:#e6e6e9; --sr-shadow:0 10px 30px rgba(0,0,0,.12);
       --sr-text:#111; --sr-muted:#5b5b66; --sr-bg:#fff; --sr-pill-bg:#fafafb; --sr-gap:16px;
       --btn-red:#dc3545; --btn-red-hover:#c82333;
+      --primary:#3182CE;
+      --text:#0b1220;
+      --muted-2:#64748b;
+      --bg-soft:#f7fafc;
     }
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
@@ -58,23 +62,9 @@
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
 
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;min-height:32px;height:auto}
-    .llm-logo img{height:28px;width:auto;display:block;object-fit:contain;max-width:110px}
-    .llm-logo img.engine-copilot{
-      height:52px;
-      max-width:220px;
-      background:#fff;
-      padding:2px 4px;
-      border-radius:6px;
-    }
-    .llm-logo img.engine-gemini{
-      height:52px;
-      max-width:220px;
-      background:#fff;
-      padding:2px 4px;
-      border-radius:6px;
-    }
-    .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
+    .llm-logo{display:flex;align-items:center;justify-content:flex-start;min-height:36px;height:auto}
+    .llm-logo img{height:32px;width:auto;display:block;object-fit:contain;max-width:140px}
+    .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
     .form-section{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);margin-top:3rem;width:100%}
@@ -112,9 +102,75 @@
     .modal-content p{margin:12px 0;color:#333}
     .modal-content strong{color:#111}
 
-    .footer{width:100%;text-align:center;padding:2rem 0 1rem;margin-top:3rem;color:#666;font-size:.9rem}
-    .footer a{color:#3182CE;text-decoration:none}
     .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem}
+
+    /* Footer */
+    footer{
+      margin-top:3rem;
+      border-top:1px solid var(--border);
+      background:var(--bg-soft);
+    }
+    .footer-inner{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:2rem var(--pad-h) 1.25rem;
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:1.6rem;
+    }
+    .foot-brand h3{
+      font-size:1.1rem;
+      font-weight:900;
+      margin-bottom:.35rem;
+      letter-spacing:-.2px;
+    }
+    .foot-brand p{
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+    .disclaimer{
+      margin-top:.75rem;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:800;
+      line-height:1.6;
+    }
+    .foot-col h4{
+      font-size:.95rem;
+      font-weight:900;
+      margin-bottom:.6rem;
+      color:#0f172a;
+    }
+    .foot-links{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:.45rem;
+    }
+    .foot-links a{
+      color:var(--muted);
+      font-weight:800;
+      text-decoration:none;
+    }
+    .foot-links a:hover{color:#0f172a;text-decoration:none}
+    .foot-bottom{
+      border-top:1px solid var(--border);
+      padding:1rem var(--pad-h);
+      max-width:var(--max-width);
+      margin:0 auto;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:700;
+      line-height:1.6;
+    }
+
+    @media (max-width:640px){
+      .footer-inner{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -176,9 +232,40 @@
     </div>
   </section>
 
-  <div class="footer">
-    © 2025 AiVi by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>.
-  </div>
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="foot-brand">
+        <h3>AiVi — AI Visibility Analysis</h3>
+        <p>
+          Powered by AIVI™, AiVi reveals how AI systems interpret, trust, and represent your website before customers see you.
+        </p>
+        <div class="disclaimer">
+          Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.
+        </div>
+      </div>
+
+      <div class="foot-col">
+        <h4>Product</h4>
+        <ul class="foot-links">
+          <li><a href="index.html#analyze">Free Analysis</a></li>
+          <li><a href="index.html#how-it-works">How it works</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h4>Company</h4>
+        <ul class="foot-links">
+          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+          <li><a href="mailto:hello@quontora.com?subject=AiVi%20Question">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div>© <span id="footer-year"></span> AiVi by Quontora. Powered by AIVI™.</div>
+    </div>
+  </footer>
 
   <!-- Progress Overlay -->
   <div id="progress-overlay" class="overlay">
@@ -227,10 +314,13 @@
   </div>
 
   <script>
+    // Footer year
+    document.getElementById("footer-year").textContent = new Date().getFullYear();
+
     const LOGO_SOURCES = {
       ChatGPT: '/img/chatgpt-logo.png',
       Claude: '/img/claude.jpeg',
-      Gemini: '/img/gemini-icon.svg',
+      Gemini: '/img/gemini.jpeg',
       Copilot: '/img/copilot.jpeg',
       Perplexity: '/img/perplexity-logo.png',
     };
@@ -246,7 +336,6 @@
       const img = document.createElement('img');
       img.alt = `${engine} logo`;
       img.src = p;
-      img.className = `engine-${String(engine).toLowerCase()}`;
       img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
       img.onerror = () => { wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`; };
       return wrap;
@@ -326,15 +415,14 @@
       }
     }
 
-    // Progress simulation (fixed: no “stuck at 95%”)
     function startProgress() {
       document.getElementById('progress-overlay').style.display = 'flex';
       const startTime = Date.now();
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
 
-      let hardCap = 99;      // keep moving up to 99 while waiting
-      let fastWindow = 35000; // get to ~92% in ~35s
+      let hardCap = 99;
+      let fastWindow = 35000;
       let lastShown = 0;
 
       const interval = setInterval(() => {
@@ -342,12 +430,11 @@
 
         let progress;
         if (elapsed <= fastWindow) {
-          const ratio = elapsed / fastWindow;         // 0..1
+          const ratio = elapsed / fastWindow;
           progress = Math.min(92, Math.floor(ratio * 92));
         } else {
-          // creep from 92 -> 99 slowly (never “stuck”)
           const extra = elapsed - fastWindow;
-          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500)); // +1 every 2.5s
+          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500));
         }
 
         if (progress < lastShown) progress = lastShown;
@@ -376,7 +463,6 @@
       }, 800);
     }
 
-    // Modal controls
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('breakdown-modal').style.display = 'flex';
@@ -390,7 +476,6 @@
       }
     });
 
-    // Copy button
     document.getElementById("copyBtn").addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
       const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
@@ -413,7 +498,6 @@
       }
     });
 
-    // Form submission handler
     document.getElementById('full-report-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('name-input').value.trim();
