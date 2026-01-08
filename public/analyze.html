@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- analyze.html - v2026.01.07-1 -->
+  <!-- analyze.html - v2025.01.07-2 -->
   <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
   <!-- Lead generation page - Full report available via form submission -->
   <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2026-01-07 -->
+  <!-- Last updated: 2025-01-07 -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -421,8 +421,8 @@
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
 
-      let hardCap = 99;
-      let fastWindow = 35000;
+      let hardCap = 95;
+      let fastWindow = 30000;
       let lastShown = 0;
 
       const interval = setInterval(() => {
@@ -431,10 +431,10 @@
         let progress;
         if (elapsed <= fastWindow) {
           const ratio = elapsed / fastWindow;
-          progress = Math.min(92, Math.floor(ratio * 92));
+          progress = Math.min(88, Math.floor(ratio * 88));
         } else {
           const extra = elapsed - fastWindow;
-          progress = Math.min(hardCap, 92 + Math.floor(extra / 2500));
+          progress = Math.min(hardCap, 88 + Math.floor(extra / 1500));
         }
 
         if (progress < lastShown) progress = lastShown;
