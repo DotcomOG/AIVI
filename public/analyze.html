@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Built by: ChatGPT
-  Version: v2026.01.10-2
-  Last updated: 2026-01-10 (America/New_York)
+Version: v2026.01.10-3
+Last updated: 2026-01-10 (America/New_York)
 
-  Best-solution changes (real UX fix + robustness):
-  1) The progress overlay now covers ONLY the score step (fast, user gets value quickly). No more “95%/99% hang.”
-  2) The full report loads progressively in-page (non-blocking) with clear messaging.
-  3) Score + report fetches run concurrently, with same-origin first and automatic fallback to Render.
-  4) Adds timeouts (AbortController) + one retry on report timeout.
-  5) Removes extra HEAD probe request.
+  OPTION A IMPLEMENTED (clean overlay until everything is ready):
+  1) Removed percent-based progress UI entirely (no 95%/99% hang).
+  2) Added indeterminate circular loader + staged, honest messaging based on elapsed time.
+  3) Overlay remains up until BOTH score + report are loaded (single clean reveal).
+  4) Restored a reliable fetch flow: same-origin first; on failure, switch BOTH endpoints to Render fallback.
+  5) Added timeouts (AbortController) and clear error handling without breaking the page.
+
+  No layout/design changes outside the overlay UI.
 -->
 <html lang="en">
 <head>
@@ -90,14 +91,26 @@
     .consultation-info{color:var(--muted);font-size:.95rem;margin-top:1rem}
     .consultation-info strong{color:#000}
 
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
-    .progress-pct{color:#666;font-size:16px;font-weight:600}
-    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-title{font-weight:800;font-size:18px;margin:0 0 10px;color:#111}
+    .progress-sub{color:#555;font-size:14px;line-height:1.45;margin:0 0 14px}
+    .progress-stage{color:#666;font-size:14px;line-height:1.45;margin:0}
+
+    /* Indeterminate circular loader */
+    .spinner-wrap{display:flex;gap:14px;align-items:center;margin:10px 0 8px}
+    .spinner{
+      width:42px;height:42px;border-radius:50%;
+      border:4px solid #e9eef7;
+      border-top-color:#3182CE;
+      animation:spin 0.95s linear infinite;
+      flex:0 0 auto;
+    }
+    .spinner-meta{display:flex;flex-direction:column;gap:2px}
+    .spinner-label{font-weight:800;color:#111;font-size:14px}
+    .spinner-hint{color:#666;font-size:13px;line-height:1.35}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -208,10 +221,7 @@
   </section>
 
   <section id="summary-results">
-    <p style="text-align:center;color:gray;">
-      Generating your analysis report...<br>
-      Some sites can take up to <strong>2 minutes</strong> depending on crawl depth and server speed.
-    </p>
+    <p style="text-align:center;color:gray;">Loading analysis...</p>
   </section>
 
   <!-- Get Full Report Form -->
@@ -277,20 +287,23 @@
     </div>
   </footer>
 
-  <!-- Progress Overlay (now used only for score / first-value) -->
-  <div id="progress-overlay" class="overlay">
+  <!-- Progress Overlay (Option A: no %, indeterminate loader, stays until everything is done) -->
+  <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
-      <div class="progress-header">
-        <div class="progress-title" id="progress-title">Calculating your score...</div>
-        <div class="progress-pct" id="progress-pct">0%</div>
+      <div class="progress-title" id="progress-title">Analyzing your website</div>
+
+      <div class="spinner-wrap">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="spinner-meta">
+          <div class="spinner-label" id="spinner-label">Processing results…</div>
+          <div class="spinner-hint" id="spinner-hint">This can take 2 minutes or more on complex sites.</div>
+        </div>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div class="progress-eta" id="progress-eta">
-        Calculating your AiVi score.<br>
-        This typically takes <strong>5–20 seconds</strong>.
-      </div>
+
+      <p class="progress-sub" id="progress-sub">
+        We’re analyzing the site and processing the results. This can take <strong>2 minutes or more</strong>.
+      </p>
+      <p class="progress-stage" id="progress-stage">Starting analysis…</p>
     </div>
   </div>
 
@@ -425,60 +438,60 @@
       }
     }
 
-    function setOverlayProgress(pct){
-      const clamped = Math.max(0, Math.min(100, Math.floor(pct)));
-      document.getElementById('progress-fill').style.width = clamped + '%';
-      document.getElementById('progress-pct').textContent = clamped + '%';
-    }
-
-    function startScoreOverlay(){
-      document.getElementById('progress-title').textContent = 'Calculating your score...';
-      document.getElementById('progress-eta').innerHTML =
-        'Calculating your AiVi score.<br>This typically takes <strong>5–20 seconds</strong>.';
-
+    // Overlay controls (Option A)
+    function showOverlay(){
       document.getElementById('progress-overlay').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function hideOverlay(){
+      document.getElementById('progress-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
 
-      const startTime = Date.now();
-      let lastPct = 0;
+    function startOverlayMessaging(){
+      const stageEl = document.getElementById('progress-stage');
+      const spinnerLabel = document.getElementById('spinner-label');
+      const spinnerHint = document.getElementById('spinner-hint');
 
-      // Score overlay progress: smooth ramp to ~92, then wait for completion.
-      // No more "almost done" hang because this overlay ends immediately after score is rendered.
+      const start = Date.now();
+
       const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
+        const s = Math.floor((Date.now() - start) / 1000);
 
-        let pct;
-        if (elapsed <= 8000) {
-          pct = (elapsed / 8000) * 75; // 0 -> 75
-        } else if (elapsed <= 20000) {
-          pct = 75 + ((elapsed - 8000) / 12000) * 17; // 75 -> 92
+        // Staged messaging by elapsed time (honest, not predictive).
+        if (s < 8) {
+          stageEl.textContent = "Fetching and parsing the website…";
+          spinnerLabel.textContent = "Processing results…";
+          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
+        } else if (s < 20) {
+          stageEl.textContent = "Extracting structure and crawl signals…";
+          spinnerLabel.textContent = "Analyzing site signals…";
+          spinnerHint.textContent = "Some sites respond slowly or block automated requests.";
+        } else if (s < 45) {
+          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
+          spinnerLabel.textContent = "Scoring and summarizing…";
+          spinnerHint.textContent = "We’re compiling your analysis into a readable report.";
+        } else if (s < 75) {
+          stageEl.textContent = "Generating the analysis report…";
+          spinnerLabel.textContent = "Finalizing report…";
+          spinnerHint.textContent = "This may take longer for large or heavily scripted sites.";
+        } else if (s < 120) {
+          stageEl.textContent = "Still working — this site is taking longer than typical.";
+          spinnerLabel.textContent = "Still analyzing…";
+          spinnerHint.textContent = "We’ll show your results as soon as they’re ready.";
         } else {
-          pct = 92; // hold; overlay will close when score arrives
-          document.getElementById('progress-eta').innerHTML =
-            'Still calculating... some sites take longer due to server speed.<br>' +
-            'We’ll show your score as soon as it’s ready.';
+          stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
+          spinnerLabel.textContent = "Still analyzing…";
+          spinnerHint.textContent = "If this continues, the site may be blocking requests or the engine is under heavy load.";
         }
+      }, 800);
 
-        pct = Math.max(lastPct, Math.min(92, pct));
-        lastPct = pct;
-        setOverlayProgress(pct);
-      }, 150);
-
-      return {
-        stop: () => clearInterval(interval),
-        startedAt: startTime
-      };
+      return () => clearInterval(interval);
     }
 
-    function stopScoreOverlay(controller){
-      if (controller && controller.stop) controller.stop();
-      setOverlayProgress(100);
-      setTimeout(() => {
-        document.getElementById('progress-overlay').style.display = 'none';
-      }, 250);
-    }
-
+    // Fetch with timeouts
     async function fetchWithTimeout(url, opts = {}) {
-      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 30000;
+      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -486,50 +499,6 @@
         return res;
       } finally {
         clearTimeout(t);
-      }
-    }
-
-    async function fetchJSON(url, timeoutMs){
-      const res = await fetchWithTimeout(url, { timeoutMs });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    }
-
-    async function fetchText(url, timeoutMs){
-      const res = await fetchWithTimeout(url, { timeoutMs });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.text();
-    }
-
-    async function tryScoreSameOriginThenFallback(fallbackBase){
-      try {
-        const j = await fetchJSON(`/api/score?url=${encodeURIComponent(targetUrl)}`, 12000);
-        return { base: '', data: j };
-      } catch {
-        const j2 = await fetchJSON(`${fallbackBase}/api/score?url=${encodeURIComponent(targetUrl)}`, 25000);
-        return { base: fallbackBase, data: j2 };
-      }
-    }
-
-    async function tryReportSameOriginThenFallback(fallbackBase){
-      // Attempt same-origin report first; if it fails quickly (404 / not wired), fallback.
-      try {
-        const html = await fetchText(`/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, 20000);
-        return { base: '', html };
-      } catch {
-        const html2 = await fetchText(`${fallbackBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, 140000);
-        return { base: fallbackBase, html: html2 };
-      }
-    }
-
-    async function fetchReportWithRetry(base){
-      // One retry on timeout/abort (common with cold starts). Second attempt gets a bit more time.
-      const url = `${base}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
-      try {
-        return await fetchText(url, 140000);
-      } catch (e) {
-        // Retry once
-        return await fetchText(url, 160000);
       }
     }
 
@@ -612,72 +581,64 @@
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
+        document.getElementById('summary-results').innerHTML =
+          "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
         return;
       }
 
       document.getElementById("current-url").textContent = targetUrl;
 
+      // Option A: show overlay immediately and keep it until both calls finish.
+      showOverlay();
+      const stopMessaging = startOverlayMessaging();
+
       const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
-      const overlayCtrl = startScoreOverlay();
+      let apiBase = '';
 
-      // Kick off both operations concurrently.
-      // Score determines the fastest “first value”; report loads progressively in the page.
-      const scorePromise = tryScoreSameOriginThenFallback(FALLBACK_BASE);
-
-      const reportPromise = (async () => {
-        // Try same-origin quickly; if that fails, use fallback. If fallback chosen, use retry wrapper.
-        try {
-          const first = await tryReportSameOriginThenFallback(FALLBACK_BASE);
-          const base = first.base || '';
-          const host = document.getElementById('summary-results');
-
-          // If report came from fallback path, it may still be a cold-start long tail.
-          // We already have HTML in first.html; render it immediately.
-          host.innerHTML = first.html;
-          transformAIInsights(host);
-
-          return base;
-        } catch (e) {
-          console.error('Report error (initial):', e);
-          const host = document.getElementById('summary-results');
-          host.innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-          return '';
-        }
-      })();
-
-      // As soon as score is ready, render and end overlay (no more waiting on report).
+      // Step 1: Choose base reliably by attempting same-origin score quickly.
+      // If it fails, switch BOTH score + report to fallback.
       try {
-        const { base, data } = await scorePromise;
-        renderScoreCard(data.score, data.pillars, data.highlights);
-        sessionStorage.setItem('sniperank:data', JSON.stringify(data));
-        stopScoreOverlay(overlayCtrl);
-
-        // If report was not yet rendered because same-origin attempt failed fast and fallback is still warming,
-        // ensure we load it in the background using the base that worked for score.
-        // (This covers the case where same-origin report is missing but score succeeded via fallback.)
-        const host = document.getElementById('summary-results');
-        const stillPlaceholder = (host.textContent || '').toLowerCase().includes('generating your analysis report');
-        if (stillPlaceholder) {
-          try {
-            const html = await fetchReportWithRetry(base || FALLBACK_BASE);
-            host.innerHTML = html;
-            transformAIInsights(host);
-          } catch (e) {
-            console.error('Report error (post-score fallback):', e);
-            host.innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-          }
-        }
-      } catch (e) {
-        console.error('Score error:', e);
-        stopScoreOverlay(overlayCtrl);
-        document.getElementById("scoreBand").textContent = "Unable to calculate score";
+        const probeScore = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
+        if (!probeScore.ok) throw new Error(`Score HTTP ${probeScore.status}`);
+        apiBase = '';
+      } catch {
+        apiBase = FALLBACK_BASE;
       }
 
-      // Ensure reportPromise is awaited to avoid unhandled rejections in some browsers.
-      try { await reportPromise; } catch {}
+      // Step 2: Fetch score + report sequentially (simple, reliable).
+      // If you prefer parallel, we can do it, but this preserves your known-good behavior.
+      try {
+        // Score
+        try {
+          const r = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 30000 });
+          if (!r.ok) throw new Error(`Score HTTP ${r.status}`);
+          const j = await r.json();
+          renderScoreCard(j.score, j.pillars, j.highlights);
+          sessionStorage.setItem('sniperank:data', JSON.stringify(j));
+        } catch (e) {
+          console.error('Score error:', e);
+          document.getElementById("scoreBand").textContent = "Unable to calculate score";
+        }
+
+        // Report
+        try {
+          const res = await fetchWithTimeout(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
+          if (!res.ok) throw new Error(`Report HTTP ${res.status}`);
+          const html = await res.text();
+          const host = document.getElementById('summary-results');
+          host.innerHTML = html;
+          transformAIInsights(host);
+        } catch (e) {
+          console.error('Report error:', e);
+          document.getElementById('summary-results').innerHTML =
+            "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
+        }
+      } finally {
+        stopMessaging();
+        hideOverlay();
+      }
     });
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.10-2 -->
+<!-- Version footer: v2026.01.10-3 -->
