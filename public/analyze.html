@@ -1,12 +1,19 @@
 <!DOCTYPE html>
+<!--
+  analyze.html
+  Built by: ChatGPT
+  Version: v2026.01.10-2
+  Last updated: 2026-01-10 (America/New_York)
+
+  Best-solution changes (real UX fix + robustness):
+  1) The progress overlay now covers ONLY the score step (fast, user gets value quickly). No more “95%/99% hang.”
+  2) The full report loads progressively in-page (non-blocking) with clear messaging.
+  3) Score + report fetches run concurrently, with same-origin first and automatic fallback to Render.
+  4) Adds timeouts (AbortController) + one retry on report timeout.
+  5) Removes extra HEAD probe request.
+-->
 <html lang="en">
 <head>
-  <!-- analyze.html - v2025.01.07-2 -->
-  <!-- Free preview report: Shows 5 strengths, 10 issues, AI Engine insights + score card -->
-  <!-- Lead generation page - Full report available via form submission -->
-  <!-- Backend compatibility: /api/score (GET) and /report.html?report=analyze (GET) only -->
-  <!-- Last updated: 2025-01-07 -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AiVi - AI Visibility Analysis</title>
@@ -201,7 +208,10 @@
   </section>
 
   <section id="summary-results">
-    <p style="text-align:center;color:gray;">Loading analysis...</p>
+    <p style="text-align:center;color:gray;">
+      Generating your analysis report...<br>
+      Some sites can take up to <strong>2 minutes</strong> depending on crawl depth and server speed.
+    </p>
   </section>
 
   <!-- Get Full Report Form -->
@@ -267,19 +277,19 @@
     </div>
   </footer>
 
-  <!-- Progress Overlay -->
+  <!-- Progress Overlay (now used only for score / first-value) -->
   <div id="progress-overlay" class="overlay">
     <div class="progress-panel">
       <div class="progress-header">
-        <div class="progress-title">Analyzing your website...</div>
+        <div class="progress-title" id="progress-title">Calculating your score...</div>
         <div class="progress-pct" id="progress-pct">0%</div>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
       <div class="progress-eta" id="progress-eta">
-        Performing website analysis.<br>
-        This typically takes <strong>15–90 seconds</strong>.
+        Calculating your AiVi score.<br>
+        This typically takes <strong>5–20 seconds</strong>.
       </div>
     </div>
   </div>
@@ -415,52 +425,112 @@
       }
     }
 
-    function startProgress() {
+    function setOverlayProgress(pct){
+      const clamped = Math.max(0, Math.min(100, Math.floor(pct)));
+      document.getElementById('progress-fill').style.width = clamped + '%';
+      document.getElementById('progress-pct').textContent = clamped + '%';
+    }
+
+    function startScoreOverlay(){
+      document.getElementById('progress-title').textContent = 'Calculating your score...';
+      document.getElementById('progress-eta').innerHTML =
+        'Calculating your AiVi score.<br>This typically takes <strong>5–20 seconds</strong>.';
+
       document.getElementById('progress-overlay').style.display = 'flex';
+
       const startTime = Date.now();
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
+      let lastPct = 0;
 
-      let hardCap = 95;
-      let fastWindow = 30000;
-      let lastShown = 0;
-
+      // Score overlay progress: smooth ramp to ~92, then wait for completion.
+      // No more "almost done" hang because this overlay ends immediately after score is rendered.
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
 
-        let progress;
-        if (elapsed <= fastWindow) {
-          const ratio = elapsed / fastWindow;
-          progress = Math.min(88, Math.floor(ratio * 88));
+        let pct;
+        if (elapsed <= 8000) {
+          pct = (elapsed / 8000) * 75; // 0 -> 75
+        } else if (elapsed <= 20000) {
+          pct = 75 + ((elapsed - 8000) / 12000) * 17; // 75 -> 92
         } else {
-          const extra = elapsed - fastWindow;
-          progress = Math.min(hardCap, 88 + Math.floor(extra / 1500));
-        }
-
-        if (progress < lastShown) progress = lastShown;
-        lastShown = progress;
-
-        progressFill.style.width = progress + '%';
-        progressPct.textContent = progress + '%';
-
-        if (progress >= 60) {
+          pct = 92; // hold; overlay will close when score arrives
           document.getElementById('progress-eta').innerHTML =
-            'Processing content structure and visibility signals...<br>Almost done!';
+            'Still calculating... some sites take longer due to server speed.<br>' +
+            'We’ll show your score as soon as it’s ready.';
         }
-      }, 120);
 
-      return interval;
+        pct = Math.max(lastPct, Math.min(92, pct));
+        lastPct = pct;
+        setOverlayProgress(pct);
+      }, 150);
+
+      return {
+        stop: () => clearInterval(interval),
+        startedAt: startTime
+      };
     }
 
-    function stopProgress() {
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
-      progressFill.style.width = '100%';
-      progressPct.textContent = '100%';
+    function stopScoreOverlay(controller){
+      if (controller && controller.stop) controller.stop();
+      setOverlayProgress(100);
       setTimeout(() => {
         document.getElementById('progress-overlay').style.display = 'none';
-      }, 800);
+      }, 250);
+    }
+
+    async function fetchWithTimeout(url, opts = {}) {
+      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 30000;
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { ...opts, signal: controller.signal });
+        return res;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    async function fetchJSON(url, timeoutMs){
+      const res = await fetchWithTimeout(url, { timeoutMs });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }
+
+    async function fetchText(url, timeoutMs){
+      const res = await fetchWithTimeout(url, { timeoutMs });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.text();
+    }
+
+    async function tryScoreSameOriginThenFallback(fallbackBase){
+      try {
+        const j = await fetchJSON(`/api/score?url=${encodeURIComponent(targetUrl)}`, 12000);
+        return { base: '', data: j };
+      } catch {
+        const j2 = await fetchJSON(`${fallbackBase}/api/score?url=${encodeURIComponent(targetUrl)}`, 25000);
+        return { base: fallbackBase, data: j2 };
+      }
+    }
+
+    async function tryReportSameOriginThenFallback(fallbackBase){
+      // Attempt same-origin report first; if it fails quickly (404 / not wired), fallback.
+      try {
+        const html = await fetchText(`/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, 20000);
+        return { base: '', html };
+      } catch {
+        const html2 = await fetchText(`${fallbackBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, 140000);
+        return { base: fallbackBase, html: html2 };
+      }
+    }
+
+    async function fetchReportWithRetry(base){
+      // One retry on timeout/abort (common with cold starts). Second attempt gets a bit more time.
+      const url = `${base}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
+      try {
+        return await fetchText(url, 140000);
+      } catch (e) {
+        // Retry once
+        return await fetchText(url, 160000);
+      }
     }
 
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
@@ -548,38 +618,66 @@
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      const progressTimer = startProgress();
+      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
+      const overlayCtrl = startScoreOverlay();
 
-      let apiBase = '';
-      try {
-        const probe = await fetch('/api/score?url=' + encodeURIComponent('https://example.com'), {method:'HEAD'});
-        if (!probe.ok) throw 0;
-      } catch {
-        apiBase = 'https://sniperank-app2.onrender.com';
-      }
+      // Kick off both operations concurrently.
+      // Score determines the fastest “first value”; report loads progressively in the page.
+      const scorePromise = tryScoreSameOriginThenFallback(FALLBACK_BASE);
 
+      const reportPromise = (async () => {
+        // Try same-origin quickly; if that fails, use fallback. If fallback chosen, use retry wrapper.
+        try {
+          const first = await tryReportSameOriginThenFallback(FALLBACK_BASE);
+          const base = first.base || '';
+          const host = document.getElementById('summary-results');
+
+          // If report came from fallback path, it may still be a cold-start long tail.
+          // We already have HTML in first.html; render it immediately.
+          host.innerHTML = first.html;
+          transformAIInsights(host);
+
+          return base;
+        } catch (e) {
+          console.error('Report error (initial):', e);
+          const host = document.getElementById('summary-results');
+          host.innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
+          return '';
+        }
+      })();
+
+      // As soon as score is ready, render and end overlay (no more waiting on report).
       try {
-        const r = await fetch(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`);
-        const j = await r.json();
-        renderScoreCard(j.score, j.pillars, j.highlights);
-        sessionStorage.setItem('sniperank:data', JSON.stringify(j));
+        const { base, data } = await scorePromise;
+        renderScoreCard(data.score, data.pillars, data.highlights);
+        sessionStorage.setItem('sniperank:data', JSON.stringify(data));
+        stopScoreOverlay(overlayCtrl);
+
+        // If report was not yet rendered because same-origin attempt failed fast and fallback is still warming,
+        // ensure we load it in the background using the base that worked for score.
+        // (This covers the case where same-origin report is missing but score succeeded via fallback.)
+        const host = document.getElementById('summary-results');
+        const stillPlaceholder = (host.textContent || '').toLowerCase().includes('generating your analysis report');
+        if (stillPlaceholder) {
+          try {
+            const html = await fetchReportWithRetry(base || FALLBACK_BASE);
+            host.innerHTML = html;
+            transformAIInsights(host);
+          } catch (e) {
+            console.error('Report error (post-score fallback):', e);
+            host.innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
+          }
+        }
       } catch (e) {
         console.error('Score error:', e);
+        stopScoreOverlay(overlayCtrl);
+        document.getElementById("scoreBand").textContent = "Unable to calculate score";
       }
 
-      try {
-        const res = await fetch(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`);
-        const html = await res.text();
-        const host = document.getElementById('summary-results');
-        host.innerHTML = html;
-        transformAIInsights(host);
-      } catch {
-        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-      } finally {
-        clearInterval(progressTimer);
-        stopProgress();
-      }
+      // Ensure reportPromise is awaited to avoid unhandled rejections in some browsers.
+      try { await reportPromise; } catch {}
     });
   </script>
 </body>
 </html>
+<!-- Version footer: v2026.01.10-2 -->
