@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-  full-report.html - COMPLETE VERSION WITH CORRECT COLORS
-  Version: v2026.01.12-FINAL
-  Critical = RED, Strategic = YELLOW, Incremental = ORANGE
+  full-report.html - CONDENSED PRINT-FRIENDLY VERSION
+  Version: v2026.01.12-CONDENSED
+  Changes: Reduced padding, changed "How to fix" to "Solution", more compact layout
 -->
 <html lang="en">
 <head>
@@ -11,7 +11,7 @@
   <title>AIVIndex™ - Full AI Visibility Report</title>
   <style>
     :root{
-      --max-width:760px; --pad-v:3vh; --pad-h:2rem;
+      --max-width:760px; --pad-v:2vh; --pad-h:1.5rem;
       --muted:#666; --border:#e5e5e5;
       --sr-radius:16px; --sr-border:#e6e6e9; --sr-shadow:0 10px 30px rgba(0,0,0,.12);
       --sr-text:#111; --sr-muted:#5b5b66; --sr-bg:#fff; --sr-pill-bg:#fafafb; --sr-gap:16px;
@@ -23,124 +23,121 @@
     }
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
-    h1{font-size:4rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px;background:linear-gradient(135deg,#000 0%,#3182CE 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
-    p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
+    h1{font-size:3.5rem;font-weight:700;margin:0 0 .2em;line-height:1;letter-spacing:-1px;background:linear-gradient(135deg,#000 0%,#3182CE 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h2{font-size:1.5rem;font-weight:700;margin:0 0 .75rem}
+    p{font-size:1.05rem;line-height:1.55;margin:0 0 .75rem}
 
-    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
-    .powered-by,.for-url{color:var(--muted);font-size:.95rem}
+    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.2rem 0 .75rem}
+    .powered-by,.for-url{color:var(--muted);font-size:.9rem}
     .powered-by a{color:#3182CE;text-decoration:none;font-weight:600}
     .for-url strong{color:#000}
 
-    .card{width:100%;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
-    .score-card{padding:1rem;margin-bottom:2.25rem}
-    .score-top{display:flex;align-items:center;gap:.75rem;justify-content:space-between;flex-wrap:wrap}
-    .score-main{display:flex;align-items:baseline;gap:.5rem}
-    .score-number{font-size:2.25rem;font-weight:800}
-    .score-band{color:var(--muted);font-size:.95rem}
-    .btn-row{display:flex;gap:.5rem;align-items:center}
-    .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.55rem .9rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;transition:.2s}
+    .card{width:100%;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
+    .score-card{padding:.85rem;margin-bottom:1.5rem}
+    .score-top{display:flex;align-items:center;gap:.6rem;justify-content:space-between;flex-wrap:wrap}
+    .score-main{display:flex;align-items:baseline;gap:.4rem}
+    .score-number{font-size:2rem;font-weight:800}
+    .score-band{color:var(--muted);font-size:.9rem}
+    .btn-row{display:flex;gap:.4rem;align-items:center}
+    .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.45rem .75rem;border-radius:7px;cursor:pointer;font-weight:700;font-size:.88rem;transition:.2s}
     .btn-ghost:hover{background:#f2f2f2}
-    .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.85rem 2rem;border-radius:999px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
+    .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.75rem 1.75rem;border-radius:999px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
     .btn-primary:hover{background:var(--btn-red-hover)}
-    .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
-    .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
+    .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.6rem}
+    .pillar{border:1px solid var(--border);border-radius:8px;padding:.5rem .65rem;display:flex;align-items:center;justify-content:space-between;font-size:.92rem;background:#fff}
     .pillar .label{font-weight:600}
-    .badge{font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem;background:#fafafa}
+    .badge{font-weight:700;padding:.15rem .45rem;border-radius:999px;border:1px solid var(--border);font-size:.82rem;background:#fafafa}
 
-    .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.95rem;font-weight:600;text-align:center}
+    .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.6rem .85rem;border-radius:7px;margin-bottom:.85rem;font-size:.9rem;font-weight:600;text-align:center}
 
-    .report-section{margin:3rem 1.5rem}
-    .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.5rem;color:#111}
-    .section-subtitle{font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem;color:#111}
+    .report-section{margin:2rem 1rem}
+    .section-title{font-size:1.3rem;font-weight:700;margin:0 0 1rem;color:#111}
+    .section-subtitle{font-size:1.1rem;font-weight:700;margin:1.75rem 0 .75rem;color:#111}
 
     .opportunity-item{
-      margin:2rem 0;
-      padding:1.5rem;
+      margin:.85rem 0;
+      padding:.85rem 1rem;
       border:1px solid #f0f0f0;
-      border-radius:8px;
+      border-radius:7px;
       background:#fafafa;
     }
-    .opportunity-item:last-child{margin-bottom:2rem}
+    .opportunity-item:last-child{margin-bottom:1.5rem}
 
-    .priority-high{background:#fef2f2;border-left:4px solid #dc3545}
-    .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
-    .priority-low{background:#fff7ed;border-left:4px solid #f97316}
+    .priority-high{background:#fef2f2;border-left:3px solid #dc3545}
+    .priority-medium{background:#fffbeb;border-left:3px solid #f59e0b}
+    .priority-low{background:#fff7ed;border-left:3px solid #f97316}
 
     .opportunity-list{list-style:none;padding:0;margin:0}
     .opportunity-item::before{content:"";margin-right:0}
-    .item-text{font-size:1.05rem;line-height:1.6;margin:0}
+    .item-text{font-size:1rem;line-height:1.5;margin:0}
 
-    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
+    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:6px;padding:.5rem .75rem;margin:.75rem 0 0;font-size:.92rem;line-height:1.4}
     .fix-callout strong{color:#111;font-weight:600}
-    .fix-title{font-weight:600;color:#495057;margin-bottom:.25rem}
+    .fix-title{font-weight:600;color:#495057;margin-bottom:.15rem;font-size:.88rem}
 
-    .address-callout{background:#e8f4fd;border:1px solid #b8daff;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
-    .address-title{font-weight:600;color:#0056b3;margin-bottom:.25rem}
-
-    .ai-insights{margin:1.5rem 0}
-    .ai-row{display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;align-items:start;padding:1.5rem 0;border-bottom:1px dashed var(--border);margin:0 1rem}
+    .ai-insights{margin:1rem 0}
+    .ai-row{display:grid;grid-template-columns:130px 1fr;gap:.85rem 1.25rem;align-items:start;padding:1rem 0;border-bottom:1px dashed var(--border);margin:0 .85rem}
     .ai-row:last-child{border-bottom:0}
-    .ai-logo{display:flex;align-items:center;justify-content:center;min-width:120px;height:40px;padding:.5rem}
-    .ai-logo img{height:32px;width:auto;max-width:140px;display:block;object-fit:contain;margin:0 auto}
-    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
-    .ai-text{font-size:1.05rem;line-height:1.6;color:#333}
+    .ai-logo{display:flex;align-items:center;justify-content:center;min-width:110px;height:36px;padding:.4rem}
+    .ai-logo img{height:28px;width:auto;max-width:130px;display:block;object-fit:contain;margin:0 auto}
+    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;width:110px;border:1px solid var(--border);border-radius:5px;font-size:.82rem;font-weight:600;color:#333;background:#f8f9fa}
+    .ai-text{font-size:1rem;line-height:1.5;color:#333}
 
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
-    .progress-pct{color:#666;font-size:16px;font-weight:600}
-    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:14px;padding:20px;width:min(460px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .progress-title{font-weight:700;font-size:17px}
+    .progress-pct{color:#666;font-size:15px;font-weight:600}
+    .progress-bar{height:11px;border-radius:7px;background:#eee;overflow:hidden;margin:10px 0}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:7px;width:0%;transition:width .3s ease}
+    .progress-eta{color:#666;font-size:13px;line-height:1.3}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
-    .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .modal-title{font-size:20px;font-weight:700;margin:0}
-    .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer;padding:4px;color:#666}
+    .modal{width:min(580px,90vw);background:#fff;border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .modal-title{font-size:19px;font-weight:700;margin:0}
+    .modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;padding:3px;color:#666}
     .modal-close:hover{color:#000}
-    .modal-content{line-height:1.6}
-    .modal-content p{margin:12px 0;color:#333}
+    .modal-content{line-height:1.5}
+    .modal-content p{margin:10px 0;color:#333;font-size:.95rem}
     .modal-content strong{color:#111}
 
     footer{
-      margin-top:3rem;
+      margin-top:2.5rem;
       border-top:1px solid var(--border);
       background:var(--bg-soft);
     }
     .footer-inner{
       max-width:var(--max-width);
       margin:0 auto;
-      padding:2rem var(--pad-h) 1.25rem;
+      padding:1.5rem var(--pad-h) 1rem;
       display:grid;
       grid-template-columns:1.4fr 1fr 1fr;
-      gap:1.6rem;
+      gap:1.4rem;
     }
     .foot-brand h3{
-      font-size:1.1rem;
+      font-size:1.05rem;
       font-weight:900;
-      margin-bottom:.35rem;
+      margin-bottom:.3rem;
       letter-spacing:-.2px;
     }
     .foot-brand p{
       color:var(--muted);
       font-weight:700;
-      line-height:1.7;
-      font-size:.95rem;
+      line-height:1.6;
+      font-size:.9rem;
     }
     .disclaimer{
-      margin-top:.75rem;
+      margin-top:.65rem;
       color:var(--muted-2);
-      font-size:.85rem;
+      font-size:.82rem;
       font-weight:800;
-      line-height:1.6;
+      line-height:1.5;
     }
     .foot-col h4{
-      font-size:.95rem;
+      font-size:.9rem;
       font-weight:900;
-      margin-bottom:.6rem;
+      margin-bottom:.5rem;
       color:#0f172a;
     }
     .foot-links{
@@ -149,27 +146,40 @@
       padding:0;
       display:flex;
       flex-direction:column;
-      gap:.45rem;
+      gap:.4rem;
     }
     .foot-links a{
       color:var(--muted);
       font-weight:800;
       text-decoration:none;
+      font-size:.88rem;
     }
     .foot-links a:hover{color:#0f172a;text-decoration:none}
     .foot-bottom{
       border-top:1px solid var(--border);
-      padding:1rem var(--pad-h);
+      padding:.85rem var(--pad-h);
       max-width:var(--max-width);
       margin:0 auto;
       color:var(--muted-2);
-      font-size:.85rem;
+      font-size:.82rem;
       font-weight:700;
-      line-height:1.6;
+      line-height:1.5;
+    }
+
+    @media print{
+      body{padding:0;max-width:100%}
+      .btn-row,.overlay,.modal-backdrop,footer{display:none!important}
+      .opportunity-item{page-break-inside:avoid;margin:.5rem 0;padding:.6rem .8rem}
+      .report-section{margin:1.25rem .5rem}
+      .section-title{font-size:1.2rem;margin-bottom:.75rem}
+      .section-subtitle{font-size:1rem;margin:.85rem 0 .5rem}
     }
 
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
+      h1{font-size:2.75rem}
+      .btn-row{flex-direction:column;width:100%}
+      .btn-ghost{width:100%;text-align:center}
     }
   </style>
 </head>
@@ -193,8 +203,8 @@
         <div class="score-band" id="scoreBand">Calculating...</div>
       </div>
       <div class="btn-row">
-        <button class="btn-ghost" id="breakdownBtn" type="button">What goes into this score?</button>
-        <button class="btn-ghost" id="copyBtn" type="button">Copy Comprehensive Summary</button>
+        <button class="btn-ghost" id="breakdownBtn" type="button">Score Details</button>
+        <button class="btn-ghost" id="copyBtn" type="button">Copy Summary</button>
       </div>
     </div>
     <div class="pillars" id="pillarsGrid"></div>
@@ -202,22 +212,19 @@
 
   <section class="report-section">
     <h3 class="section-title">Comprehensive Opportunities</h3>
-    <p>These are specific, actionable improvements that will enhance how AI systems interpret, trust, and represent your website. Items are grouped by urgency.</p>
+    <p>Specific, actionable improvements grouped by urgency.</p>
 
     <h4 class="section-subtitle">Critical Priorities</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">High-impact changes that should be addressed first.</p>
     <ul class="opportunity-list" id="opportunitiesCritical">
       <li class="opportunity-item priority-high"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Strategic Improvements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Meaningful improvements that require more coordination.</p>
     <ul class="opportunity-list" id="opportunitiesStrategic">
       <li class="opportunity-item priority-medium"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Incremental Enhancements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Smaller optimizations that compound over time.</p>
     <ul class="opportunity-list" id="opportunitiesIncremental">
       <li class="opportunity-item priority-low"><p class="item-text">Loading...</p></li>
     </ul>
@@ -238,13 +245,13 @@
   <div class="overlay" id="progress-overlay">
     <div class="progress-panel">
       <div class="progress-header">
-        <span class="progress-title">Generating Comprehensive Analysis</span>
+        <span class="progress-title">Generating Analysis</span>
         <span class="progress-pct" id="progress-pct">0%</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
-      <div class="progress-eta">Analyzing AI accessibility patterns, content structure, and optimization opportunities...</div>
+      <div class="progress-eta">Analyzing AI accessibility patterns...</div>
     </div>
   </div>
 
@@ -256,16 +263,16 @@
       </div>
       <div class="modal-content">
         <p><strong>AI Access Readiness (25 points)</strong><br>
-        Measures how easily AI models can discover, crawl, and access your content.</p>
+        How easily AI models can discover and access content.</p>
 
         <p><strong>Trust &amp; Verification Signals (25 points)</strong><br>
-        Evaluates authority indicators AI models use to assess content credibility.</p>
+        Authority indicators AI uses to assess credibility.</p>
 
         <p><strong>LLM Interpretability &amp; Clarity (25 points)</strong><br>
-        Assesses how well AI models can understand and parse your content structure.</p>
+        How well AI models understand content structure.</p>
 
         <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>
-        Measures how well your content matches common AI query patterns and user intent.</p>
+        How well content matches AI query patterns.</p>
       </div>
     </div>
   </div>
@@ -273,13 +280,9 @@
   <footer>
     <div class="footer-inner">
       <div class="foot-brand">
-        <h3>AIVIndex™ — Full AI Visibility Report</h3>
-        <p>
-          AIVIndex™ provides comprehensive AI visibility analysis with actionable recommendations for improving how AI systems interpret and represent your website.
-        </p>
-        <div class="disclaimer">
-          AIVIndex™ is a diagnostic index. Results are directional and may vary by model, query, and crawl conditions.
-        </div>
+        <h3>AIVIndex™</h3>
+        <p>Comprehensive AI visibility analysis with actionable recommendations.</p>
+        <div class="disclaimer">Results are directional and may vary by model and query.</div>
       </div>
 
       <div class="foot-col">
@@ -294,13 +297,13 @@
         <h4>Company</h4>
         <ul class="foot-links">
           <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-          <li><a href="mailto:hello@quontora.com?subject=AIVIndex%20Question">Contact</a></li>
+          <li><a href="mailto:hello@quontora.com">Contact</a></li>
         </ul>
       </div>
     </div>
 
     <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> AIVIndex™ by Quontora. All rights reserved.</div>
+      <div>© <span id="footer-year"></span> AIVIndex™ by Quontora.</div>
     </div>
   </footer>
 
@@ -308,90 +311,38 @@
     document.getElementById("footer-year").textContent = new Date().getFullYear();
 
     const urlParams = new URLSearchParams(window.location.search);
-
-    const urlFromQuery =
-      urlParams.get('url') ||
-      urlParams.get('targetUrl') ||
-      urlParams.get('target') ||
-      urlParams.get('site') ||
-      '';
-
-    const userName = urlParams.get('name') || sessionStorage.getItem('sniperank:name') || '';
-    const userEmail = urlParams.get('email') || sessionStorage.getItem('sniperank:email') || '';
-    const userDomain = urlParams.get('domain') || sessionStorage.getItem('sniperank:domain') || '';
-    const source = urlParams.get('source') || sessionStorage.getItem('sniperank:source') || '';
-
-    if (userName) sessionStorage.setItem('sniperank:name', userName);
-    if (userEmail) sessionStorage.setItem('sniperank:email', userEmail);
-    if (userDomain) sessionStorage.setItem('sniperank:domain', userDomain);
-    if (source) sessionStorage.setItem('sniperank:source', source);
-
-    const targetUrl = urlFromQuery || sessionStorage.getItem('sniperank:lastUrl') || '';
-    if (targetUrl) sessionStorage.setItem('sniperank:lastUrl', targetUrl);
-
+    const targetUrl = urlParams.get('url') || urlParams.get('targetUrl') || sessionStorage.getItem('sniperank:lastUrl') || '';
     const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
 
     function esc(s){
-      return String(s || '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     function normalizeList(input){
       if (!Array.isArray(input)) return [];
       const out = [];
-
-      const splitByNewlinesOrBullets = (str) => {
-        const s = String(str || '').replace(/\r/g,'').trim();
-        if (!s) return [];
-
-        if (s.includes('\n')) {
-          return s.split('\n').map(x => x.trim()).filter(Boolean);
-        }
-
-        if (s.includes('•')) {
-          return s.split('•').map(x => x.trim()).filter(Boolean);
-        }
-
-        if (/\s-\s/.test(s) && s.length > 180) {
-          const parts = s.split(/\s-\s/).map(x => x.trim()).filter(Boolean);
-          return parts.length > 1 ? parts : [s];
-        }
-
-        return [s];
-      };
-
       input.forEach(item => {
-        splitByNewlinesOrBullets(item).forEach(line => {
-          const cleaned = line.replace(/^\s*[-*]\s+/,'').trim();
-          if (cleaned) out.push(cleaned);
-        });
+        const s = String(item || '').trim();
+        if (s) out.push(s);
       });
-
       return out;
     }
 
     function renderScoreCardFromScoreApi(j){
       const total = typeof j.score === 'number' ? j.score : 0;
       const pillars = j.pillars || {};
-      const scoreNum = document.getElementById('scoreNumber');
-      const scoreBand = document.getElementById('scoreBand');
-      const pillarsGrid = document.getElementById('pillarsGrid');
-
-      scoreNum.textContent = `${Math.round(total)}/100`;
-
+      
+      document.getElementById('scoreNumber').textContent = `${Math.round(total)}/100`;
+      
       const band =
         total >= 90 ? 'Rank: Excellent ★★★★★' :
         total >= 80 ? 'Rank: Very Good ★★★★☆' :
         total >= 70 ? 'Rank: Good ★★★☆☆' :
         total >= 60 ? 'Rank: Fair ★★☆☆☆' :
         'Rank: Needs Work ★☆☆☆☆';
-
-      scoreBand.textContent = band;
-
+      
+      document.getElementById('scoreBand').textContent = band;
+      
       const rows = [
         ['AI Access Readiness', pillars.access],
         ['Trust & Verification Signals', pillars.trust],
@@ -399,7 +350,7 @@
         ['Prompt-Pattern Alignment', pillars.alignment],
       ];
 
-      pillarsGrid.innerHTML = rows.map(([label, val]) => `
+      document.getElementById('pillarsGrid').innerHTML = rows.map(([label, val]) => `
         <div class="pillar">
           <span class="label">${esc(label)}</span>
           <span class="badge">${(typeof val === 'number' ? Math.round(val) : 0)}/25</span>
@@ -408,7 +359,7 @@
     }
 
     async function fetchWithTimeout(url, opts = {}) {
-      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
+      const timeoutMs = opts.timeoutMs || 60000;
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -422,7 +373,6 @@
       document.getElementById('progress-overlay').style.display = 'flex';
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
-
       let progress = 0;
       const interval = setInterval(() => {
         progress += Math.random() * 3;
@@ -433,14 +383,12 @@
         progressFill.style.width = progress + '%';
         progressPct.textContent = Math.round(progress) + '%';
       }, 150);
-
       return interval;
     }
 
     function stopProgress() {
       const progressFill = document.getElementById('progress-fill');
       const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
       progressFill.style.width = '100%';
       progressPct.textContent = '100%';
       setTimeout(() => {
@@ -448,8 +396,7 @@
       }, 800);
     }
 
-    document.getElementById('breakdownBtn').addEventListener('click', (e) => {
-      e.preventDefault();
+    document.getElementById('breakdownBtn').addEventListener('click', () => {
       document.getElementById('breakdown-modal').style.display = 'flex';
     });
 
@@ -465,20 +412,11 @@
 
     document.getElementById("copyBtn").addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
-      const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
-      const vals = [...document.querySelectorAll('.pillar .badge')].map(el => el.textContent.trim());
-
       const opportunities = [
         ...document.querySelectorAll('#opportunitiesCritical .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesStrategic .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesIncremental .opportunity-item .item-text')
-      ].slice(0, 12).map(el => {
-        const text = el.textContent.trim();
-        const mainText = text.split('Impact:')[0].trim();
-        const fixCallout = el.parentNode.querySelector('.fix-callout');
-        const fix = fixCallout ? fixCallout.textContent.replace(/How to fix.*?:/, '').trim() : '';
-        return fix ? `${mainText.split(' - ')[0]} - ${fix.split('.')[0]}.` : mainText;
-      });
+      ].slice(0, 12).map(el => el.textContent.trim().split('Impact:')[0].trim());
 
       const aiInsights = [...document.querySelectorAll('.ai-row .ai-text')].map(el => {
         const logoImg = el.parentNode.querySelector('.ai-logo img');
@@ -488,18 +426,15 @@
 
       const txt = [
         `Website: ${targetUrl}`,
-        `AIVIndex™ AI Visibility Score: ${scoreText}`,
+        `AIVIndex™ Score: ${scoreText}`,
         ``,
-        `Pillar Breakdown:`,
-        ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
-        ``,
-        `Priority Optimization Opportunities:`,
-        ...opportunities.slice(0, 10).map(o => `- ${o}`),
+        `Priority Opportunities:`,
+        ...opportunities.map(o => `- ${o}`),
         ``,
         `AI Engine Insights:`,
         ...aiInsights,
         ``,
-        `Full analysis available at: ${window.location.href}`
+        `Full analysis: ${window.location.href}`
       ].join("\n");
 
       try {
@@ -509,78 +444,48 @@
         b.textContent = "Copied!";
         setTimeout(() => b.textContent = old, 1500);
       } catch {
-        window.prompt("Copy the comprehensive summary:", txt);
+        window.prompt("Copy the summary:", txt);
       }
     });
 
-    async function getApiBaseForScore(targetUrl){
-      try{
-        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
-        if (!probe.ok) throw new Error('probe not ok');
-        return '';
-      }catch{
-        return FALLBACK_BASE;
-      }
-    }
-
     function setNoDataState(){
       document.getElementById('opportunitiesCritical').innerHTML =
-        "<li class='opportunity-item priority-high'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
+        "<li class='opportunity-item priority-high'><p class='item-text'>No opportunities returned.</p></li>";
       document.getElementById('opportunitiesStrategic').innerHTML =
-        "<li class='opportunity-item priority-medium'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
+        "<li class='opportunity-item priority-medium'><p class='item-text'>No opportunities returned.</p></li>";
       document.getElementById('opportunitiesIncremental').innerHTML =
-        "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
+        "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities returned.</p></li>";
       document.getElementById('aiInsights').innerHTML =
-        "<div class='ai-row'><div class='ai-logo'><span class='ai-fallback'>AI</span></div><div class='ai-text'>No engine insights were returned for this scan.</div></div>";
+        "<div class='ai-row'><div class='ai-logo'><span class='ai-fallback'>AI</span></div><div class='ai-text'>No insights returned.</div></div>";
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('opportunitiesCritical').innerHTML =
-          "<li class='opportunity-item priority-high'><p class='item-text' style='text-align:center;color:#b91c1c'>No URL provided. Please go back to the homepage.</p></li>";
-        document.getElementById('opportunitiesStrategic').innerHTML = "";
-        document.getElementById('opportunitiesIncremental').innerHTML = "";
-        document.getElementById('aiInsights').innerHTML = "";
+        setNoDataState();
         return;
       }
 
       document.getElementById("current-url").textContent = targetUrl;
-
       const progressTimer = startProgress();
 
       try {
-        const apiBase = await getApiBaseForScore(targetUrl);
-
-        try{
-          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000 });
-          if (!scoreRes.ok) throw new Error('score not ok');
-          const scoreJson = await scoreRes.json();
-          renderScoreCardFromScoreApi(scoreJson);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(scoreJson));
-        }catch(e){
-          console.error('Score error:', e);
-          document.getElementById("scoreBand").textContent = "Unable to calculate score";
-        }
-
         let apiResponse;
         try {
           apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
-          if (!apiResponse.ok) throw new Error('full not ok');
+          if (!apiResponse.ok) throw new Error('primary failed');
         } catch {
           apiResponse = await fetchWithTimeout(`${FALLBACK_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
         }
 
         if (!apiResponse.ok) throw new Error('API response not ok');
-
         const data = await apiResponse.json();
 
-        if (data.meta?.mode === 'lite-fallback' || data.success === false) {
-          document.getElementById('lite-banner').style.display = 'block';
+        if (typeof data.score === 'number') {
+          renderScoreCardFromScoreApi({ score: data.score, pillars: data.pillars || {} });
         }
 
         const needsAttentionLines = normalizeList(data.needsAttention);
-        const engineInsightLines = normalizeList(data.engineInsights);
 
         if (needsAttentionLines.length > 0) {
           const critical = [];
@@ -593,18 +498,15 @@
             const solution = parts[1] ? parts[1].trim() : '';
 
             let priority = 'priority-low';
-            if (issueRaw.includes('[PRIORITY: High]') || issueRaw.includes('Missing') || issueRaw.includes('Critical')) {
-              priority = 'priority-high';
-            } else if (issueRaw.includes('[PRIORITY: Medium]') || issueRaw.includes('Limited') || issueRaw.includes('Weak')) {
-              priority = 'priority-medium';
-            }
+            if (issueRaw.includes('[PRIORITY: High]')) priority = 'priority-high';
+            else if (issueRaw.includes('[PRIORITY: Medium]')) priority = 'priority-medium';
 
             const issue = issueRaw.replace(/\[PRIORITY: [^\]]+\]/, '').trim();
 
             const html = `
               <li class="opportunity-item ${priority}">
                 <p class="item-text">${esc(issue)}</p>
-                ${solution ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${esc(solution.split('Impact:')[0].trim())}</div>` : ''}
+                ${solution ? `<div class="fix-callout"><div class="fix-title">Solution:</div>${esc(solution.split('Impact:')[0].trim())}</div>` : ''}
               </li>
             `;
 
@@ -613,16 +515,14 @@
             else incremental.push(html);
           });
 
-          document.getElementById('opportunitiesCritical').innerHTML =
-            (critical.length ? critical.join('') : "<li class='opportunity-item priority-high'><p class='item-text'>No critical priorities identified.</p></li>");
-          document.getElementById('opportunitiesStrategic').innerHTML =
-            (strategic.length ? strategic.join('') : "<li class='opportunity-item priority-medium'><p class='item-text'>No strategic improvements identified.</p></li>");
-          document.getElementById('opportunitiesIncremental').innerHTML =
-            (incremental.length ? incremental.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>No incremental enhancements identified.</p></li>");
+          document.getElementById('opportunitiesCritical').innerHTML = critical.length ? critical.join('') : "<li class='opportunity-item priority-high'><p class='item-text'>None</p></li>";
+          document.getElementById('opportunitiesStrategic').innerHTML = strategic.length ? strategic.join('') : "<li class='opportunity-item priority-medium'><p class='item-text'>None</p></li>";
+          document.getElementById('opportunitiesIncremental').innerHTML = incremental.length ? incremental.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>None</p></li>";
         } else {
           setNoDataState();
         }
 
+        const engineInsightLines = normalizeList(data.engineInsights);
         if (engineInsightLines.length > 0) {
           const engineMap = {
             'ChatGPT': '/img/chatgpt-logo.png',
@@ -655,7 +555,7 @@
 
       } catch (error) {
         console.error('Full report error:', error);
-        document.getElementById("scoreBand").textContent = "Error loading full report";
+        document.getElementById("scoreBand").textContent = "Error loading report";
         setNoDataState();
       } finally {
         clearInterval(progressTimer);
