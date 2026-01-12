@@ -1,7 +1,8 @@
 /* 
-  api/full.js - v3.5.0 — WORKING VERSION
+  api/full.js - v3.6.0 — PRODUCTION VERSION
   Purpose: Comprehensive AI SEO analysis (25 opportunities minimum)
   ENV Required: OPENAI_API_KEY
+  User-Agent: Normal browser (avoids blocking by CNN, Macy's, etc)
 */
 
 import OpenAI from "openai";
