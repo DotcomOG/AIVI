@@ -206,7 +206,7 @@
     </div>
     <div class="pillars" id="pillarsGrid"></div>
   </section>
-
+<!--
   <section class="report-section">
     <h3 class="section-title">Comprehensive Opportunities</h3>
     <p>These are specific, actionable improvements that will enhance how AI systems interpret, trust, and represent your website. Items are grouped by urgency.</p>
@@ -250,7 +250,7 @@
       </div>
     </div>
   </section>
-
+-->
   <div class="overlay" id="progress-overlay">
     <div class="progress-panel">
       <div class="progress-header">
@@ -656,16 +656,7 @@
         } else {
           setNoDataState();
         }
-
-        // What's working
-        if (whatsWorkingLines.length > 0) {
-          document.getElementById('workingList').innerHTML = whatsWorkingLines.map(item => `
-            <li class="working-item">
-              <p class="item-text">${esc(item)}</p>
-            </li>
-          `).join('');
-        }
-
+      
         // Engine insights
         if (engineInsightLines.length > 0) {
           const engineMap = {
