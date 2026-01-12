@@ -3,6 +3,13 @@
   full-report.html
   Version: v2026.01.12-3
   Last updated: 2026-01-12 (America/New_York)
+
+  CHANGES (only):
+  1) Renamed all SnipeRank references to AIVindex™ (UI copy, title, footer, share text).
+  2) Fixed rendering so Opportunities + What’s Working lists always populate as full lists (no single placeholder item).
+     - Also splits “one big string” responses into multiple items when the API returns newline/bullet-delimited content.
+  3) Unified loading experience with analyze.html (Option A: indeterminate overlay; no % hang).
+  4) Kept same-origin-first fetch; reliable Render fallback for /api/full.
 -->
 <html lang="en">
 <head>
@@ -24,8 +31,10 @@
     *{box-sizing:border-box}
     body{
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-      background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);
-      max-width:var(--max-width);margin-inline:auto;
+      background:#fff;color:#000;margin:0;
+      padding:var(--pad-v) var(--pad-h);
+      max-width:var(--max-width);
+      margin-inline:auto;
       display:flex;flex-direction:column;align-items:flex-start
     }
     h1{
@@ -50,12 +59,18 @@
     .btn-row{display:flex;gap:.5rem;align-items:center}
     .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.55rem .9rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;transition:.2s}
     .btn-ghost:hover{background:#f2f2f2}
+    .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.85rem 2rem;border-radius:999px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
+    .btn-primary:hover{background:var(--btn-red-hover)}
     .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
     .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
     .pillar .label{font-weight:600}
     .badge{font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem;background:#fafafa}
 
-    .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.95rem;font-weight:600;text-align:center;display:none}
+    .lite-banner{
+      background:#fef3c7;border:1px solid #f59e0b;color:#92400e;
+      padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;
+      font-size:.95rem;font-weight:700;text-align:center;display:none
+    }
 
     .report-section{margin:3rem 1.5rem}
     .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.5rem;color:#111}
@@ -68,26 +83,39 @@
       border-radius:8px;
       background:#fafafa;
     }
+
     .priority-high{background:#fef2f2;border-left:4px solid #dc3545}
     .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
     .priority-low{background:#f0fdf4;border-left:4px solid #10b981}
 
     .opportunity-list, .working-list{list-style:none;padding:0;margin:0}
-    .item-text{font-size:1.05rem;line-height:1.6;margin:0}
+    .item-text{font-size:1.05rem;line-height:1.6;margin:0;color:#111}
 
-    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:.9rem 0 0;font-size:.95rem;line-height:1.5}
-    .fix-callout strong{color:#111;font-weight:600}
-    .fix-title{font-weight:600;color:#495057;margin-bottom:.25rem}
+    .fix-callout{
+      background:#fff;border:1px solid #e9ecef;border-radius:8px;
+      padding:.75rem 1rem;margin:.9rem 0 0;font-size:.95rem;line-height:1.5;color:#333
+    }
+    .fix-callout strong{color:#111;font-weight:800}
+    .fix-title{font-weight:800;color:#495057;margin-bottom:.25rem}
+
+    .address-callout{
+      background:#e8f4fd;border:1px solid #b8daff;border-radius:8px;
+      padding:.75rem 1rem;margin:.9rem 0 0;font-size:.95rem;line-height:1.5;color:#1f3a5f
+    }
+    .address-title{font-weight:900;color:#0056b3;margin-bottom:.25rem}
 
     .ai-insights{margin:1.5rem 0}
-    .ai-row{display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;align-items:start;padding:1.25rem 0;border-bottom:1px dashed var(--border);margin:0 1rem}
+    .ai-row{
+      display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;
+      align-items:start;padding:1.15rem 0;border-bottom:1px dashed var(--border);margin:0 1rem
+    }
     .ai-row:last-child{border-bottom:0}
     .ai-logo{display:flex;align-items:center;justify-content:center;min-width:120px;height:40px;padding:.5rem}
     .ai-logo img{height:32px;width:auto;max-width:140px;display:block;object-fit:contain;margin:0 auto}
-    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
+    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:800;color:#333;background:#f8f9fa}
     .ai-text{font-size:1.05rem;line-height:1.6;color:#333}
 
-    /* Indeterminate overlay (unified with analyze Option A) */
+    /* Option A overlay (indeterminate, no % hang) */
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .progress-title{font-weight:800;font-size:18px;margin:0 0 10px;color:#111}
@@ -103,35 +131,74 @@
       flex:0 0 auto;
     }
     .spinner-meta{display:flex;flex-direction:column;gap:2px}
-    .spinner-label{font-weight:800;color:#111;font-size:14px}
+    .spinner-label{font-weight:900;color:#111;font-size:14px}
     .spinner-hint{color:#666;font-size:13px;line-height:1.35}
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
     .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .modal-title{font-size:20px;font-weight:700;margin:0}
+    .modal-title{font-size:20px;font-weight:800;margin:0}
     .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer;padding:4px;color:#666}
     .modal-close:hover{color:#000}
     .modal-content{line-height:1.6}
     .modal-content p{margin:12px 0;color:#333}
     .modal-content strong{color:#111}
 
-    .error-note{color:#b91c1c;font-weight:800;margin:.75rem 0 0;font-size:.95rem}
-
     /* Footer */
-    footer{margin-top:3rem;border-top:1px solid var(--border);background:var(--bg-soft);width:100%}
-    .footer-inner{
-      max-width:var(--max-width);margin:0 auto;
-      padding:2rem var(--pad-h) 1.25rem;
-      display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1.6rem;
+    footer{
+      margin-top:3rem;
+      border-top:1px solid var(--border);
+      background:var(--bg-soft);
+      width:100%;
     }
-    .foot-brand h3{font-size:1.1rem;font-weight:900;margin-bottom:.35rem;letter-spacing:-.2px}
-    .foot-brand p{color:var(--muted);font-weight:700;line-height:1.7;font-size:.95rem}
-    .disclaimer{margin-top:.75rem;color:var(--muted-2);font-size:.85rem;font-weight:800;line-height:1.6}
-    .foot-col h4{font-size:.95rem;font-weight:900;margin-bottom:.6rem;color:#0f172a}
-    .foot-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
-    .foot-links a{color:var(--muted);font-weight:800;text-decoration:none}
+    .footer-inner{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:2rem var(--pad-h) 1.25rem;
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:1.6rem;
+    }
+    .foot-brand h3{
+      font-size:1.1rem;
+      font-weight:900;
+      margin-bottom:.35rem;
+      letter-spacing:-.2px;
+      color:#0f172a;
+    }
+    .foot-brand p{
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+    .disclaimer{
+      margin-top:.75rem;
+      color:var(--muted-2);
+      font-size:.85rem;
+      font-weight:900;
+      line-height:1.6;
+    }
+    .foot-col h4{
+      font-size:.95rem;
+      font-weight:900;
+      margin-bottom:.6rem;
+      color:#0f172a;
+    }
+    .foot-links{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:.45rem;
+    }
+    .foot-links a{
+      color:var(--muted);
+      font-weight:900;
+      text-decoration:none;
+    }
     .foot-links a:hover{color:#0f172a;text-decoration:none}
     .foot-bottom{
       border-top:1px solid var(--border);
@@ -140,17 +207,20 @@
       margin:0 auto;
       color:var(--muted-2);
       font-size:.85rem;
-      font-weight:700;
+      font-weight:800;
       line-height:1.6;
     }
+
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
-      .report-section{margin:2.5rem 0}
+      .report-section{margin:2.25rem 0}
+      .ai-row{grid-template-columns:1fr; margin:0}
+      .ai-logo{justify-content:flex-start}
     }
   </style>
 </head>
 <body>
-  <h1>AIVindex</h1>
+  <h1>AIVindex™</h1>
   <h2>Full AI Visibility Report</h2>
 
   <div class="info-row">
@@ -159,7 +229,7 @@
   </div>
 
   <div class="lite-banner" id="lite-banner">
-    Lite Analysis Mode: Some advanced checks may be limited.
+    Lite Analysis Mode — some advanced features may be limited for this scan.
   </div>
 
   <section class="card score-card" id="scoreCard" aria-live="polite">
@@ -174,7 +244,7 @@
       </div>
     </div>
     <div class="pillars" id="pillarsGrid"></div>
-    <div id="scoreError" class="error-note" style="display:none;"></div>
+    <div id="fullReportStatus" style="margin-top:.75rem;color:#b91c1c;font-weight:800;display:none;"></div>
   </section>
 
   <!-- Comprehensive Opportunities Section -->
@@ -187,7 +257,7 @@
     <ul class="opportunity-list" id="opportunitiesCritical"></ul>
 
     <h4 class="section-subtitle">Strategic Improvements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.25rem;">Meaningful improvements that require more coordination.</p>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.25rem;">Meaningful improvements that require coordination.</p>
     <ul class="opportunity-list" id="opportunitiesStrategic"></ul>
 
     <h4 class="section-subtitle">Incremental Enhancements</h4>
@@ -197,8 +267,8 @@
 
   <!-- What's Working Section -->
   <section class="report-section">
-    <h3 class="section-title">What's Working</h3>
-    <p>Current strengths that already support discoverability and interpretation by AI systems.</p>
+    <h3 class="section-title">What’s Working</h3>
+    <p>Strengths already supporting your site’s discoverability and trust by large language models. Maintain these while you implement the opportunities above.</p>
     <ul class="working-list" id="workingList"></ul>
   </section>
 
@@ -208,7 +278,7 @@
     <div class="ai-insights" id="aiInsights"></div>
   </section>
 
-  <!-- Progress Overlay (indeterminate) -->
+  <!-- Option A Progress Overlay -->
   <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
       <div class="progress-title" id="progress-title">Generating your full report</div>
@@ -222,7 +292,7 @@
       </div>
 
       <p class="progress-sub" id="progress-sub">
-        We’re analyzing the site and processing the results. This can take <strong id="time-hint-strong">2 minutes or more</strong>.
+        We’re analyzing the site and compiling your full report. This can take <strong>2 minutes or more</strong>.
       </p>
       <p class="progress-stage" id="progress-stage">Starting analysis…</p>
     </div>
@@ -232,21 +302,21 @@
   <div class="modal-backdrop" id="breakdown-modal">
     <div class="modal">
       <div class="modal-header">
-        <h3 class="modal-title">Score Breakdown</h3>
+        <h3 class="modal-title">What goes into your score?</h3>
         <button class="modal-close" id="modal-close" type="button">&times;</button>
       </div>
       <div class="modal-content">
         <p><strong>AI Access Readiness (25 points)</strong><br>
-        How easily AI systems can discover, crawl, and understand your site structure.</p>
+        How easily AI models can discover, crawl, and access your content.</p>
 
         <p><strong>Trust &amp; Verification Signals (25 points)</strong><br>
-        Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
+        Authority indicators AI models use to assess credibility.</p>
 
         <p><strong>LLM Interpretability &amp; Clarity (25 points)</strong><br>
-        Content organization, semantic markup, and clarity for AI language models.</p>
+        How well AI models can understand and parse your content structure.</p>
 
         <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>
-        How well your content matches common query patterns and question-based discovery.</p>
+        How well your content matches common AI query patterns and intent.</p>
       </div>
     </div>
   </div>
@@ -257,10 +327,10 @@
       <div class="foot-brand">
         <h3>AIVindex™ — Full AI Visibility Report</h3>
         <p>
-          Powered by AIVindex™, this report summarizes how AI systems interpret, trust, and represent your site, with prioritized recommendations.
+          Powered by AIVI™, AIVindex™ provides AI visibility analysis with actionable recommendations for improving how AI systems interpret and represent your brand.
         </p>
         <div class="disclaimer">
-          Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.
+          AIVI™ is a diagnostic index. Results are directional and may vary by model, query, and crawl conditions.
         </div>
       </div>
 
@@ -282,7 +352,7 @@
     </div>
 
     <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> AIVindex™ by Quontora.</div>
+      <div>© <span id="footer-year"></span> AIVindex™ by Quontora. Powered by AIVI™.</div>
     </div>
   </footer>
 
@@ -290,21 +360,68 @@
     // Footer year
     document.getElementById("footer-year").textContent = new Date().getFullYear();
 
-    const ENGINE_LOGOS = {
+    const LOGO_SOURCES = {
       ChatGPT: '/img/chatgpt-logo.png',
       Claude: '/img/claude.jpeg',
       Gemini: '/img/gemini.jpeg',
+      Copilot: '/img/copilot.jpeg',
       Perplexity: '/img/perplexity-logo.png',
-      Copilot: '/img/copilot.jpeg'
     };
 
-    function escapeHTML(str){
-      return String(str ?? '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
+    function logoBlock(engine){
+      const logoPath = LOGO_SOURCES[engine];
+      if (!logoPath) return `<span class="ai-fallback">${engine}</span>`;
+      return `<img src="${logoPath}" alt="${engine}" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>${engine}</span>'">`;
+    }
+
+    // Overlay controls (Option A)
+    function showOverlay(){
+      document.getElementById('progress-overlay').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function hideOverlay(){
+      document.getElementById('progress-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function startOverlayMessaging(domain){
+      const stageEl = document.getElementById('progress-stage');
+      const spinnerLabel = document.getElementById('spinner-label');
+      const spinnerHint = document.getElementById('spinner-hint');
+
+      const start = Date.now();
+
+      const interval = setInterval(() => {
+        const s = Math.floor((Date.now() - start) / 1000);
+
+        if (s < 8) {
+          stageEl.textContent = `Fetching and parsing ${domain || 'the website'}…`;
+          spinnerLabel.textContent = "Processing results…";
+          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
+        } else if (s < 20) {
+          stageEl.textContent = "Extracting structure and crawl signals…";
+          spinnerLabel.textContent = "Analyzing site signals…";
+          spinnerHint.textContent = "Some sites respond slowly or block automated requests.";
+        } else if (s < 45) {
+          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
+          spinnerLabel.textContent = "Scoring and summarizing…";
+          spinnerHint.textContent = "We’re compiling a full report you can act on.";
+        } else if (s < 75) {
+          stageEl.textContent = "Generating the full report sections…";
+          spinnerLabel.textContent = "Finalizing report…";
+          spinnerHint.textContent = "This may take longer for large or heavily scripted sites.";
+        } else if (s < 120) {
+          stageEl.textContent = "Still working — this site is taking longer than typical.";
+          spinnerLabel.textContent = "Still analyzing…";
+          spinnerHint.textContent = "We’ll show your report as soon as it’s ready.";
+        } else {
+          stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
+          spinnerLabel.textContent = "Still analyzing…";
+          spinnerHint.textContent = "If this continues, the site may be blocking requests or the engine is under heavy load.";
+        }
+      }, 800);
+
+      return () => clearInterval(interval);
     }
 
     function extractDomain(u){
@@ -319,68 +436,122 @@
       }
     }
 
-    function isBigSite(domain){
-      const d = (domain || '').toLowerCase();
-      const BIG = [
-        'cnn.com','nytimes.com','washingtonpost.com','wsj.com','bbc.com',
-        'bankofamerica.com','chase.com','wellsfargo.com','citi.com'
-      ];
-      return BIG.some(x => d === x || d.endsWith('.' + x));
+    function normalizeToArray(input){
+      if (!input) return [];
+      if (Array.isArray(input)) {
+        return input.flatMap(x => normalizeToArray(x));
+      }
+      if (typeof input === 'string') {
+        const s = input.trim();
+        if (!s) return [];
+        // split by newlines and common bullet patterns
+        const parts = s
+          .split(/\r?\n+/)
+          .map(p => p.replace(/^\s*[-•*]\s+/,'').trim())
+          .filter(Boolean);
+        // if it's a single long paragraph that still contains bullet separators, split again
+        if (parts.length === 1 && /•|\s-\s|\s\*\s/.test(parts[0])) {
+          return parts[0]
+            .split(/(?:\s*•\s*|\s+-\s+|\s+\*\s+)/)
+            .map(p => p.replace(/^\s*[-•*]\s+/,'').trim())
+            .filter(Boolean);
+        }
+        return parts;
+      }
+      // unknown type -> stringify safely
+      try {
+        return [String(input)].filter(Boolean);
+      } catch {
+        return [];
+      }
     }
 
-    // Overlay controls
-    function showOverlay(){
-      document.getElementById('progress-overlay').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-    function hideOverlay(){
-      document.getElementById('progress-overlay').style.display = 'none';
-      document.body.style.overflow = '';
+    function splitIssueAndFix(text){
+      const t = String(text || '').trim();
+      if (!t) return { issue:'', fix:'' };
+
+      // Handle "How to fix:" or "How to enhance:" in returned strings
+      const m = t.split(/How to (?:fix|enhance)\s*:\s*/i);
+      if (m.length >= 2) {
+        return { issue: m[0].trim(), fix: m.slice(1).join(' ').trim() };
+      }
+      return { issue: t, fix: '' };
     }
 
-    function startOverlayMessaging(bigSiteMode){
-      const stageEl = document.getElementById('progress-stage');
-      const spinnerLabel = document.getElementById('spinner-label');
-      const spinnerHint = document.getElementById('spinner-hint');
-      const strongHint = document.getElementById('time-hint-strong');
+    function classifyPriority(issueText){
+      const s = String(issueText || '');
+      if (/\[PRIORITY:\s*High\]/i.test(s) || /\bcritical\b/i.test(s) || /\bmissing\b/i.test(s)) return 'priority-high';
+      if (/\[PRIORITY:\s*Medium\]/i.test(s) || /\bweak\b/i.test(s) || /\blimited\b/i.test(s)) return 'priority-medium';
+      if (/\[PRIORITY:\s*Low\]/i.test(s)) return 'priority-low';
+      // heuristic
+      if (/blocking|cannot|error|noindex|robots|timeout|rate.limit/i.test(s)) return 'priority-high';
+      if (/duplicate|overlong|thin|unclear|inconsistent/i.test(s)) return 'priority-medium';
+      return 'priority-low';
+    }
 
-      if (bigSiteMode){
-        spinnerHint.textContent = "Large sites can take up to 5 minutes or more.";
-        strongHint.textContent = "5 minutes or more";
-      } else {
-        spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
-        strongHint.textContent = "2 minutes or more";
+    function clearAllLists(){
+      document.getElementById('opportunitiesCritical').innerHTML = '';
+      document.getElementById('opportunitiesStrategic').innerHTML = '';
+      document.getElementById('opportunitiesIncremental').innerHTML = '';
+      document.getElementById('workingList').innerHTML = '';
+      document.getElementById('aiInsights').innerHTML = '';
+    }
+
+    function setEmptyState(ulId, label){
+      const ul = document.getElementById(ulId);
+      ul.innerHTML = `
+        <li class="opportunity-item priority-low">
+          <p class="item-text">No ${label} were returned for this scan.</p>
+        </li>
+      `;
+    }
+
+    function renderScoreCard(score, pillars){
+      const scoreNum = document.getElementById('scoreNumber');
+      const scoreBand = document.getElementById('scoreBand');
+      const pillarsGrid = document.getElementById('pillarsGrid');
+
+      if (typeof score !== 'number' || !isFinite(score)) {
+        scoreNum.textContent = "-";
+        scoreBand.textContent = "Unable to calculate score";
+        pillarsGrid.innerHTML = "";
+        return;
       }
 
-      const start = Date.now();
+      const s = Math.round(score);
+      scoreNum.textContent = `${s}/100`;
 
-      const interval = setInterval(() => {
-        const s = Math.floor((Date.now() - start) / 1000);
+      let band = '';
+      if (s >= 90) band = 'Rank: Excellent ★★★★★';
+      else if (s >= 80) band = 'Rank: Very Good ★★★★☆';
+      else if (s >= 70) band = 'Rank: Good ★★★☆☆';
+      else if (s >= 60) band = 'Rank: Partially Visible ★★★☆☆';
+      else if (s >= 45) band = 'Rank: Needs Work ★★☆☆☆';
+      else band = 'Rank: Low Visibility ★☆☆☆☆';
+      scoreBand.textContent = band;
 
-        if (s < 8) {
-          stageEl.textContent = "Fetching and parsing the website…";
-          spinnerLabel.textContent = "Processing results…";
-        } else if (s < 20) {
-          stageEl.textContent = "Extracting structure and crawl signals…";
-          spinnerLabel.textContent = "Analyzing site signals…";
-        } else if (s < 45) {
-          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
-          spinnerLabel.textContent = "Scoring and summarizing…";
-        } else if (s < 90) {
-          stageEl.textContent = "Generating the full report…";
-          spinnerLabel.textContent = "Finalizing report…";
-        } else if (s < 180) {
-          stageEl.textContent = "Still working — this site is taking longer than typical.";
-          spinnerLabel.textContent = "Still analyzing…";
-        } else {
-          stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
-          spinnerLabel.textContent = "Still analyzing…";
-        }
-      }, 800);
+      const p = pillars || {};
+      const access = Number(p.access);
+      const trust = Number(p.trust);
+      const clarity = Number(p.clarity);
+      const alignment = Number(p.alignment);
 
-      return () => clearInterval(interval);
+      const safe = (v) => (isFinite(v) ? v : 0);
+
+      pillarsGrid.innerHTML = [
+        { label:'AI Access Readiness', value: `${Math.round(safe(access))}/25` },
+        { label:'Trust & Verification Signals', value: `${Math.round(safe(trust))}/25` },
+        { label:'LLM Interpretability & Clarity', value: `${Math.round(safe(clarity))}/25` },
+        { label:'Prompt-Pattern Alignment', value: `${Math.round(safe(alignment))}/25` },
+      ].map(row => `
+        <div class="pillar">
+          <span class="label">${row.label}</span>
+          <span class="badge">${row.value}</span>
+        </div>
+      `).join('');
     }
 
+    // Fetch with timeouts
     async function fetchWithTimeout(url, opts = {}) {
       const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
       const controller = new AbortController();
@@ -392,211 +563,23 @@
       }
     }
 
-    function setScoreError(msg){
-      const el = document.getElementById('scoreError');
-      if (!msg){
-        el.style.display = 'none';
-        el.textContent = '';
-        return;
+    async function fetchFullData(targetUrl){
+      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
+      const path = `/api/full?url=${encodeURIComponent(targetUrl)}`;
+
+      // same-origin first
+      try {
+        const res = await fetchWithTimeout(path, { timeoutMs: 140000 });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } catch (e1) {
+        // fallback
+        const res2 = await fetchWithTimeout(`${FALLBACK_BASE}${path}`, { timeoutMs: 140000 });
+        if (!res2.ok) throw new Error(`Fallback HTTP ${res2.status}`);
+        return await res2.json();
       }
-      el.textContent = msg;
-      el.style.display = 'block';
     }
 
-    function renderScoreCardFromScoreAPI(j){
-      if (!j || typeof j.score !== 'number' || !j.pillars){
-        document.getElementById("scoreNumber").textContent = "-";
-        document.getElementById("scoreBand").textContent = "Unable to calculate score";
-        document.getElementById("pillarsGrid").innerHTML = "";
-        return;
-      }
-
-      const total = Math.max(0, Math.min(100, Math.round(j.score)));
-      document.getElementById("scoreNumber").textContent = `${total}/100`;
-      document.getElementById("scoreBand").textContent =
-        total >= 70 ? "Rank: Highly Visible ★★★★☆" :
-        total >= 55 ? "Rank: Partially Visible ★★★☆☆" :
-        total >= 40 ? "Rank: Needs Work ★★☆☆☆" :
-        "Rank: Low Visibility ★☆☆☆☆";
-
-      const grid = document.getElementById("pillarsGrid");
-      grid.innerHTML = "";
-
-      const rows = [
-        ["AI Access Readiness", j.pillars.access],
-        ["Trust & Verification Signals", j.pillars.trust],
-        ["LLM Interpretability & Clarity", j.pillars.clarity],
-        ["Prompt-Pattern Alignment", j.pillars.alignment]
-      ];
-
-      rows.forEach(([label, val]) => {
-        const safe = Math.max(0, Math.min(25, Number(val) || 0));
-        const d = document.createElement("div");
-        d.className = "pillar";
-        d.innerHTML = `<span class="label">${escapeHTML(label)}</span><span class="badge">${safe}/25</span>`;
-        grid.appendChild(d);
-      });
-    }
-
-    function priorityFor(text){
-      const t = String(text || '');
-      if (/\[PRIORITY:\s*High\]/i.test(t)) return 'priority-high';
-      if (/\[PRIORITY:\s*Medium\]/i.test(t)) return 'priority-medium';
-      if (/\[PRIORITY:\s*Low\]/i.test(t)) return 'priority-low';
-
-      if (/critical|must|blocking|severe/i.test(t)) return 'priority-high';
-      if (/limited|weak|improve|missing/i.test(t)) return 'priority-medium';
-      return 'priority-low';
-    }
-
-    function stripPriorityTag(text){
-      return String(text || '').replace(/\[PRIORITY:\s*[^\]]+\]/i,'').trim();
-    }
-
-    function renderOpportunities(needsAttention){
-      const criticalEl = document.getElementById('opportunitiesCritical');
-      const strategicEl = document.getElementById('opportunitiesStrategic');
-      const incrementalEl = document.getElementById('opportunitiesIncremental');
-
-      criticalEl.innerHTML = '';
-      strategicEl.innerHTML = '';
-      incrementalEl.innerHTML = '';
-
-      if (!Array.isArray(needsAttention) || needsAttention.length === 0){
-        const empty = `
-          <li class="opportunity-item priority-low">
-            <p class="item-text">No opportunities were returned for this scan.</p>
-          </li>
-        `;
-        criticalEl.innerHTML = empty;
-        strategicEl.innerHTML = empty;
-        incrementalEl.innerHTML = empty;
-        return;
-      }
-
-      const buckets = { critical: [], strategic: [], incremental: [] };
-
-      needsAttention.forEach(raw => {
-        const str = String(raw || '').trim();
-        if (!str) return;
-
-        const parts = str.split('How to fix:');
-        const issueRaw = stripPriorityTag(parts[0].trim());
-        const fixRaw = parts[1] ? parts.slice(1).join('How to fix:').trim() : '';
-
-        const p = priorityFor(str);
-        let bucket = 'incremental';
-        if (p === 'priority-high') bucket = 'critical';
-        else if (p === 'priority-medium') bucket = 'strategic';
-
-        const li = document.createElement('li');
-        li.className = `opportunity-item ${p}`;
-
-        const issueP = document.createElement('p');
-        issueP.className = 'item-text';
-        issueP.innerHTML = escapeHTML(issueRaw);
-
-        li.appendChild(issueP);
-
-        if (fixRaw){
-          const callout = document.createElement('div');
-          callout.className = 'fix-callout';
-          callout.innerHTML = `<div class="fix-title">How to fix:</div>${escapeHTML(fixRaw)}`;
-          li.appendChild(callout);
-        }
-
-        buckets[bucket].push(li);
-      });
-
-      function mount(listEl, items){
-        if (!items.length){
-          listEl.innerHTML = `
-            <li class="opportunity-item priority-low">
-              <p class="item-text">No opportunities were returned for this scan.</p>
-            </li>
-          `;
-          return;
-        }
-        items.forEach(n => listEl.appendChild(n));
-      }
-
-      mount(criticalEl, buckets.critical);
-      mount(strategicEl, buckets.strategic);
-      mount(incrementalEl, buckets.incremental);
-    }
-
-    function renderWorking(whatsWorking){
-      const el = document.getElementById('workingList');
-      el.innerHTML = '';
-      if (!Array.isArray(whatsWorking) || whatsWorking.length === 0){
-        el.innerHTML = `
-          <li class="working-item">
-            <p class="item-text">No strengths were returned for this scan.</p>
-          </li>
-        `;
-        return;
-      }
-      whatsWorking.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'working-item';
-        const p = document.createElement('p');
-        p.className = 'item-text';
-        p.innerHTML = escapeHTML(item);
-        li.appendChild(p);
-        el.appendChild(li);
-      });
-    }
-
-    function renderEngineInsights(engineInsights){
-      const el = document.getElementById('aiInsights');
-      el.innerHTML = '';
-
-      if (!Array.isArray(engineInsights) || engineInsights.length === 0){
-        el.innerHTML = `
-          <div class="ai-row">
-            <div class="ai-logo"><span class="ai-fallback">AI</span></div>
-            <div class="ai-text">No engine insights were returned for this scan.</div>
-          </div>
-        `;
-        return;
-      }
-
-      engineInsights.forEach(insight => {
-        const s = String(insight || '').trim();
-        if (!s) return;
-
-        const parts = s.split(':');
-        const engine = (parts[0] || 'AI').trim();
-        const text = parts.slice(1).join(':').trim() || s;
-
-        const row = document.createElement('div');
-        row.className = 'ai-row';
-
-        const logoWrap = document.createElement('div');
-        logoWrap.className = 'ai-logo';
-
-        const logoPath = ENGINE_LOGOS[engine];
-        if (logoPath){
-          const img = document.createElement('img');
-          img.src = logoPath;
-          img.alt = engine;
-          img.onerror = () => { logoWrap.innerHTML = `<span class="ai-fallback">${escapeHTML(engine)}</span>`; };
-          logoWrap.appendChild(img);
-        } else {
-          logoWrap.innerHTML = `<span class="ai-fallback">${escapeHTML(engine)}</span>`;
-        }
-
-        const txt = document.createElement('div');
-        txt.className = 'ai-text';
-        txt.innerHTML = escapeHTML(text);
-
-        row.appendChild(logoWrap);
-        row.appendChild(txt);
-        el.appendChild(row);
-      });
-    }
-
-    // Modal wiring
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('breakdown-modal').style.display = 'flex';
@@ -610,31 +593,36 @@
       }
     });
 
-    // Copy summary
     document.getElementById("copyBtn").addEventListener("click", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlFromQuery =
+        urlParams.get('url') ||
+        urlParams.get('targetUrl') ||
+        urlParams.get('target') ||
+        urlParams.get('site') ||
+        '';
+
+      const targetUrl = urlFromQuery || sessionStorage.getItem('aivi:lastUrl') || '';
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
       const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
       const vals = [...document.querySelectorAll('.pillar .badge')].map(el => el.textContent.trim());
 
-      const opp = [
+      const oppTexts = [
         ...document.querySelectorAll('#opportunitiesCritical .item-text'),
         ...document.querySelectorAll('#opportunitiesStrategic .item-text'),
-        ...document.querySelectorAll('#opportunitiesIncremental .item-text'),
-      ].map(el => el.textContent.trim()).filter(Boolean).slice(0, 12);
+        ...document.querySelectorAll('#opportunitiesIncremental .item-text')
+      ].map(el => el.textContent.trim()).filter(Boolean);
 
-      const working = [...document.querySelectorAll('#workingList .item-text')]
-        .map(el => el.textContent.trim()).filter(Boolean).slice(0, 10);
+      const workTexts = [...document.querySelectorAll('#workingList .item-text')]
+        .map(el => el.textContent.trim()).filter(Boolean);
 
-      const insights = [...document.querySelectorAll('#aiInsights .ai-row')]
-        .map(row => {
-          const img = row.querySelector('img');
-          const engine = img ? img.alt : (row.querySelector('.ai-fallback')?.textContent || 'AI');
-          const text = row.querySelector('.ai-text')?.textContent || '';
-          return `${engine}: ${text.trim()}`;
-        })
-        .filter(Boolean);
-
-      const targetUrl = window.__AIV_TARGET_URL__ || '';
+      const aiTexts = [...document.querySelectorAll('.ai-row .ai-text')]
+        .map(el => {
+          const row = el.closest('.ai-row');
+          const img = row ? row.querySelector('.ai-logo img') : null;
+          const engine = img ? img.alt : 'AI Engine';
+          return `${engine}: ${el.textContent.trim()}`;
+        });
 
       const txt = [
         `Website: ${targetUrl}`,
@@ -643,14 +631,14 @@
         `Pillar Breakdown:`,
         ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
         ``,
-        `Opportunities:`,
-        ...opp.map(o => `- ${o}`),
+        `Top Opportunities:`,
+        ...oppTexts.slice(0, 10).map(o => `- ${o}`),
         ``,
-        `What's Working:`,
-        ...working.map(w => `- ${w}`),
+        `What’s Working:`,
+        ...workTexts.slice(0, 10).map(w => `- ${w}`),
         ``,
         `AI Engine Insights:`,
-        ...insights,
+        ...aiTexts,
         ``,
         `Full report: ${window.location.href}`
       ].join("\n");
@@ -662,11 +650,13 @@
         b.textContent = "Copied!";
         setTimeout(() => b.textContent = old, 1500);
       } catch {
-        window.prompt("Copy the comprehensive summary:", txt);
+        window.prompt("Copy the summary:", txt);
       }
     });
 
     document.addEventListener("DOMContentLoaded", async () => {
+      clearAllLists();
+
       const urlParams = new URLSearchParams(window.location.search);
 
       const urlFromQuery =
@@ -676,95 +666,140 @@
         urlParams.get('site') ||
         '';
 
-      const targetUrl = urlFromQuery || sessionStorage.getItem('sniperank:lastUrl') || '';
-      window.__AIV_TARGET_URL__ = targetUrl;
+      const targetUrl = urlFromQuery || sessionStorage.getItem('aivi:lastUrl') || '';
+      if (targetUrl) sessionStorage.setItem('aivi:lastUrl', targetUrl);
 
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        setScoreError("No URL provided. Please go back to the homepage and try again.");
-        renderOpportunities([]);
-        renderWorking([]);
-        renderEngineInsights([]);
+        document.getElementById('scoreBand').textContent = "No URL provided";
+        setEmptyState('opportunitiesCritical', 'opportunities');
+        setEmptyState('opportunitiesStrategic', 'opportunities');
+        setEmptyState('opportunitiesIncremental', 'opportunities');
+        document.getElementById('workingList').innerHTML =
+          `<li class="working-item"><p class="item-text">No data available.</p></li>`;
+        document.getElementById('aiInsights').innerHTML = '';
         return;
       }
 
-      sessionStorage.setItem('sniperank:lastUrl', targetUrl);
+      const domain = extractDomain(targetUrl);
       document.getElementById("current-url").textContent = targetUrl;
 
-      const domain = extractDomain(targetUrl);
-      const bigSiteMode = isBigSite(domain);
-
       showOverlay();
-      const stopMessaging = startOverlayMessaging(bigSiteMode);
-
-      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
-      let apiBase = '';
-
-      // Choose base by probing same-origin score
-      try {
-        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
-        if (!probe.ok) throw new Error(`probe ${probe.status}`);
-        apiBase = '';
-      } catch {
-        apiBase = FALLBACK_BASE;
-      }
+      const stopMessaging = startOverlayMessaging(domain);
 
       try {
-        // 1) Score (always from /api/score to unify with analyze.html)
-        try {
-          setScoreError('');
-          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 90000 });
-          if (!scoreRes.ok) throw new Error(`score ${scoreRes.status}`);
-          const scoreJson = await scoreRes.json();
-          renderScoreCardFromScoreAPI(scoreJson);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(scoreJson));
-        } catch (e) {
-          console.error('Score error:', e);
-          document.getElementById("scoreNumber").textContent = "-";
-          document.getElementById("scoreBand").textContent = "Unable to calculate score";
-          document.getElementById("pillarsGrid").innerHTML = "";
-          setScoreError("Score could not be calculated for this scan. The detailed report may still load.");
+        const data = await fetchFullData(targetUrl);
+
+        // banner / status
+        if (data && (data.meta?.mode === 'lite-fallback' || data.mode === 'lite-fallback' || data.success === false)) {
+          document.getElementById('lite-banner').style.display = 'block';
         }
 
-        // 2) Full details (from /api/full). If same base fails, retry once on fallback.
-        let fullData = null;
+        // score + pillars
+        const score = (typeof data.score === 'number') ? data.score : (typeof data.rawScore === 'number' ? data.rawScore : NaN);
+        const pillars = data.pillars || data.breakdown || {};
+        renderScoreCard(score, pillars);
 
-        async function tryFull(base){
-          const res = await fetchWithTimeout(`${base}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: bigSiteMode ? 360000 : 240000 });
-          if (!res.ok) throw new Error(`full ${res.status}`);
-          return await res.json();
-        }
+        // Opportunities (needsAttention)
+        const needsAttentionRaw = data.needsAttention || data.needs_attention || data.opportunities || data.issues || [];
+        const needs = normalizeToArray(needsAttentionRaw)
+          .map(s => s.replace(/\[PRIORITY:\s*(High|Medium|Low)\]/ig, (m) => m.toUpperCase()))
+          .filter(Boolean);
 
-        try {
-          fullData = await tryFull(apiBase);
-        } catch (e1) {
-          console.error('Full report first attempt failed:', e1);
-          if (apiBase !== FALLBACK_BASE) {
-            try {
-              fullData = await tryFull(FALLBACK_BASE);
-              document.getElementById('lite-banner').style.display = 'block';
-            } catch (e2) {
-              console.error('Full report fallback failed:', e2);
-              fullData = null;
-            }
-          }
-        }
+        const critical = [];
+        const strategic = [];
+        const incremental = [];
 
-        if (!fullData || fullData.success === false) {
-          // Render explicit non-garbage output
-          renderOpportunities([]);
-          renderWorking([]);
-          renderEngineInsights([]);
-          setScoreError("Full report could not be generated for this scan. Please try again, or test another URL.");
+        needs.forEach(item => {
+          const { issue, fix } = splitIssueAndFix(item);
+          const pr = classifyPriority(issue);
+
+          const li = `
+            <li class="opportunity-item ${pr}">
+              <p class="item-text">${issue}</p>
+              ${fix ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${fix}</div>` : ``}
+            </li>
+          `;
+
+          if (pr === 'priority-high') critical.push(li);
+          else if (pr === 'priority-medium') strategic.push(li);
+          else incremental.push(li);
+        });
+
+        if (critical.length) document.getElementById('opportunitiesCritical').innerHTML = critical.join('');
+        else setEmptyState('opportunitiesCritical', 'opportunities');
+
+        if (strategic.length) document.getElementById('opportunitiesStrategic').innerHTML = strategic.join('');
+        else setEmptyState('opportunitiesStrategic', 'opportunities');
+
+        if (incremental.length) document.getElementById('opportunitiesIncremental').innerHTML = incremental.join('');
+        else setEmptyState('opportunitiesIncremental', 'opportunities');
+
+        // What’s Working
+        const whatsWorkingRaw = data.whatsWorking || data.whats_working || data.strengths || [];
+        const working = normalizeToArray(whatsWorkingRaw).filter(Boolean);
+
+        if (working.length) {
+          document.getElementById('workingList').innerHTML = working.map(item => {
+            const { issue, fix } = splitIssueAndFix(item);
+            return `
+              <li class="working-item">
+                <p class="item-text">${issue}</p>
+                ${fix ? `<div class="address-callout"><div class="address-title">How to enhance:</div>${fix}</div>` : ``}
+              </li>
+            `;
+          }).join('');
         } else {
-          if (fullData.meta?.mode === 'lite-fallback') {
-            document.getElementById('lite-banner').style.display = 'block';
-          }
-
-          renderOpportunities(fullData.needsAttention);
-          renderWorking(fullData.whatsWorking);
-          renderEngineInsights(fullData.engineInsights);
+          document.getElementById('workingList').innerHTML =
+            `<li class="working-item"><p class="item-text">No strengths were returned for this scan.</p></li>`;
         }
+
+        // AI engine insights
+        const engineInsightsRaw = data.engineInsights || data.engine_insights || data.aiInsights || [];
+        const insights = normalizeToArray(engineInsightsRaw).filter(Boolean);
+
+        if (insights.length) {
+          document.getElementById('aiInsights').innerHTML = insights.map(insight => {
+            const s = String(insight);
+            const idx = s.indexOf(':');
+            const engine = (idx > 0 ? s.slice(0, idx).trim() : 'AI Engine');
+            const text = (idx > 0 ? s.slice(idx + 1).trim() : s.trim());
+            return `
+              <div class="ai-row">
+                <div class="ai-logo">${logoBlock(engine)}</div>
+                <div class="ai-text">${text || ''}</div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          document.getElementById('aiInsights').innerHTML = '';
+        }
+
+        // If API indicates failure, show a clear status (but do NOT replace rendered data if present)
+        if (data && (data.success === false || data.error)) {
+          const msg = data.message || data.error || "Full report could not be generated for this scan.";
+          const sEl = document.getElementById('fullReportStatus');
+          sEl.textContent = msg;
+          sEl.style.display = 'block';
+        }
+
+      } catch (error) {
+        console.error('Full report error:', error);
+
+        document.getElementById('scoreBand').textContent = "Error loading full report";
+        document.getElementById('scoreNumber').textContent = "-";
+        document.getElementById('pillarsGrid').innerHTML = "";
+
+        setEmptyState('opportunitiesCritical', 'opportunities');
+        setEmptyState('opportunitiesStrategic', 'opportunities');
+        setEmptyState('opportunitiesIncremental', 'opportunities');
+
+        document.getElementById('workingList').innerHTML =
+          `<li class="working-item"><p class="item-text">Unable to load “What’s Working” for this scan.</p></li>`;
+
+        const sEl = document.getElementById('fullReportStatus');
+        sEl.textContent = "Full report could not be generated for this scan. Please try again, or test another URL.";
+        sEl.style.display = 'block';
 
       } finally {
         stopMessaging();
