@@ -1,6 +1,6 @@
 /* 
-  api/full.js - v3.4.0 — FIXED VERSION (works on Vercel)
-  Purpose: Comprehensive AI SEO analysis
+  api/full.js - v3.5.0 — WORKING VERSION
+  Purpose: Comprehensive AI SEO analysis (25 opportunities minimum)
   ENV Required: OPENAI_API_KEY
 */
 
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     // Calculate score
     const score = calculateScore(contentData, aiAnalysis);
 
-    // Return successful response (NO whatsWorking - you want it deleted)
+    // Return successful response (NO whatsWorking - deleted per user request)
     return res.status(200).json({
       success: true,
       score,
