@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- full-report.html - v1.2.6 - Comprehensive AI Visibility Analysis -->
-  <!-- Features: Improved terminology, proper spacing, consistent logos, clear business language -->
-  <!-- Compatible with: /api/full for comprehensive data -->
-  <!-- Last updated: January 07, 2026 -->
+  <!-- full-report.html -->
+  <!-- Version: v2026.01.12-1 -->
+  <!-- Last updated: 2026-01-12 (America/New_York) -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -106,7 +105,6 @@
     .modal-content p{margin:12px 0;color:#333}
     .modal-content strong{color:#111}
 
-    /* Footer */
     footer{
       margin-top:3rem;
       border-top:1px solid var(--border);
@@ -397,53 +395,52 @@
     if (source) sessionStorage.setItem('sniperank:source', source);
 
     const targetUrl = urlFromQuery || sessionStorage.getItem('sniperank:lastUrl') || '';
+    if (targetUrl) sessionStorage.setItem('sniperank:lastUrl', targetUrl);
 
-    if (targetUrl) {
-      sessionStorage.setItem('sniperank:lastUrl', targetUrl);
-    }
+    const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
 
-    function renderScoreCard(data) {
+    function renderScoreCardFromScoreApi(j){
+      const total = typeof j.score === 'number' ? j.score : 0;
+      const pillars = j.pillars || {};
       const scoreNum = document.getElementById('scoreNumber');
       const scoreBand = document.getElementById('scoreBand');
       const pillarsGrid = document.getElementById('pillarsGrid');
 
-      let score, pillars;
+      scoreNum.textContent = `${Math.round(total)}/100`;
 
-      if (data.rawScore !== undefined) {
-        score = data.rawScore;
-        pillars = [
-          { label: 'AI Access Readiness', value: Math.round(data.breakdown?.presence || 0) },
-          { label: 'Trust & Verification Signals', value: Math.round(data.breakdown?.citations || 0) },
-          { label: 'LLM Interpretability & Clarity', value: Math.round(data.breakdown?.answerability || 0) },
-          { label: 'Prompt-Pattern Alignment', value: Math.round(data.breakdown?.technical || 0) }
-        ];
-      } else {
-        score = data.score || 0;
-        pillars = [
-          { label: 'AI Access Readiness', value: Math.round((data.pillars?.access || 0) * 2.2) },
-          { label: 'Trust & Verification Signals', value: Math.round((data.pillars?.trust || 0) * 0.8) },
-          { label: 'LLM Interpretability & Clarity', value: Math.round((data.pillars?.clarity || 0) * 0.6) },
-          { label: 'Prompt-Pattern Alignment', value: Math.round((data.pillars?.alignment || 0) * 0.4) }
-        ];
-      }
-
-      scoreNum.textContent = Math.round(score) + '/100';
-
-      let band = '';
-      if (score >= 90) band = 'Rank: Excellent ★★★★★';
-      else if (score >= 80) band = 'Rank: Very Good ★★★★☆';
-      else if (score >= 70) band = 'Rank: Good ★★★☆☆';
-      else if (score >= 60) band = 'Rank: Fair ★★☆☆☆';
-      else band = 'Rank: Needs Work ★☆☆☆☆';
+      const band =
+        total >= 90 ? 'Rank: Excellent ★★★★★' :
+        total >= 80 ? 'Rank: Very Good ★★★★☆' :
+        total >= 70 ? 'Rank: Good ★★★☆☆' :
+        total >= 60 ? 'Rank: Fair ★★☆☆☆' :
+        'Rank: Needs Work ★☆☆☆☆';
 
       scoreBand.textContent = band;
 
-      pillarsGrid.innerHTML = pillars.map(p => `
+      const rows = [
+        ['AI Access Readiness', pillars.access],
+        ['Trust & Verification Signals', pillars.trust],
+        ['LLM Interpretability & Clarity', pillars.clarity],
+        ['Prompt-Pattern Alignment', pillars.alignment],
+      ];
+
+      pillarsGrid.innerHTML = rows.map(([label, val]) => `
         <div class="pillar">
-          <span class="label">${p.label}</span>
-          <span class="badge">${p.value}</span>
+          <span class="label">${label}</span>
+          <span class="badge">${(typeof val === 'number' ? val : 0)}/25</span>
         </div>
       `).join('');
+    }
+
+    async function fetchWithTimeout(url, opts = {}) {
+      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...opts, signal: controller.signal });
+      } finally {
+        clearTimeout(t);
+      }
     }
 
     function startProgress() {
@@ -521,7 +518,7 @@
 
       const txt = [
         `Website: ${targetUrl}`,
-        `SnipeRank Comprehensive AI Visibility Score: ${scoreText}`,
+        `SnipeRank AI Visibility Score: ${scoreText}`,
         ``,
         `Pillar Breakdown:`,
         ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
@@ -549,6 +546,16 @@
       }
     });
 
+    async function getApiBaseForScore(targetUrl){
+      try{
+        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
+        if (!probe.ok) throw new Error('probe not ok');
+        return '';
+      }catch{
+        return FALLBACK_BASE;
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
@@ -562,11 +569,27 @@
       const progressTimer = startProgress();
 
       try {
+        const apiBase = await getApiBaseForScore(targetUrl);
+
+        // 1) Canonical score (UNIFIED with analyze.html)
+        try{
+          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000 });
+          if (!scoreRes.ok) throw new Error('score not ok');
+          const scoreJson = await scoreRes.json();
+          renderScoreCardFromScoreApi(scoreJson);
+          sessionStorage.setItem('sniperank:data', JSON.stringify(scoreJson));
+        }catch(e){
+          console.error('Score error:', e);
+          document.getElementById("scoreBand").textContent = "Unable to calculate score";
+        }
+
+        // 2) Full report data (kept as-is for content sections)
         let apiResponse;
         try {
-          apiResponse = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`);
+          apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
+          if (!apiResponse.ok) throw new Error('full not ok');
         } catch {
-          apiResponse = await fetch(`https://sniperank-v2-dev.onrender.com/api/full?url=${encodeURIComponent(targetUrl)}`);
+          apiResponse = await fetchWithTimeout(`${FALLBACK_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
         }
 
         if (!apiResponse.ok) throw new Error('API response not ok');
@@ -575,12 +598,6 @@
 
         if (data.meta?.mode === 'lite-fallback' || data.success === false) {
           document.getElementById('lite-banner').style.display = 'block';
-        }
-
-        if (data.score !== undefined) {
-          renderScoreCard({ score: data.score, pillars: data.pillars });
-        } else if (data.rawScore !== undefined) {
-          renderScoreCard(data);
         }
 
         if (Array.isArray(data.needsAttention) && data.needsAttention.length > 0) {
@@ -660,14 +677,12 @@
 
       } catch (error) {
         console.error('Full report error:', error);
-        renderScoreCard({ score: 72, pillars: { access: 18, trust: 15, clarity: 19, alignment: 20 } });
       } finally {
         clearInterval(progressTimer);
         stopProgress();
       }
     });
   </script>
-
-  <!-- full-report.html - v1.2.6 -->
 </body>
 </html>
+<!-- Version footer: v2026.01.12-1 -->
