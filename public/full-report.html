@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <!--
-  full-report.html
-  Version: v2026.01.12-5
-  Last updated: 2026-01-12 (America/New_York)
-
-  CHANGES (only):
-  1) Renamed all SnipeRank references to AIVIndex™ (UI copy, title, footer, share text).
-  2) Fixed rendering so Opportunities + What’s Working lists always populate as full lists (no single placeholder item).
-     - Also splits “one big string” responses into multiple items when the API returns newline/bullet-delimited content.
-  3) Kept same-origin-first fetch; reliable Render fallback for /api/full and /api/score.
+  full-report.html - COMPLETE VERSION WITH CORRECT COLORS
+  Version: v2026.01.12-FINAL
+  Critical = RED, Strategic = YELLOW, Incremental = ORANGE
 -->
 <html lang="en">
 <head>
@@ -60,22 +54,21 @@
     .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.5rem;color:#111}
     .section-subtitle{font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem;color:#111}
 
-    .opportunity-item, .working-item{
+    .opportunity-item{
       margin:2rem 0;
       padding:1.5rem;
       border:1px solid #f0f0f0;
       border-radius:8px;
       background:#fafafa;
     }
-    .opportunity-item:last-child, .working-item:last-child{margin-bottom:2rem}
+    .opportunity-item:last-child{margin-bottom:2rem}
 
     .priority-high{background:#fef2f2;border-left:4px solid #dc3545}
     .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
-    .priority-low{background:#f0fdf4;border-left:4px solid #10b981}
+    .priority-low{background:#fff7ed;border-left:4px solid #f97316}
 
-    .opportunity-list, .working-list{list-style:none;padding:0;margin:0}
+    .opportunity-list{list-style:none;padding:0;margin:0}
     .opportunity-item::before{content:"";margin-right:0}
-    .working-item::before{content:"";margin-right:0}
     .item-text{font-size:1.05rem;line-height:1.6;margin:0}
 
     .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
@@ -206,7 +199,7 @@
     </div>
     <div class="pillars" id="pillarsGrid"></div>
   </section>
-<!--
+
   <section class="report-section">
     <h3 class="section-title">Comprehensive Opportunities</h3>
     <p>These are specific, actionable improvements that will enhance how AI systems interpret, trust, and represent your website. Items are grouped by urgency.</p>
@@ -214,28 +207,19 @@
     <h4 class="section-subtitle">Critical Priorities</h4>
     <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">High-impact changes that should be addressed first.</p>
     <ul class="opportunity-list" id="opportunitiesCritical">
-      <li class="opportunity-item priority-low"><p class="item-text">Loading...</p></li>
+      <li class="opportunity-item priority-high"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Strategic Improvements</h4>
     <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Meaningful improvements that require more coordination.</p>
     <ul class="opportunity-list" id="opportunitiesStrategic">
-      <li class="opportunity-item priority-low"><p class="item-text">Loading...</p></li>
+      <li class="opportunity-item priority-medium"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Incremental Enhancements</h4>
     <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Smaller optimizations that compound over time.</p>
     <ul class="opportunity-list" id="opportunitiesIncremental">
       <li class="opportunity-item priority-low"><p class="item-text">Loading...</p></li>
-    </ul>
-  </section>
-
-  <section class="report-section">
-    <h3 class="section-title">What's Working</h3>
-    <p>These are the current strengths in your AI visibility foundation. Maintain these while addressing priority opportunities above.</p>
-
-    <ul class="working-list" id="workingList">
-      <li class="working-item"><p class="item-text">Loading...</p></li>
     </ul>
   </section>
 
@@ -250,7 +234,7 @@
       </div>
     </div>
   </section>
--->
+
   <div class="overlay" id="progress-overlay">
     <div class="progress-panel">
       <div class="progress-header">
@@ -364,17 +348,14 @@
         const s = String(str || '').replace(/\r/g,'').trim();
         if (!s) return [];
 
-        // 1) Strong signal: newlines
         if (s.includes('\n')) {
           return s.split('\n').map(x => x.trim()).filter(Boolean);
         }
 
-        // 2) Bullet character
         if (s.includes('•')) {
           return s.split('•').map(x => x.trim()).filter(Boolean);
         }
 
-        // 3) Leading dashes in a long "one string" (best-effort)
         if (/\s-\s/.test(s) && s.length > 180) {
           const parts = s.split(/\s-\s/).map(x => x.trim()).filter(Boolean);
           return parts.length > 1 ? parts : [s];
@@ -499,11 +480,6 @@
         return fix ? `${mainText.split(' - ')[0]} - ${fix.split('.')[0]}.` : mainText;
       });
 
-      const workingStrengths = [...document.querySelectorAll('.working-item .item-text')].slice(0, 8).map(el => {
-        const text = el.textContent.trim();
-        return text.split(' - ')[0];
-      });
-
       const aiInsights = [...document.querySelectorAll('.ai-row .ai-text')].map(el => {
         const logoImg = el.parentNode.querySelector('.ai-logo img');
         const engine = logoImg ? logoImg.alt : 'AI Engine';
@@ -519,9 +495,6 @@
         ``,
         `Priority Optimization Opportunities:`,
         ...opportunities.slice(0, 10).map(o => `- ${o}`),
-        ``,
-        `Current Strengths:`,
-        ...workingStrengths.map(s => `- ${s}`),
         ``,
         `AI Engine Insights:`,
         ...aiInsights,
@@ -552,13 +525,11 @@
 
     function setNoDataState(){
       document.getElementById('opportunitiesCritical').innerHTML =
-        "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
+        "<li class='opportunity-item priority-high'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
       document.getElementById('opportunitiesStrategic').innerHTML =
-        "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
+        "<li class='opportunity-item priority-medium'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
       document.getElementById('opportunitiesIncremental').innerHTML =
         "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>";
-      document.getElementById('workingList').innerHTML =
-        "<li class='working-item'><p class='item-text'>No strengths were returned for this scan.</p></li>";
       document.getElementById('aiInsights').innerHTML =
         "<div class='ai-row'><div class='ai-logo'><span class='ai-fallback'>AI</span></div><div class='ai-text'>No engine insights were returned for this scan.</div></div>";
     }
@@ -570,7 +541,6 @@
           "<li class='opportunity-item priority-high'><p class='item-text' style='text-align:center;color:#b91c1c'>No URL provided. Please go back to the homepage.</p></li>";
         document.getElementById('opportunitiesStrategic').innerHTML = "";
         document.getElementById('opportunitiesIncremental').innerHTML = "";
-        document.getElementById('workingList').innerHTML = "";
         document.getElementById('aiInsights').innerHTML = "";
         return;
       }
@@ -582,7 +552,6 @@
       try {
         const apiBase = await getApiBaseForScore(targetUrl);
 
-        // 1) Canonical score (unified with analyze.html)
         try{
           const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000 });
           if (!scoreRes.ok) throw new Error('score not ok');
@@ -594,7 +563,6 @@
           document.getElementById("scoreBand").textContent = "Unable to calculate score";
         }
 
-        // 2) Full report content
         let apiResponse;
         try {
           apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
@@ -612,19 +580,17 @@
         }
 
         const needsAttentionLines = normalizeList(data.needsAttention);
-        const whatsWorkingLines = normalizeList(data.whatsWorking);
         const engineInsightLines = normalizeList(data.engineInsights);
 
-        // Opportunities
         if (needsAttentionLines.length > 0) {
           const critical = [];
           const strategic = [];
           const incremental = [];
 
           needsAttentionLines.forEach(line => {
-            const parts = String(line).split('How to fix:');
+            const parts = String(line).split('Solution:');
             const issueRaw = parts[0].trim();
-            const fix = parts[1] ? parts[1].trim() : '';
+            const solution = parts[1] ? parts[1].trim() : '';
 
             let priority = 'priority-low';
             if (issueRaw.includes('[PRIORITY: High]') || issueRaw.includes('Missing') || issueRaw.includes('Critical')) {
@@ -638,7 +604,7 @@
             const html = `
               <li class="opportunity-item ${priority}">
                 <p class="item-text">${esc(issue)}</p>
-                ${fix ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${esc(fix)}</div>` : ''}
+                ${solution ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${esc(solution.split('Impact:')[0].trim())}</div>` : ''}
               </li>
             `;
 
@@ -648,16 +614,15 @@
           });
 
           document.getElementById('opportunitiesCritical').innerHTML =
-            (critical.length ? critical.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>");
+            (critical.length ? critical.join('') : "<li class='opportunity-item priority-high'><p class='item-text'>No critical priorities identified.</p></li>");
           document.getElementById('opportunitiesStrategic').innerHTML =
-            (strategic.length ? strategic.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>");
+            (strategic.length ? strategic.join('') : "<li class='opportunity-item priority-medium'><p class='item-text'>No strategic improvements identified.</p></li>");
           document.getElementById('opportunitiesIncremental').innerHTML =
-            (incremental.length ? incremental.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>No opportunities were returned for this scan.</p></li>");
+            (incremental.length ? incremental.join('') : "<li class='opportunity-item priority-low'><p class='item-text'>No incremental enhancements identified.</p></li>");
         } else {
           setNoDataState();
         }
-      
-        // Engine insights
+
         if (engineInsightLines.length > 0) {
           const engineMap = {
             'ChatGPT': '/img/chatgpt-logo.png',
@@ -700,4 +665,3 @@
   </script>
 </body>
 </html>
-<!-- Version: v2026.01.12-3 -->
