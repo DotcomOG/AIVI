@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-Version: v2026.01.10-3
-Last updated: 2026-01-10 (America/New_York)
+  Built by: ChatGPT
+  Version: v2026.01.12-1
+  Last updated: 2026-01-12 (America/New_York)
 
-  OPTION A IMPLEMENTED (clean overlay until everything is ready):
-  1) Removed percent-based progress UI entirely (no 95%/99% hang).
-  2) Added indeterminate circular loader + staged, honest messaging based on elapsed time.
-  3) Overlay remains up until BOTH score + report are loaded (single clean reveal).
-  4) Restored a reliable fetch flow: same-origin first; on failure, switch BOTH endpoints to Render fallback.
-  5) Added timeouts (AbortController) and clear error handling without breaking the page.
+  REPAIR FOR LARGE WEBSITES (keeps Option A spinner overlay):
+  1) Removed the “quick score probe decides apiBase” behavior that caused false fallbacks on slow/large sites.
+     Reverted to a lightweight HEAD probe against /api/score with https://example.com (fast, deterministic).
+  2) Score + Report now fetch IN PARALLEL (report no longer waits behind score).
+  3) Increased timeouts to be large-site-safe:
+     - Score: 120s
+     - Report: 8 minutes
+  4) Added automatic ONE-TIME retry on failure using the alternate base (same-origin <-> Render fallback).
+     This fixes cold starts / transient 5xx / edge routing issues without punishing large-site scans.
+  5) Overlay stays until BOTH requests settle (success or failure), preserving Option A “single reveal”.
 
-  No layout/design changes outside the overlay UI.
+  No design/layout changes outside the overlay logic and network orchestration.
 -->
 <html lang="en">
 <head>
@@ -458,7 +463,6 @@ Last updated: 2026-01-10 (America/New_York)
       const interval = setInterval(() => {
         const s = Math.floor((Date.now() - start) / 1000);
 
-        // Staged messaging by elapsed time (honest, not predictive).
         if (s < 8) {
           stageEl.textContent = "Fetching and parsing the website…";
           spinnerLabel.textContent = "Processing results…";
@@ -479,17 +483,21 @@ Last updated: 2026-01-10 (America/New_York)
           stageEl.textContent = "Still working — this site is taking longer than typical.";
           spinnerLabel.textContent = "Still analyzing…";
           spinnerHint.textContent = "We’ll show your results as soon as they’re ready.";
+        } else if (s < 240) {
+          stageEl.textContent = "Still working. Large sites can take several minutes.";
+          spinnerLabel.textContent = "Still analyzing…";
+          spinnerHint.textContent = "We’re continuing to process the site and generate your report.";
         } else {
           stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
           spinnerLabel.textContent = "Still analyzing…";
-          spinnerHint.textContent = "If this continues, the site may be blocking requests or the engine is under heavy load.";
+          spinnerHint.textContent = "If this continues, the site may be throttling requests or the engine is under heavy load.";
         }
       }, 800);
 
       return () => clearInterval(interval);
     }
 
-    // Fetch with timeouts
+    // Fetch with timeouts (AbortController)
     async function fetchWithTimeout(url, opts = {}) {
       const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
       const controller = new AbortController();
@@ -499,6 +507,27 @@ Last updated: 2026-01-10 (America/New_York)
         return res;
       } finally {
         clearTimeout(t);
+      }
+    }
+
+    // One-time retry helper: try primary base, then alternate base on failure.
+    async function fetchWithRetry(primaryUrl, altUrl, opts, isOkFn) {
+      let lastErr = null;
+
+      try {
+        const r1 = await fetchWithTimeout(primaryUrl, opts);
+        if (isOkFn(r1)) return { res: r1, usedAlt: false };
+        lastErr = new Error(`HTTP ${r1.status}`);
+      } catch (e) {
+        lastErr = e;
+      }
+
+      try {
+        const r2 = await fetchWithTimeout(altUrl, opts);
+        if (isOkFn(r2)) return { res: r2, usedAlt: true };
+        throw new Error(`HTTP ${r2.status}`);
+      } catch (e2) {
+        throw (e2 || lastErr || new Error("Request failed"));
       }
     }
 
@@ -588,42 +617,64 @@ Last updated: 2026-01-10 (America/New_York)
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      // Option A: show overlay immediately and keep it until both calls finish.
       showOverlay();
       const stopMessaging = startOverlayMessaging();
 
       const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
       let apiBase = '';
 
-      // Step 1: Choose base reliably by attempting same-origin score quickly.
-      // If it fails, switch BOTH score + report to fallback.
+      // Base selection: lightweight HEAD probe (fast and does NOT depend on targetUrl size).
+      // If same-origin API is missing/down, use Render fallback.
       try {
-        const probeScore = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
-        if (!probeScore.ok) throw new Error(`Score HTTP ${probeScore.status}`);
+        const probe = await fetchWithTimeout('/api/score?url=' + encodeURIComponent('https://example.com'), {
+          method: 'HEAD',
+          timeoutMs: 9000
+        });
+        if (!probe.ok) throw new Error(`Probe HTTP ${probe.status}`);
         apiBase = '';
       } catch {
         apiBase = FALLBACK_BASE;
       }
 
-      // Step 2: Fetch score + report sequentially (simple, reliable).
-      // If you prefer parallel, we can do it, but this preserves your known-good behavior.
-      try {
-        // Score
+      const primaryBase = apiBase;
+      const altBase = (primaryBase === '') ? FALLBACK_BASE : '';
+
+      // Parallel fetches with large-site-safe timeouts + one-time base retry.
+      const scorePrimaryUrl = `${primaryBase}/api/score?url=${encodeURIComponent(targetUrl)}`;
+      const scoreAltUrl     = `${altBase}/api/score?url=${encodeURIComponent(targetUrl)}`;
+
+      const reportPrimaryUrl = `${primaryBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
+      const reportAltUrl     = `${altBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
+
+      const SCORE_TIMEOUT_MS  = 120000;  // 2 minutes
+      const REPORT_TIMEOUT_MS = 480000;  // 8 minutes (large-site safe)
+
+      // Run both in parallel.
+      const scorePromise = (async () => {
         try {
-          const r = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 30000 });
-          if (!r.ok) throw new Error(`Score HTTP ${r.status}`);
-          const j = await r.json();
+          const { res } = await fetchWithRetry(
+            scorePrimaryUrl,
+            scoreAltUrl,
+            { timeoutMs: SCORE_TIMEOUT_MS },
+            (r) => r && r.ok
+          );
+          const j = await res.json();
           renderScoreCard(j.score, j.pillars, j.highlights);
           sessionStorage.setItem('sniperank:data', JSON.stringify(j));
         } catch (e) {
           console.error('Score error:', e);
           document.getElementById("scoreBand").textContent = "Unable to calculate score";
         }
+      })();
 
-        // Report
+      const reportPromise = (async () => {
         try {
-          const res = await fetchWithTimeout(`${apiBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
-          if (!res.ok) throw new Error(`Report HTTP ${res.status}`);
+          const { res } = await fetchWithRetry(
+            reportPrimaryUrl,
+            reportAltUrl,
+            { timeoutMs: REPORT_TIMEOUT_MS },
+            (r) => r && r.ok
+          );
           const html = await res.text();
           const host = document.getElementById('summary-results');
           host.innerHTML = html;
@@ -633,6 +684,10 @@ Last updated: 2026-01-10 (America/New_York)
           document.getElementById('summary-results').innerHTML =
             "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
         }
+      })();
+
+      try {
+        await Promise.allSettled([scorePromise, reportPromise]);
       } finally {
         stopMessaging();
         hideOverlay();
@@ -641,4 +696,4 @@ Last updated: 2026-01-10 (America/New_York)
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.10-3 -->
+<!-- Version footer: v2026.01.12-1 -->
