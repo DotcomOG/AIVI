@@ -1,53 +1,40 @@
 /* 
-  api/full.js - v3.3.0 — ROBUST VERSION (no crashes on missing keys)
-  Purpose: Comprehensive AI SEO analysis with graceful degradation
-  ENV Optional: OPENAI_API_KEY, PAGESPEED_API_KEY (works without them)
+  api/full.js - v3.4.0 — FIXED VERSION (works on Vercel)
+  Purpose: Comprehensive AI SEO analysis
+  ENV Required: OPENAI_API_KEY
 */
 
+import OpenAI from "openai";
 import * as cheerio from "cheerio";
 import axios from "axios";
-
-// Conditional imports (only if keys exist)
-let openai = null;
-if (process.env.OPENAI_API_KEY) {
-  const { default: OpenAI } = await import("openai");
-  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-}
 
 export default async function handler(req, res) {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: "Missing URL parameter" });
 
-  // Check if we can do full analysis
-  const canDoFullAnalysis = !!(process.env.OPENAI_API_KEY && openai);
-  const canUsePageSpeed = !!process.env.PAGESPEED_API_KEY;
+  // Check if we have OpenAI key
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
 
-  console.log("API Keys status:", { 
-    openai: canDoFullAnalysis,
-    pagespeed: canUsePageSpeed 
-  });
+  console.log("API Key status:", { hasOpenAI });
+
+  if (!hasOpenAI) {
+    console.error("OPENAI_API_KEY not found");
+    return res.status(200).json(fallbackPayload(url, "missing_api_key"));
+  }
 
   try {
-    // 🔄 PARALLEL DATA COLLECTION
-    const dataPromises = [
-      // Fetch website content (always)
-      axios.get(url, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; SnipeRankBot/1.0)" },
-        timeout: 15000
-      }).catch(e => ({ error: e.message }))
-    ];
+    // Initialize OpenAI inside try block
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // Add PageSpeed only if key exists
-    if (canUsePageSpeed) {
-      dataPromises.push(fetchPageSpeedData(url));
-    }
-
-    const [htmlResp, pageSpeedData] = await Promise.allSettled(dataPromises);
-
-    // Extract website content
+    // Fetch website content
     let contentData = {};
-    if (htmlResp.status === 'fulfilled' && !htmlResp.value.error) {
-      const $ = cheerio.load(htmlResp.value.data);
+    try {
+      const htmlResp = await axios.get(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; AIVIndexBot/1.0)" },
+        timeout: 15000
+      });
+
+      const $ = cheerio.load(htmlResp.data);
       contentData = {
         textContent: $("body").text().replace(/\s+/g, " ").trim(),
         pageTitle: $("title").text().trim(),
@@ -58,224 +45,85 @@ export default async function handler(req, res) {
         internalLinks: $("a[href^='/'], a[href*='" + new URL(url).hostname + "']").length,
         hasSchema: $("script[type='application/ld+json']").length > 0
       };
+    } catch (fetchError) {
+      console.error("Failed to fetch website:", fetchError.message);
+      return res.status(200).json(fallbackPayload(url, "fetch_failed"));
     }
 
-    // Extract performance data
-    let perfData = null;
-    if (canUsePageSpeed && pageSpeedData?.status === 'fulfilled') {
-      perfData = pageSpeedData.value;
-    }
+    // Build AI prompt
+    const analysisPrompt = buildEnhancedPrompt(url, contentData);
 
-    // 🧠 AI ANALYSIS (if OpenAI key exists)
+    // Call OpenAI
     let aiAnalysis = null;
-    if (canDoFullAnalysis) {
-      try {
-        const analysisPrompt = buildEnhancedPrompt(url, contentData, perfData);
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4-turbo",
-          temperature: 0.3,
-          max_tokens: 4000,
-          messages: [
-            { role: "system", content: "You are a data-driven AI SEO analyst. Use the provided metrics to generate specific, actionable recommendations." },
-            { role: "user", content: analysisPrompt }
-          ]
-        });
-
-        const raw = completion?.choices?.[0]?.message?.content?.trim() || "";
-        const jsonString = extractJSONObject(raw);
-        if (jsonString) {
-          aiAnalysis = JSON.parse(jsonString);
-        }
-      } catch (aiError) {
-        console.error("AI analysis failed:", aiError.message);
-        // Continue with fallback data
-      }
-    }
-
-    // If AI analysis succeeded, use it
-    if (aiAnalysis && Array.isArray(aiAnalysis.whatsWorking) && Array.isArray(aiAnalysis.needsAttention)) {
-      const score = calculateRealSEOScore(contentData, perfData, aiAnalysis);
-
-      return res.status(200).json({
-        success: true,
-        score,
-        whatsWorking: aiAnalysis.whatsWorking.slice(0, 10),
-        needsAttention: aiAnalysis.needsAttention.slice(0, 25),
-        engineInsights: aiAnalysis.engineInsights?.slice(0, 5) || [],
-        metrics: {
-          performance: perfData,
-          technical: {
-            imagesWithAlt: contentData.imagesWithAlt || 0,
-            totalImages: contentData.images || 0,
-            internalLinks: contentData.internalLinks || 0,
-            hasSchema: contentData.hasSchema || false,
-            metaDescription: !!contentData.metaDescription
-          }
-        },
-        meta: {
-          analyzedAt: new Date().toISOString(),
-          model: "gpt-4-turbo",
-          analysisDepth: "premium-with-ai",
-          url
-        }
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4-turbo",
+        temperature: 0.3,
+        max_tokens: 4000,
+        messages: [
+          { 
+            role: "system", 
+            content: "You are an expert AI SEO analyst. Return ONLY valid JSON with no markdown formatting."
+          },
+          { role: "user", content: analysisPrompt }
+        ]
       });
-    }
 
-    // Fallback: Return basic analysis based on technical audit
-    return res.status(200).json(buildBasicAnalysis(url, contentData, perfData, canDoFullAnalysis, canUsePageSpeed));
-
-  } catch (error) {
-    console.error("Analysis error:", error);
-    return res.status(200).json(fallbackPayload(url, String(error?.code || error?.message || "unknown")));
-  }
-}
-
-/* ---------- BASIC ANALYSIS (when AI not available) ---------- */
-function buildBasicAnalysis(url, contentData, perfData, hadOpenAI, hadPageSpeed) {
-  const whatsWorking = [];
-  const needsAttention = [];
-
-  // Analyze what we can without AI
-  if (contentData.hasSchema) {
-    whatsWorking.push("Structured data markup detected - helps AI engines understand your content");
-  }
-
-  if (contentData.metaDescription) {
-    whatsWorking.push("Meta description present - provides context for AI search results");
-  } else {
-    needsAttention.push("[PRIORITY: High] Missing Meta Description: Add descriptive meta tags. Impact: Better AI search visibility.");
-  }
-
-  const altCoverage = contentData.images > 0 
-    ? (contentData.imagesWithAlt / contentData.images) * 100 
-    : 100;
-
-  if (altCoverage > 80) {
-    whatsWorking.push(`Strong image accessibility - ${Math.round(altCoverage)}% of images have alt text`);
-  } else {
-    needsAttention.push(`[PRIORITY: Medium] Image Alt Text Coverage: Only ${Math.round(altCoverage)}% of images have alt text. Solution: Add descriptive alt text to all images. Impact: Improved AI content understanding.`);
-  }
-
-  if (perfData) {
-    if (perfData.performanceScore > 80) {
-      whatsWorking.push(`Strong performance score: ${Math.round(perfData.performanceScore)}/100`);
-    } else {
-      needsAttention.push(`[PRIORITY: High] Performance Score: Currently ${Math.round(perfData.performanceScore)}/100. Solution: Optimize images, reduce JavaScript, enable caching. Impact: Better AI crawler access.`);
-    }
-
-    if (perfData.seoScore > 90) {
-      whatsWorking.push(`Excellent technical SEO: ${Math.round(perfData.seoScore)}/100`);
-    }
-  }
-
-  // Add some generic AI optimization tips
-  if (whatsWorking.length < 5) {
-    whatsWorking.push("Site is accessible to AI crawlers");
-    whatsWorking.push("Basic HTML structure detected");
-  }
-
-  if (needsAttention.length < 15) {
-    needsAttention.push(
-      "[PRIORITY: Medium] Content Structure: Review heading hierarchy for AI clarity. Solution: Use semantic HTML with proper H1-H6 structure. Impact: Better content comprehension.",
-      "[PRIORITY: Medium] Internal Linking: Strengthen internal link structure. Solution: Add contextual links between related pages. Impact: Improved AI navigation.",
-      "[PRIORITY: Low] FAQ Schema: Consider adding FAQ schema markup. Solution: Implement JSON-LD FAQ structured data. Impact: Direct AI answer sourcing."
-    );
-  }
-
-  const engineInsights = [
-    "ChatGPT: Focuses on clear, structured content with proper headings",
-    "Claude: Values comprehensive, well-organized information",
-    "Gemini: Prioritizes technical SEO and page speed",
-    "Perplexity: Prefers sites with strong citation and authority signals",
-    "Copilot: Emphasizes accessibility and semantic HTML structure"
-  ];
-
-  const score = calculateBasicScore(contentData, perfData);
-
-  return {
-    success: true,
-    score,
-    whatsWorking,
-    needsAttention,
-    engineInsights,
-    metrics: {
-      performance: perfData,
-      technical: {
-        imagesWithAlt: contentData.imagesWithAlt || 0,
-        totalImages: contentData.images || 0,
-        hasSchema: contentData.hasSchema || false,
-        metaDescription: !!contentData.metaDescription
+      const raw = completion?.choices?.[0]?.message?.content?.trim() || "";
+      const jsonString = extractJSONObject(raw);
+      
+      if (jsonString) {
+        aiAnalysis = JSON.parse(jsonString);
+      } else {
+        console.error("Could not extract JSON from AI response");
       }
-    },
-    meta: {
-      analyzedAt: new Date().toISOString(),
-      analysisDepth: "basic-technical-audit",
-      url,
-      note: hadOpenAI ? "AI analysis failed, using technical audit" : "AI analysis requires OPENAI_API_KEY",
-      hadPageSpeed
+    } catch (aiError) {
+      console.error("AI analysis failed:", aiError.message);
+      return res.status(200).json(fallbackPayload(url, "ai_failed"));
     }
-  };
-}
 
-/* ---------- BASIC SCORING ---------- */
-function calculateBasicScore(contentData, perfData) {
-  let score = 50;
+    // Validate AI response
+    if (!aiAnalysis || !Array.isArray(aiAnalysis.needsAttention) || aiAnalysis.needsAttention.length < 10) {
+      console.error("AI returned invalid/incomplete data");
+      return res.status(200).json(fallbackPayload(url, "invalid_ai_response"));
+    }
 
-  if (contentData.metaDescription) score += 5;
-  if (contentData.hasSchema) score += 8;
+    // Calculate score
+    const score = calculateScore(contentData, aiAnalysis);
 
-  if (contentData.images > 0) {
-    const altCoverage = contentData.imagesWithAlt / contentData.images;
-    score += altCoverage * 10;
-  }
+    // Return successful response (NO whatsWorking - you want it deleted)
+    return res.status(200).json({
+      success: true,
+      score,
+      needsAttention: aiAnalysis.needsAttention.slice(0, 25),
+      engineInsights: aiAnalysis.engineInsights?.slice(0, 5) || [],
+      whatsWorking: [], // Empty array so frontend doesn't break
+      metrics: {
+        technical: {
+          imagesWithAlt: contentData.imagesWithAlt || 0,
+          totalImages: contentData.images || 0,
+          internalLinks: contentData.internalLinks || 0,
+          hasSchema: contentData.hasSchema || false,
+          metaDescription: !!contentData.metaDescription
+        }
+      },
+      meta: {
+        analyzedAt: new Date().toISOString(),
+        model: "gpt-4-turbo",
+        url
+      }
+    });
 
-  if (perfData) {
-    score += (perfData.performanceScore - 50) * 0.3;
-    score += (perfData.seoScore - 50) * 0.2;
-  }
-
-  return Math.max(20, Math.min(100, Math.round(score)));
-}
-
-/* ---------- PAGESPEED API INTEGRATION ---------- */
-async function fetchPageSpeedData(url) {
-  const apiKey = process.env.PAGESPEED_API_KEY;
-  if (!apiKey) return null;
-
-  const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${apiKey}&strategy=mobile&category=performance&category=seo`;
-
-  try {
-    const response = await axios.get(apiUrl, { timeout: 30000 });
-    const data = response.data;
-    const lighthouse = data.lighthouseResult;
-    const audits = lighthouse?.audits || {};
-    
-    return {
-      performanceScore: lighthouse?.categories?.performance?.score * 100 || 0,
-      seoScore: lighthouse?.categories?.seo?.score * 100 || 0,
-      lcp: audits['largest-contentful-paint']?.numericValue || 0,
-      cls: audits['cumulative-layout-shift']?.numericValue || 0,
-      missingAltText: audits['image-alt']?.score < 1,
-      httpStatus: audits['is-on-https']?.score === 1 ? 'https' : 'http'
-    };
   } catch (error) {
-    console.warn("PageSpeed API failed:", error.message);
-    return null;
+    console.error("Handler error:", error);
+    return res.status(200).json(fallbackPayload(url, error.message));
   }
 }
 
-/* ---------- ENHANCED PROMPT (only called if OpenAI available) ---------- */
-function buildEnhancedPrompt(url, contentData, perfData) {
-  const performanceSection = perfData ? `
-ACTUAL PERFORMANCE METRICS:
-- Performance Score: ${perfData.performanceScore}/100
-- SEO Score: ${perfData.seoScore}/100
-- Largest Contentful Paint: ${(perfData.lcp / 1000).toFixed(1)}s
-- Cumulative Layout Shift: ${perfData.cls.toFixed(3)}
-` : "";
-
+/* ---------- ENHANCED PROMPT ---------- */
+function buildEnhancedPrompt(url, contentData) {
   return `
-You are an expert AI SEO specialist analyzing this website:
+You are an expert AI SEO specialist analyzing this website for AI search engine optimization.
 
 URL: ${url}
 Title: ${contentData.pageTitle || 'Not found'}
@@ -286,53 +134,93 @@ TECHNICAL SEO:
 - Schema Markup: ${contentData.hasSchema ? 'Present' : 'MISSING'}
 - Internal Links: ${contentData.internalLinks || 0}
 
-${performanceSection}
-
 Sample Content: ${(contentData.textContent || '').slice(0, 6000)}
 
-Return ONLY JSON with these exact keys:
-- "whatsWorking": array of 10 specific strengths
-- "needsAttention": array of 25 items. Format: "[PRIORITY: High|Medium|Low] Title. Solution: Steps. Impact: Expected result."
-- "engineInsights": array of 5 items (ChatGPT, Claude, Gemini, Perplexity, Copilot specific advice)
+CRITICAL INSTRUCTIONS:
+1. Return ONLY valid JSON - NO markdown, NO code blocks, NO explanations
+2. Provide EXACTLY 25 items in "needsAttention" array
+3. Provide EXACTLY 5 items in "engineInsights" array
 
-Focus on actionable, specific insights with real metrics where available.
+JSON Structure:
+{
+  "needsAttention": [
+    "[PRIORITY: High] Issue title. Solution: Specific steps to fix. Impact: Expected measurable outcome.",
+    "[PRIORITY: High] Second issue...",
+    "[PRIORITY: High] Third issue...",
+    "[PRIORITY: High] Fourth issue...",
+    "[PRIORITY: High] Fifth issue...",
+    "[PRIORITY: Medium] Sixth issue...",
+    "[PRIORITY: Medium] Seventh issue...",
+    "[PRIORITY: Medium] Eighth issue...",
+    "[PRIORITY: Medium] Ninth issue...",
+    "[PRIORITY: Medium] Tenth issue...",
+    "[PRIORITY: Medium] Eleventh issue...",
+    "[PRIORITY: Medium] Twelfth issue...",
+    "[PRIORITY: Medium] Thirteenth issue...",
+    "[PRIORITY: Medium] Fourteenth issue...",
+    "[PRIORITY: Medium] Fifteenth issue...",
+    "[PRIORITY: Medium] Sixteenth issue...",
+    "[PRIORITY: Low] Seventeenth issue...",
+    "[PRIORITY: Low] Eighteenth issue...",
+    "[PRIORITY: Low] Nineteenth issue...",
+    "[PRIORITY: Low] Twentieth issue...",
+    "[PRIORITY: Low] Twenty-first issue...",
+    "[PRIORITY: Low] Twenty-second issue...",
+    "[PRIORITY: Low] Twenty-third issue...",
+    "[PRIORITY: Low] Twenty-fourth issue...",
+    "[PRIORITY: Low] Twenty-fifth issue..."
+  ],
+  "engineInsights": [
+    "ChatGPT: Specific optimization strategy",
+    "Claude: Specific optimization strategy",
+    "Gemini: Specific optimization strategy",
+    "Perplexity: Specific optimization strategy",
+    "Copilot: Specific optimization strategy"
+  ]
+}
+
+PRIORITY DISTRIBUTION:
+- High: 5-7 critical issues
+- Medium: 10-12 important improvements  
+- Low: 8-10 incremental enhancements
+
+Focus on AI-specific optimizations, not generic SEO advice. Be specific and actionable.
+
+COUNT YOUR ITEMS - YOU MUST HAVE EXACTLY 25 IN needsAttention ARRAY!
 `.trim();
 }
 
-/* ---------- REAL SEO SCORING ---------- */
-function calculateRealSEOScore(contentData, perfData, aiAnalysis) {
-  let score = 50;
-  
-  if (perfData) {
-    score += (perfData.performanceScore - 50) * 0.4;
-    score += (perfData.seoScore - 50) * 0.3;
-    if (perfData.lcp < 2500) score += 5;
-    else if (perfData.lcp > 4000) score -= 8;
-    if (perfData.cls < 0.1) score += 3;
-    else if (perfData.cls > 0.25) score -= 5;
-  }
-  
-  if (contentData.metaDescription) score += 3;
-  if (contentData.hasSchema) score += 5;
-  
+/* ---------- SCORE CALCULATION ---------- */
+function calculateScore(contentData, aiAnalysis) {
+  let score = 55; // Base score
+
+  // Technical factors
+  if (contentData.metaDescription) score += 5;
+  if (contentData.hasSchema) score += 8;
+
+  // Image optimization
   if (contentData.images > 0) {
-    const altCoverage = (contentData.imagesWithAlt / contentData.images);
+    const altCoverage = contentData.imagesWithAlt / contentData.images;
     score += altCoverage * 10;
   }
-  
-  const strengths = aiAnalysis.whatsWorking?.length || 0;
+
+  // Internal linking
+  if (contentData.internalLinks > 10) score += 5;
+
+  // AI analysis impact
   const issues = aiAnalysis.needsAttention?.length || 0;
-  score += Math.min(strengths * 2, 10);
-  score -= Math.min(issues * 0.5, 15);
-  
+  score -= Math.min(issues * 0.8, 20); // Penalty for issues found
+
   return Math.max(20, Math.min(100, Math.round(score)));
 }
 
 /* ---------- HELPER FUNCTIONS ---------- */
 function extractJSONObject(text) {
-  const fenced = text.match(/```json\s*([\s\S]*?)\s*```/i);
+  // Remove markdown code blocks if present
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
   if (fenced) return fenced[1].trim();
 
+  // Find JSON object
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start !== -1 && end !== -1 && end > start) {
@@ -345,21 +233,23 @@ function fallbackPayload(url, reason = "fallback") {
   return {
     success: false,
     score: 50,
-    whatsWorking: [
-      "Your website is accessible and loads successfully",
-      "HTTPS appears active - baseline security for AI crawlers"
-    ],
     needsAttention: [
-      "[PRIORITY: High] Complete Analysis Required: Unable to perform full AI analysis. Solution: Verify API configuration and retry. Impact: Full visibility assessment.",
-      "[PRIORITY: Medium] Technical Review Needed: Basic factors require manual verification. Solution: Check meta tags, schema, and performance. Impact: Better AI understanding."
+      "[PRIORITY: High] Analysis Unavailable: Unable to complete AI analysis. Solution: Verify API configuration and site accessibility. Impact: Full visibility assessment needed.",
+      "[PRIORITY: High] Missing Schema Markup: Implement structured data for better AI understanding. Solution: Add JSON-LD schema. Impact: Improved content interpretation.",
+      "[PRIORITY: Medium] Technical Audit Required: Basic SEO factors need verification. Solution: Manual review of meta tags and structure. Impact: Better baseline.",
+      "[PRIORITY: Medium] Content Structure: Review heading hierarchy. Solution: Use semantic HTML. Impact: Improved comprehension.",
+      "[PRIORITY: Medium] Internal Linking: Strengthen site structure. Solution: Add contextual links. Impact: Better navigation.",
+      "[PRIORITY: Low] Performance Review: Check page speed. Solution: Optimize images and scripts. Impact: Faster load times.",
+      "[PRIORITY: Low] Mobile Optimization: Ensure responsive design. Solution: Test on mobile devices. Impact: Better mobile experience."
     ],
     engineInsights: [
-      "ChatGPT: Ensure clear content structure and proper headings",
+      "ChatGPT: Ensure clear content structure with proper headings",
       "Claude: Focus on comprehensive, well-organized information",
       "Gemini: Optimize technical SEO and page performance",
-      "Perplexity: Build authority through citations and quality content",
-      "Copilot: Implement semantic HTML and accessibility features"
+      "Perplexity: Build authority through quality citations",
+      "Copilot: Implement semantic HTML and accessibility"
     ],
-    meta: { url, mode: "fallback", reason, requiresRetry: true }
+    whatsWorking: [],
+    meta: { url, mode: "fallback", reason }
   };
 }
