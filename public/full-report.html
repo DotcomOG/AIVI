@@ -1,13 +1,21 @@
 <!DOCTYPE html>
+<!--
+  full-report.html
+  Version: v2026.01.12-2
+  Last updated: 2026-01-12 (America/New_York)
+
+  CHANGES (only):
+  1) Renamed all SnipeRank references to AIVindex™ (UI copy, title, footer, share text).
+  2) Fixed rendering so Opportunities + What’s Working lists always populate as full lists (no single placeholder item).
+     - Also splits “one big string” responses into multiple items when the API returns newline/bullet-delimited content.
+  3) Unified loading experience with analyze.html (Option A: indeterminate overlay; no % hang).
+  4) Kept same-origin-first fetch; reliable Render fallback for /api/full.
+-->
 <html lang="en">
 <head>
-  <!-- full-report.html -->
-  <!-- Version: v2026.01.12-1 -->
-  <!-- Last updated: 2026-01-12 (America/New_York) -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnipeRank - Full AI SEO Analysis</title>
+  <title>AIVindex™ - Full AI Visibility Report</title>
   <style>
     :root{
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
@@ -47,68 +55,77 @@
     .pillar .label{font-weight:600}
     .badge{font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem;background:#fafafa}
 
-    .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.95rem;font-weight:600;text-align:center}
+    .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.95rem;font-weight:700;text-align:center}
 
     .report-section{margin:3rem 1.5rem}
-    .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.5rem;color:#111}
-    .section-subtitle{font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem;color:#111}
+    .section-title{font-size:1.4rem;font-weight:800;margin:0 0 1.5rem;color:#111}
+    .section-subtitle{font-size:1.2rem;font-weight:800;margin:2.5rem 0 1rem;color:#111}
 
     .opportunity-item, .working-item{
-      margin:2rem 0;
+      margin:1rem 0;
       padding:1.5rem;
       border:1px solid #f0f0f0;
       border-radius:8px;
       background:#fafafa;
     }
-    .opportunity-item:last-child, .working-item:last-child{margin-bottom:2rem}
 
     .priority-high{background:#fef2f2;border-left:4px solid #dc3545}
     .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
     .priority-low{background:#f0fdf4;border-left:4px solid #10b981}
 
     .opportunity-list, .working-list{list-style:none;padding:0;margin:0}
-    .opportunity-item::before{content:"";margin-right:0}
-    .working-item::before{content:"";margin-right:0}
     .item-text{font-size:1.05rem;line-height:1.6;margin:0}
 
-    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
-    .fix-callout strong{color:#111;font-weight:600}
-    .fix-title{font-weight:600;color:#495057;margin-bottom:.25rem}
+    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:1rem 0 0;font-size:.95rem;line-height:1.5}
+    .fix-callout strong{color:#111;font-weight:700}
+    .fix-title{font-weight:800;color:#495057;margin-bottom:.25rem}
 
-    .address-callout{background:#e8f4fd;border:1px solid #b8daff;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
-    .address-title{font-weight:600;color:#0056b3;margin-bottom:.25rem}
+    .address-callout{background:#e8f4fd;border:1px solid #b8daff;border-radius:8px;padding:.75rem 1rem;margin:1rem 0 0;font-size:.95rem;line-height:1.5}
+    .address-title{font-weight:800;color:#0056b3;margin-bottom:.25rem}
 
     .ai-insights{margin:1.5rem 0}
-    .ai-row{display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;align-items:start;padding:1.5rem 0;border-bottom:1px dashed var(--border);margin:0 1rem}
+    .ai-row{display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;align-items:start;padding:1.25rem 0;border-bottom:1px dashed var(--border);margin:0 1rem}
     .ai-row:last-child{border-bottom:0}
     .ai-logo{display:flex;align-items:center;justify-content:center;min-width:120px;height:40px;padding:.5rem}
     .ai-logo img{height:32px;width:auto;max-width:140px;display:block;object-fit:contain;margin:0 auto}
-    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
+    .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:700;color:#333;background:#f8f9fa}
     .ai-text{font-size:1.05rem;line-height:1.6;color:#333}
 
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
-    .progress-pct{color:#666;font-size:16px;font-weight:600}
-    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+    /* Option A overlay (unified with analyze.html) */
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-title{font-weight:900;font-size:18px;margin:0 0 10px;color:#111}
+    .progress-sub{color:#555;font-size:14px;line-height:1.45;margin:0 0 14px}
+    .progress-stage{color:#666;font-size:14px;line-height:1.45;margin:0}
+    .spinner-wrap{display:flex;gap:14px;align-items:center;margin:10px 0 8px}
+    .spinner{
+      width:42px;height:42px;border-radius:50%;
+      border:4px solid #e9eef7;
+      border-top-color:#3182CE;
+      animation:spin 0.95s linear infinite;
+      flex:0 0 auto;
+    }
+    .spinner-meta{display:flex;flex-direction:column;gap:2px}
+    .spinner-label{font-weight:900;color:#111;font-size:14px}
+    .spinner-hint{color:#666;font-size:13px;line-height:1.35}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
     .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .modal-title{font-size:20px;font-weight:700;margin:0}
+    .modal-title{font-size:20px;font-weight:800;margin:0}
     .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer;padding:4px;color:#666}
     .modal-close:hover{color:#000}
     .modal-content{line-height:1.6}
     .modal-content p{margin:12px 0;color:#333}
     .modal-content strong{color:#111}
 
+    /* Footer */
     footer{
       margin-top:3rem;
       border-top:1px solid var(--border);
       background:var(--bg-soft);
+      width:100%;
     }
     .footer-inner{
       max-width:var(--max-width);
@@ -164,26 +181,27 @@
       margin:0 auto;
       color:var(--muted-2);
       font-size:.85rem;
-      font-weight:700;
+      font-weight:800;
       line-height:1.6;
     }
 
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
+      .report-section{margin:2.25rem 0.5rem}
     }
   </style>
 </head>
 <body>
-  <h1>SnipeRank</h1>
-  <h2>Full AI SEO Analysis</h2>
+  <h1>AIVindex™</h1>
+  <h2>Full AI Visibility Report</h2>
 
   <div class="info-row">
-    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">quontora</a></div>
+    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
   </div>
 
   <div class="lite-banner" id="lite-banner" style="display:none">
-    🔄 Lite Analysis Mode - Some advanced features may be limited
+    Lite Analysis Mode — some advanced signals may be limited.
   </div>
 
   <section class="card score-card" id="scoreCard" aria-live="polite">
@@ -203,113 +221,52 @@
   <!-- Comprehensive Opportunities Section -->
   <section class="report-section">
     <h3 class="section-title">Comprehensive Opportunities</h3>
-    <p>These are specific, actionable improvements that will enhance your site's visibility to AI models and large language models. Each item is prioritized by impact and includes implementation guidance. High-priority items offer the greatest immediate benefit, while medium and low-priority optimizations provide incremental gains that compound over time.</p>
+    <p>Specific, actionable improvements that enhance how AI systems interpret, trust, and represent your website. Items are grouped by urgency.</p>
 
     <h4 class="section-subtitle">Critical Priorities</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">These high-impact optimizations provide immediate benefits for AI visibility and should be implemented first.</p>
-    <ul class="opportunity-list" id="opportunitiesCritical">
-      <li class="opportunity-item priority-high">
-        <p class="item-text"><strong>Missing Article Schema Markup</strong> - Your content lacks structured data that helps LLMs understand article context, publication date, and author credentials. <em>Impact: 25-40% improvement in AI citation probability</em></p>
-        <div class="fix-callout">
-          <div class="fix-title">How to fix (Est. 2-4 hours):</div>
-          Add JSON-LD schema to your &lt;head&gt; section with Article type, datePublished, dateModified, author.name, and publisher properties. Use Google's Structured Data Testing Tool to validate implementation. Template available for immediate deployment.
-        </div>
-      </li>
-    </ul>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.25rem;">High-impact changes that should be addressed first.</p>
+    <ul class="opportunity-list" id="opportunitiesCritical"></ul>
 
     <h4 class="section-subtitle">Strategic Improvements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">These optimizations require more planning but provide significant long-term value for AI model understanding.</p>
-    <ul class="opportunity-list" id="opportunitiesStrategic">
-      <li class="opportunity-item priority-medium">
-        <p class="item-text"><strong>Weak E-A-T Signal Implementation</strong> - Limited author information and credential display reduces content authority signals for LLMs. <em>Impact: 30-50% improvement in content trustworthiness assessment</em></p>
-        <div class="fix-callout">
-          <div class="fix-title">How to fix (Est. 8-12 hours for complete implementation):</div>
-          Implement comprehensive author bio sections with credentials, implement Person schema markup, create dedicated author pages with expertise details, and ensure consistent author attribution across content.
-        </div>
-      </li>
-    </ul>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.25rem;">Meaningful improvements that require more coordination.</p>
+    <ul class="opportunity-list" id="opportunitiesStrategic"></ul>
 
     <h4 class="section-subtitle">Incremental Enhancements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">These smaller optimizations provide incremental gains and can be implemented when resources allow.</p>
-    <ul class="opportunity-list" id="opportunitiesIncremental">
-      <li class="opportunity-item priority-low">
-        <p class="item-text"><strong>Missing Image Alt Text Optimization</strong> - Images lack descriptive alt attributes that provide context for AI content analysis. <em>Impact: Improved accessibility and content comprehension</em></p>
-        <div class="fix-callout">
-          <div class="fix-title">How to fix (Est. 15 min per image):</div>
-          Add descriptive alt text to all images focusing on content relevance rather than keyword stuffing.
-        </div>
-      </li>
-    </ul>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.25rem;">Smaller optimizations that compound over time.</p>
+    <ul class="opportunity-list" id="opportunitiesIncremental"></ul>
   </section>
 
   <!-- What's Working Section -->
   <section class="report-section">
     <h3 class="section-title">What's Working</h3>
-    <p>These are the current strengths in your AI visibility strategy that are already supporting your site's discoverability by large language models. Maintaining and building upon these foundations will preserve your competitive advantages while you implement the optimization opportunities above.</p>
+    <p>Strengths already supporting discoverability and interpretability across major AI systems.</p>
 
-    <ul class="working-list" id="workingList">
-      <li class="working-item">
-        <p class="item-text"><strong>HTTPS Implementation</strong> - Site properly implements SSL/TLS encryption, meeting AI model security requirements for content indexing and trust assessment.</p>
-        <div class="address-callout">
-          <div class="address-title">How to enhance:</div>
-          Implement HSTS headers (max-age=31536000), upgrade to TLS 1.3 if available, and add Content Security Policy headers for enhanced security posture.
-        </div>
-      </li>
-    </ul>
+    <ul class="working-list" id="workingList"></ul>
   </section>
 
   <!-- AI Engine Insights Section -->
   <section class="report-section">
     <h3 class="section-title">AI Engine Insights</h3>
-    <div class="ai-insights" id="aiInsights">
-      <div class="ai-row">
-        <div class="ai-logo">
-          <img src="/img/chatgpt-logo.png" alt="ChatGPT" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>ChatGPT</span>'">
-        </div>
-        <div class="ai-text">Your content structure aligns well with GPT-4's preference for hierarchical information presentation. Consider implementing more conversational Q&amp;A sections to match natural language query patterns.</div>
-      </div>
-
-      <div class="ai-row">
-        <div class="ai-logo">
-          <img src="/img/claude.jpeg" alt="Claude" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>Claude</span>'">
-        </div>
-        <div class="ai-text">Claude responds well to detailed, context-rich content. Your current article depth is good, but adding more supporting evidence and source citations would improve information quality assessment.</div>
-      </div>
-
-      <div class="ai-row">
-        <div class="ai-logo">
-          <img src="/img/gemini.jpeg" alt="Gemini" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>Gemini</span>'">
-        </div>
-        <div class="ai-text">Gemini values multimodal content signals. Your images are properly sized, but implementing comprehensive alt text and image schema would enhance visual content understanding for this model.</div>
-      </div>
-
-      <div class="ai-row">
-        <div class="ai-logo">
-          <img src="/img/perplexity-logo.png" alt="Perplexity" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>Perplexity</span>'">
-        </div>
-        <div class="ai-text">Perplexity prioritizes factual accuracy and source verification. Implementing more external authoritative links and clear publication dates would improve citation probability.</div>
-      </div>
-
-      <div class="ai-row">
-        <div class="ai-logo">
-          <img src="/img/copilot.jpeg" alt="Copilot" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>Copilot</span>'">
-        </div>
-        <div class="ai-text">Microsoft Copilot values structured data and clear information hierarchy. Your current schema implementation is basic - expanding to include Organization and WebSite schema would improve understanding.</div>
-      </div>
-    </div>
+    <div class="ai-insights" id="aiInsights"></div>
   </section>
 
-  <!-- Progress Overlay -->
-  <div class="overlay" id="progress-overlay">
+  <!-- Option A Progress Overlay -->
+  <div class="overlay" id="progress-overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
-      <div class="progress-header">
-        <span class="progress-title">Generating Comprehensive Analysis</span>
-        <span class="progress-pct" id="progress-pct">0%</span>
+      <div class="progress-title" id="progress-title">Generating your full report</div>
+
+      <div class="spinner-wrap">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="spinner-meta">
+          <div class="spinner-label" id="spinner-label">Processing results…</div>
+          <div class="spinner-hint" id="spinner-hint">This can take a few minutes on large sites.</div>
+        </div>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div class="progress-eta">Analyzing AI accessibility patterns, content structure, and optimization opportunities...</div>
+
+      <p class="progress-sub" id="progress-sub">
+        We’re scanning the site and compiling your full report. Large sites can take <strong>up to 5 minutes</strong>.
+      </p>
+      <p class="progress-stage" id="progress-stage">Starting analysis…</p>
     </div>
   </div>
 
@@ -322,16 +279,16 @@
       </div>
       <div class="modal-content">
         <p><strong>AI Access Readiness (25 points)</strong><br>
-        Measures how easily AI models can discover, crawl, and access your content. Includes technical factors like site speed, mobile optimization, and crawlability.</p>
+        How easily AI systems can discover, crawl, and understand your site structure.</p>
 
         <p><strong>Trust &amp; Verification Signals (25 points)</strong><br>
-        Evaluates authority indicators that AI models use to assess content credibility. Includes author credentials, source citations, and domain authority signals.</p>
+        Authority indicators, security implementation, and credibility markers AI engines prioritize.</p>
 
         <p><strong>LLM Interpretability &amp; Clarity (25 points)</strong><br>
-        Assesses how well AI models can understand and parse your content structure. Includes heading hierarchy, schema markup, and content organization.</p>
+        Content organization, semantic markup, and clarity for language models.</p>
 
         <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>
-        Measures how well your content matches common AI query patterns and user intent. Includes FAQ formats, natural language optimization, and query-answer alignment.</p>
+        How well your content matches common query patterns and question-based discovery.</p>
       </div>
     </div>
   </div>
@@ -340,12 +297,12 @@
   <footer>
     <div class="footer-inner">
       <div class="foot-brand">
-        <h3>SnipeRank — Full AI Visibility Report</h3>
+        <h3>AIVindex™ — Full AI Visibility Report</h3>
         <p>
-          Powered by AIVI™, SnipeRank provides comprehensive AI visibility analysis with actionable recommendations for optimizing your presence across AI platforms.
+          Powered by AIVindex™, this report summarizes how AI systems interpret, trust, and represent your website — with prioritized actions to improve visibility.
         </p>
         <div class="disclaimer">
-          AIVI™ is a diagnostic index. Results are directional and may vary by model, query, and crawl conditions.
+          Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.
         </div>
       </div>
 
@@ -353,7 +310,7 @@
         <h4>Product</h4>
         <ul class="foot-links">
           <li><a href="index.html#analyze">Free Analysis</a></li>
-          <li><a href="index.html#how-it-works">How AIVI works</a></li>
+          <li><a href="index.html#how-it-works">How it works</a></li>
         </ul>
       </div>
 
@@ -361,19 +318,27 @@
         <h4>Company</h4>
         <ul class="foot-links">
           <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-          <li><a href="mailto:hello@quontora.com?subject=SnipeRank%20Question">Contact</a></li>
+          <li><a href="mailto:hello@quontora.com?subject=AIVindex%20Question">Contact</a></li>
         </ul>
       </div>
     </div>
 
     <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> SnipeRank by Quontora. Powered by AIVI™. All rights reserved.</div>
+      <div>© <span id="footer-year"></span> AIVindex™ by Quontora. All rights reserved.</div>
     </div>
   </footer>
 
   <script>
     // Footer year
     document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+    const ENGINE_LOGOS = {
+      ChatGPT: '/img/chatgpt-logo.png',
+      Claude: '/img/claude.jpeg',
+      Gemini: '/img/gemini.jpeg',
+      Perplexity: '/img/perplexity-logo.png',
+      Copilot: '/img/copilot.jpeg'
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -397,43 +362,87 @@
     const targetUrl = urlFromQuery || sessionStorage.getItem('sniperank:lastUrl') || '';
     if (targetUrl) sessionStorage.setItem('sniperank:lastUrl', targetUrl);
 
-    const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
+    function extractDomain(u){
+      if (!u) return '';
+      try {
+        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
+        const { hostname } = new URL(withProto);
+        return hostname.replace(/^www\./i,'').toLowerCase();
+      } catch {
+        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
+        return (m ? m[1] : '').replace(/^www\./i,'').toLowerCase();
+      }
+    }
 
-    function renderScoreCardFromScoreApi(j){
-      const total = typeof j.score === 'number' ? j.score : 0;
-      const pillars = j.pillars || {};
-      const scoreNum = document.getElementById('scoreNumber');
-      const scoreBand = document.getElementById('scoreBand');
-      const pillarsGrid = document.getElementById('pillarsGrid');
-
-      scoreNum.textContent = `${Math.round(total)}/100`;
-
-      const band =
-        total >= 90 ? 'Rank: Excellent ★★★★★' :
-        total >= 80 ? 'Rank: Very Good ★★★★☆' :
-        total >= 70 ? 'Rank: Good ★★★☆☆' :
-        total >= 60 ? 'Rank: Fair ★★☆☆☆' :
-        'Rank: Needs Work ★☆☆☆☆';
-
-      scoreBand.textContent = band;
-
-      const rows = [
-        ['AI Access Readiness', pillars.access],
-        ['Trust & Verification Signals', pillars.trust],
-        ['LLM Interpretability & Clarity', pillars.clarity],
-        ['Prompt-Pattern Alignment', pillars.alignment],
+    function isLikelyLargeSite(domain){
+      if (!domain) return false;
+      const big = [
+        'cnn.com','nytimes.com','washingtonpost.com','bbc.co.uk','bbc.com','reuters.com',
+        'bankofamerica.com','chase.com','wellsfargo.com','citi.com',
+        'amazon.com','walmart.com','apple.com','microsoft.com','google.com'
       ];
+      if (big.includes(domain)) return true;
+      if (domain.endsWith('.gov') || domain.endsWith('.edu')) return true;
+      return false;
+    }
 
-      pillarsGrid.innerHTML = rows.map(([label, val]) => `
-        <div class="pillar">
-          <span class="label">${label}</span>
-          <span class="badge">${(typeof val === 'number' ? val : 0)}/25</span>
-        </div>
-      `).join('');
+    function showOverlay(){
+      document.getElementById('progress-overlay').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function hideOverlay(){
+      document.getElementById('progress-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function startOverlayMessaging(domain){
+      const stageEl = document.getElementById('progress-stage');
+      const spinnerLabel = document.getElementById('spinner-label');
+      const spinnerHint = document.getElementById('spinner-hint');
+      const sub = document.getElementById('progress-sub');
+
+      if (domain) {
+        document.getElementById('progress-title').textContent = `Generating report for ${domain}`;
+      }
+
+      if (isLikelyLargeSite(domain)) {
+        sub.innerHTML = `We’re scanning <strong>${domain}</strong> and compiling your full report. Large sites can take <strong>up to 5 minutes</strong>.`;
+        spinnerHint.textContent = "Large sites can take up to 5 minutes.";
+      } else {
+        sub.innerHTML = `We’re scanning the site and compiling your full report. This can take <strong>2 minutes or more</strong>.`;
+        spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
+      }
+
+      const start = Date.now();
+      const interval = setInterval(() => {
+        const s = Math.floor((Date.now() - start) / 1000);
+
+        if (s < 8) {
+          stageEl.textContent = "Fetching and parsing the website…";
+          spinnerLabel.textContent = "Processing results…";
+        } else if (s < 20) {
+          stageEl.textContent = "Extracting structure and crawl signals…";
+          spinnerLabel.textContent = "Analyzing site signals…";
+        } else if (s < 45) {
+          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
+          spinnerLabel.textContent = "Scoring and summarizing…";
+        } else if (s < 90) {
+          stageEl.textContent = "Generating your full report…";
+          spinnerLabel.textContent = "Finalizing report…";
+        } else if (s < 180) {
+          stageEl.textContent = "Still working — this site is taking longer than typical.";
+          spinnerLabel.textContent = "Still analyzing…";
+        } else {
+          stageEl.textContent = "Still working. Some sites rate-limit or respond slowly.";
+          spinnerLabel.textContent = "Still analyzing…";
+        }
+      }, 800);
+
+      return () => clearInterval(interval);
     }
 
     async function fetchWithTimeout(url, opts = {}) {
-      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
+      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 120000;
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -443,34 +452,191 @@
       }
     }
 
-    function startProgress() {
-      document.getElementById('progress-overlay').style.display = 'flex';
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
+    function safeText(s){ return String(s || '').trim(); }
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 3;
-        if (progress >= 95) {
-          progress = 95;
-          clearInterval(interval);
+    function normalizeStringList(input){
+      // Accepts arrays OR single strings that contain multiple bullets/lines.
+      if (!input) return [];
+      const arr = Array.isArray(input) ? input : [String(input)];
+      const out = [];
+      arr.forEach(item => {
+        const raw = String(item || '').replace(/\r/g,'').trim();
+        if (!raw) return;
+
+        const pieces = raw
+          .split(/\n+|•/g)
+          .map(x => x.trim())
+          .filter(Boolean);
+
+        if (pieces.length > 1) {
+          pieces.forEach(p => out.push(p));
+        } else {
+          out.push(raw);
         }
-        progressFill.style.width = progress + '%';
-        progressPct.textContent = Math.round(progress) + '%';
-      }, 150);
+      });
 
-      return interval;
+      // De-dupe while preserving order
+      const seen = new Set();
+      return out.filter(x => {
+        const k = x.toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
     }
 
-    function stopProgress() {
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
-      progressFill.style.width = '100%';
-      progressPct.textContent = '100%';
-      setTimeout(() => {
-        document.getElementById('progress-overlay').style.display = 'none';
-      }, 800);
+    function classifyPriority(issueRaw){
+      const s = String(issueRaw || '');
+      if (/\[PRIORITY:\s*High\]/i.test(s)) return 'priority-high';
+      if (/\[PRIORITY:\s*Medium\]/i.test(s)) return 'priority-medium';
+      if (/\[PRIORITY:\s*Low\]/i.test(s)) return 'priority-low';
+
+      // Heuristic fallback
+      if (/critical|must|blocking|severe|missing\s+(schema|structured|robots|sitemap)|no\s+index|not\s+accessible/i.test(s)) return 'priority-high';
+      if (/limited|weak|inconsistent|improve|add|expand/i.test(s)) return 'priority-medium';
+      return 'priority-low';
+    }
+
+    function stripPriorityTag(s){
+      return String(s || '').replace(/\[PRIORITY:\s*[^\]]+\]/ig,'').trim();
+    }
+
+    function renderScoreCard(score, pillars){
+      const total = Number(score);
+      const s = Number.isFinite(total) ? Math.round(total) : null;
+
+      document.getElementById("scoreNumber").textContent = (s === null ? "-" : `${s}/100`);
+      document.getElementById("scoreBand").textContent =
+        (s === null) ? "Unable to calculate score" :
+        s >= 70 ? "Rank: Highly Visible ★★★★☆" :
+        s >= 55 ? "Rank: Partially Visible ★★★☆☆" :
+        s >= 40 ? "Rank: Needs Work ★★☆☆☆" :
+        "Rank: Low Visibility ★☆☆☆☆";
+
+      const grid = document.getElementById("pillarsGrid");
+      grid.innerHTML = "";
+
+      const p = pillars || {};
+      const items = [
+        ["AI Access Readiness", Number(p.access)],
+        ["Trust & Verification Signals", Number(p.trust)],
+        ["LLM Interpretability & Clarity", Number(p.clarity)],
+        ["Prompt-Pattern Alignment", Number(p.alignment)]
+      ];
+
+      items.forEach(([label, val]) => {
+        const v = Number.isFinite(val) ? Math.round(val) : 0;
+        const d = document.createElement("div");
+        d.className = "pillar";
+        d.innerHTML = `<span class="label">${label}</span><span class="badge">${v}/25</span>`;
+        grid.appendChild(d);
+      });
+    }
+
+    function renderOpportunities(needsAttention){
+      const criticalEl = document.getElementById('opportunitiesCritical');
+      const strategicEl = document.getElementById('opportunitiesStrategic');
+      const incrementalEl = document.getElementById('opportunitiesIncremental');
+
+      criticalEl.innerHTML = "";
+      strategicEl.innerHTML = "";
+      incrementalEl.innerHTML = "";
+
+      const items = normalizeStringList(needsAttention);
+
+      if (!items.length) {
+        criticalEl.innerHTML = `<li class="opportunity-item priority-low"><p class="item-text">No opportunities were returned for this scan.</p></li>`;
+        strategicEl.innerHTML = `<li class="opportunity-item priority-low"><p class="item-text">—</p></li>`;
+        incrementalEl.innerHTML = `<li class="opportunity-item priority-low"><p class="item-text">—</p></li>`;
+        return;
+      }
+
+      const critical = [];
+      const strategic = [];
+      const incremental = [];
+
+      items.forEach(item => {
+        const parts = String(item).split(/How to fix:/i);
+        const issueRaw = safeText(parts[0]);
+        const fix = parts[1] ? safeText(parts.slice(1).join('How to fix:')) : "";
+
+        const priority = classifyPriority(issueRaw);
+        const issue = stripPriorityTag(issueRaw);
+
+        const html = `
+          <li class="opportunity-item ${priority}">
+            <p class="item-text">${issue}</p>
+            ${fix ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${fix}</div>` : ''}
+          </li>
+        `;
+
+        if (priority === 'priority-high') critical.push(html);
+        else if (priority === 'priority-medium') strategic.push(html);
+        else incremental.push(html);
+      });
+
+      criticalEl.innerHTML = critical.length
+        ? critical.join('')
+        : `<li class="opportunity-item priority-low"><p class="item-text">No critical priorities detected in this scan.</p></li>`;
+
+      strategicEl.innerHTML = strategic.length
+        ? strategic.join('')
+        : `<li class="opportunity-item priority-low"><p class="item-text">No strategic improvements detected in this scan.</p></li>`;
+
+      incrementalEl.innerHTML = incremental.length
+        ? incremental.join('')
+        : `<li class="opportunity-item priority-low"><p class="item-text">No incremental enhancements detected in this scan.</p></li>`;
+    }
+
+    function renderWhatsWorking(whatsWorking){
+      const workingEl = document.getElementById('workingList');
+      workingEl.innerHTML = "";
+
+      const items = normalizeStringList(whatsWorking);
+
+      if (!items.length) {
+        workingEl.innerHTML = `<li class="working-item"><p class="item-text">No strengths were returned for this scan.</p></li>`;
+        return;
+      }
+
+      workingEl.innerHTML = items.map(item => `
+        <li class="working-item">
+          <p class="item-text">${item}</p>
+        </li>
+      `).join('');
+    }
+
+    function renderEngineInsights(engineInsights){
+      const aiInsights = document.getElementById('aiInsights');
+      aiInsights.innerHTML = "";
+
+      const items = normalizeStringList(engineInsights);
+
+      if (!items.length) {
+        aiInsights.innerHTML = `<div class="ai-row"><div class="ai-logo"><span class="ai-fallback">AI</span></div><div class="ai-text">No engine insights were returned for this scan.</div></div>`;
+        return;
+      }
+
+      aiInsights.innerHTML = items.map(insight => {
+        const raw = String(insight);
+        const parts = raw.split(':');
+        const engine = safeText(parts[0]) || 'AI';
+        const text = safeText(parts.slice(1).join(':')) || raw;
+
+        const logoPath = ENGINE_LOGOS[engine] || '';
+
+        return `
+          <div class="ai-row">
+            <div class="ai-logo">
+              ${logoPath
+                ? `<img src="${logoPath}" alt="${engine}" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>${engine}</span>'">`
+                : `<span class="ai-fallback">${engine}</span>`
+              }
+            </div>
+            <div class="ai-text">${text}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
@@ -497,42 +663,34 @@
         ...document.querySelectorAll('#opportunitiesCritical .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesStrategic .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesIncremental .opportunity-item .item-text')
-      ].slice(0, 12).map(el => {
-        const text = el.textContent.trim();
-        const mainText = text.split('Impact:')[0].trim();
-        const fixCallout = el.parentNode.querySelector('.fix-callout');
-        const fix = fixCallout ? fixCallout.textContent.replace(/How to fix.*?:/, '').trim() : '';
-        return fix ? `${mainText.split(' - ')[0]} - ${fix.split('.')[0]}.` : mainText;
-      });
+      ].slice(0, 12).map(el => el.textContent.trim());
 
-      const workingStrengths = [...document.querySelectorAll('.working-item .item-text')].slice(0, 8).map(el => {
-        const text = el.textContent.trim();
-        return text.split(' - ')[0];
-      });
+      const workingStrengths = [...document.querySelectorAll('#workingList .working-item .item-text')]
+        .slice(0, 10).map(el => el.textContent.trim());
 
-      const aiInsights = [...document.querySelectorAll('.ai-row .ai-text')].map(el => {
-        const logoImg = el.parentNode.querySelector('.ai-logo img');
-        const engine = logoImg ? logoImg.alt : 'AI Engine';
+      const aiInsights = [...document.querySelectorAll('.ai-row .ai-text')].slice(0, 10).map(el => {
+        const engineEl = el.parentNode.querySelector('.ai-logo img');
+        const engine = engineEl ? engineEl.alt : 'AI';
         return `${engine}: ${el.textContent.trim()}`;
       });
 
       const txt = [
-        `Website: ${targetUrl}`,
-        `SnipeRank AI Visibility Score: ${scoreText}`,
+        `Website: ${targetUrl || '-'}`,
+        `AIVindex™ Score: ${scoreText}`,
         ``,
         `Pillar Breakdown:`,
         ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
         ``,
-        `Priority Optimization Opportunities:`,
-        ...opportunities.slice(0, 10).map(o => `- ${o}`),
+        `Priority Opportunities:`,
+        ...opportunities.map(o => `- ${o}`),
         ``,
-        `Current Strengths:`,
+        `What's Working:`,
         ...workingStrengths.map(s => `- ${s}`),
         ``,
         `AI Engine Insights:`,
         ...aiInsights,
         ``,
-        `Full analysis available at: ${window.location.href}`
+        `Full report: ${window.location.href}`
       ].join("\n");
 
       try {
@@ -546,143 +704,69 @@
       }
     });
 
-    async function getApiBaseForScore(targetUrl){
-      try{
-        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
-        if (!probe.ok) throw new Error('probe not ok');
-        return '';
-      }catch{
-        return FALLBACK_BASE;
-      }
-    }
-
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('opportunitiesCritical').innerHTML =
-          "<li class='opportunity-item priority-high'><p class='item-text' style='text-align:center;color:#b91c1c'>No URL provided. Please go back to the homepage.</p></li>";
+        renderScoreCard(null, { access: 0, trust: 0, clarity: 0, alignment: 0 });
+        renderOpportunities([]);
+        renderWhatsWorking([]);
+        renderEngineInsights([]);
         return;
       }
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      const progressTimer = startProgress();
+      const domain = extractDomain(targetUrl);
+      showOverlay();
+      const stopMessaging = startOverlayMessaging(domain);
+
+      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
+      let apiBase = '';
+
+      // Same-origin first; if fails quickly, use fallback for the full endpoint.
+      try {
+        const probe = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
+        if (!probe.ok) throw new Error(`HTTP ${probe.status}`);
+        apiBase = '';
+      } catch {
+        apiBase = FALLBACK_BASE;
+      }
 
       try {
-        const apiBase = await getApiBaseForScore(targetUrl);
+        const res = await fetchWithTimeout(`${apiBase}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 240000 });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        // 1) Canonical score (UNIFIED with analyze.html)
-        try{
-          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000 });
-          if (!scoreRes.ok) throw new Error('score not ok');
-          const scoreJson = await scoreRes.json();
-          renderScoreCardFromScoreApi(scoreJson);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(scoreJson));
-        }catch(e){
-          console.error('Score error:', e);
-          document.getElementById("scoreBand").textContent = "Unable to calculate score";
-        }
+        const data = await res.json();
 
-        // 2) Full report data (kept as-is for content sections)
-        let apiResponse;
-        try {
-          apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
-          if (!apiResponse.ok) throw new Error('full not ok');
-        } catch {
-          apiResponse = await fetchWithTimeout(`${FALLBACK_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 160000 });
-        }
-
-        if (!apiResponse.ok) throw new Error('API response not ok');
-
-        const data = await apiResponse.json();
-
-        if (data.meta?.mode === 'lite-fallback' || data.success === false) {
+        if (data && (data.meta?.mode === 'lite-fallback' || data.success === false)) {
           document.getElementById('lite-banner').style.display = 'block';
         }
 
-        if (Array.isArray(data.needsAttention) && data.needsAttention.length > 0) {
-          const critical = [];
-          const strategic = [];
-          const incremental = [];
-
-          data.needsAttention.forEach(item => {
-            const parts = String(item).split('How to fix:');
-            const issueRaw = parts[0].trim();
-            const fix = parts[1] ? parts[1].trim() : '';
-
-            let priority = 'priority-low';
-            if (issueRaw.includes('[PRIORITY: High]') || issueRaw.includes('Missing') || issueRaw.includes('Critical')) {
-              priority = 'priority-high';
-            } else if (issueRaw.includes('[PRIORITY: Medium]') || issueRaw.includes('Limited') || issueRaw.includes('Weak')) {
-              priority = 'priority-medium';
-            }
-
-            const issue = issueRaw.replace(/\[PRIORITY: [^\]]+\]/, '').trim();
-
-            const html = `
-              <li class="opportunity-item ${priority}">
-                <p class="item-text">${issue}</p>
-                ${fix ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${fix}</div>` : ''}
-              </li>
-            `;
-
-            if (priority === 'priority-high') critical.push(html);
-            else if (priority === 'priority-medium') strategic.push(html);
-            else incremental.push(html);
-          });
-
-          if (critical.length) document.getElementById('opportunitiesCritical').innerHTML = critical.join('');
-          if (strategic.length) document.getElementById('opportunitiesStrategic').innerHTML = strategic.join('');
-          if (incremental.length) document.getElementById('opportunitiesIncremental').innerHTML = incremental.join('');
+        // Prefer canonical fields from /api/full
+        const score = (data && (data.score ?? data.rawScore));
+        const pillars = data && (data.pillars || {});
+        if (score !== undefined) {
+          renderScoreCard(score, pillars);
+        } else {
+          renderScoreCard(null, { access: 0, trust: 0, clarity: 0, alignment: 0 });
         }
 
-        if (Array.isArray(data.whatsWorking) && data.whatsWorking.length > 0) {
-          const workingList = document.getElementById('workingList');
-          workingList.innerHTML = data.whatsWorking.map(item => `
-            <li class="working-item">
-              <p class="item-text">${item}</p>
-            </li>
-          `).join('');
-        }
-
-        if (Array.isArray(data.engineInsights) && data.engineInsights.length > 0) {
-          const aiInsights = document.getElementById('aiInsights');
-          const engineMap = {
-            'ChatGPT': '/img/chatgpt-logo.png',
-            'Claude': '/img/claude.jpeg',
-            'Gemini': '/img/gemini.jpeg',
-            'Perplexity': '/img/perplexity-logo.png',
-            'Copilot': '/img/copilot.jpeg'
-          };
-
-          aiInsights.innerHTML = data.engineInsights.map(insight => {
-            const parts = String(insight).split(':');
-            const engine = parts[0].trim();
-            const text = parts.slice(1).join(':').trim();
-            const logoPath = engineMap[engine] || '';
-
-            return `
-              <div class="ai-row">
-                <div class="ai-logo">
-                  ${logoPath
-                    ? `<img src="${logoPath}" alt="${engine}" onerror="this.parentNode.innerHTML='<span class=&quot;ai-fallback&quot;>${engine}</span>'">`
-                    : `<span class="ai-fallback">${engine}</span>`
-                  }
-                </div>
-                <div class="ai-text">${text}</div>
-              </div>
-            `;
-          }).join('');
-        }
+        renderOpportunities(data && data.needsAttention ? data.needsAttention : []);
+        renderWhatsWorking(data && data.whatsWorking ? data.whatsWorking : []);
+        renderEngineInsights(data && data.engineInsights ? data.engineInsights : []);
 
       } catch (error) {
         console.error('Full report error:', error);
+        renderScoreCard(null, { access: 0, trust: 0, clarity: 0, alignment: 0 });
+        renderOpportunities([]);
+        renderWhatsWorking([]);
+        renderEngineInsights([]);
       } finally {
-        clearInterval(progressTimer);
-        stopProgress();
+        stopMessaging();
+        hideOverlay();
       }
     });
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-1 -->
+<!-- Version footer: v2026.01.12-2 -->
