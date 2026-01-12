@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Built by: ChatGPT
-  Version: v2026.01.12-1
+  Version: v2026.01.12-3
   Last updated: 2026-01-12 (America/New_York)
 
-  REPAIR FOR LARGE WEBSITES (keeps Option A spinner overlay):
-  1) Removed the “quick score probe decides apiBase” behavior that caused false fallbacks on slow/large sites.
-     Reverted to a lightweight HEAD probe against /api/score with https://example.com (fast, deterministic).
-  2) Score + Report now fetch IN PARALLEL (report no longer waits behind score).
-  3) Increased timeouts to be large-site-safe:
-     - Score: 120s
-     - Report: 8 minutes
-  4) Added automatic ONE-TIME retry on failure using the alternate base (same-origin <-> Render fallback).
-     This fixes cold starts / transient 5xx / edge routing issues without punishing large-site scans.
-  5) Overlay stays until BOTH requests settle (success or failure), preserving Option A “single reveal”.
+  FIX: CNN-class sites where report loads but score endpoint fails/times out.
+  1) Score UI now renders a "pending" state immediately (pillars placeholders + stable copy).
+  2) Removed early "Unable to calculate score" messaging; score retries quietly up to 5 minutes.
+  3) If score still cannot be computed, show a neutral final state:
+     "Score unavailable for this site right now."
+  4) Overlay behavior remains: hide overlay when REPORT is ready; score continues in background.
+  5) No layout/design changes beyond placeholder content in the score card.
 
-  No design/layout changes outside the overlay logic and network orchestration.
 -->
 <html lang="en">
 <head>
@@ -74,7 +69,6 @@
     .llm-insights{margin:.4rem 0 1.2rem}
     .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
     .llm-row:last-child{border-bottom:0}
-
     .llm-logo{display:flex;align-items:center;justify-content:flex-start;min-height:36px;height:auto}
     .llm-logo img{height:32px;width:auto;display:block;object-fit:contain;max-width:140px}
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
@@ -102,7 +96,6 @@
     .progress-sub{color:#555;font-size:14px;line-height:1.45;margin:0 0 14px}
     .progress-stage{color:#666;font-size:14px;line-height:1.45;margin:0}
 
-    /* Indeterminate circular loader */
     .spinner-wrap{display:flex;gap:14px;align-items:center;margin:10px 0 8px}
     .spinner{
       width:42px;height:42px;border-radius:50%;
@@ -114,7 +107,6 @@
     .spinner-meta{display:flex;flex-direction:column;gap:2px}
     .spinner-label{font-weight:800;color:#111;font-size:14px}
     .spinner-hint{color:#666;font-size:13px;line-height:1.35}
-
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
@@ -129,7 +121,6 @@
 
     .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem}
 
-    /* Footer */
     footer{
       margin-top:3rem;
       border-top:1px solid var(--border);
@@ -210,8 +201,8 @@
   <section class="card score-card" id="scoreCard" aria-live="polite">
     <div class="score-top">
       <div class="score-main">
-        <div class="score-number" id="scoreNumber">-</div>
-        <div class="score-band" id="scoreBand">Calculating...</div>
+        <div class="score-number" id="scoreNumber">—</div>
+        <div class="score-band" id="scoreBand">Computing score…</div>
       </div>
       <div class="btn-row">
         <button class="btn-ghost" id="breakdownBtn" type="button">What goes into this score?</button>
@@ -292,7 +283,7 @@
     </div>
   </footer>
 
-  <!-- Progress Overlay (Option A: no %, indeterminate loader, stays until everything is done) -->
+  <!-- Progress Overlay -->
   <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
       <div class="progress-title" id="progress-title">Analyzing your website</div>
@@ -428,6 +419,27 @@
       }
     }
 
+    // Always show a stable "pending" score UI immediately (no blank score card)
+    function renderScorePending(){
+      document.getElementById("scoreNumber").textContent = "—";
+      document.getElementById("scoreBand").textContent = "Computing score…";
+      const grid = document.getElementById("pillarsGrid");
+      grid.innerHTML = "";
+      [
+        "AI Access Readiness",
+        "Trust & Verification Signals",
+        "LLM Interpretability & Clarity",
+        "Prompt-Pattern Alignment"
+      ].forEach((label) => {
+        const d = document.createElement("div");
+        d.className = "pillar";
+        d.innerHTML = `<span class="label">${label}</span><span class="badge">—/25</span>`;
+        grid.appendChild(d);
+      });
+      document.getElementById("highlightsBlock").hidden = true;
+      document.getElementById("highlightsList").innerHTML = "";
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
 
@@ -443,7 +455,6 @@
       }
     }
 
-    // Overlay controls (Option A)
     function showOverlay(){
       document.getElementById('progress-overlay').style.display = 'flex';
       document.body.style.overflow = 'hidden';
@@ -453,10 +464,30 @@
       document.body.style.overflow = '';
     }
 
-    function startOverlayMessaging(){
+    const LARGE_SITE_HOSTS = new Set([
+      'cnn.com','nytimes.com','bbc.com','theguardian.com','washingtonpost.com','wsj.com',
+      'reddit.com','wikipedia.org','amazon.com','linkedin.com','facebook.com','x.com','twitter.com'
+    ]);
+
+    function startOverlayMessaging(domain){
       const stageEl = document.getElementById('progress-stage');
       const spinnerLabel = document.getElementById('spinner-label');
       const spinnerHint = document.getElementById('spinner-hint');
+      const progressSub = document.getElementById('progress-sub');
+
+      const d = (domain || '').toLowerCase();
+      const isLarge = LARGE_SITE_HOSTS.has(d);
+
+      if (d) {
+        document.getElementById('progress-title').textContent = `Analyzing ${d}`;
+        if (isLarge) {
+          spinnerHint.textContent = "Large sites can take up to ~5 minutes to analyze accurately.";
+          progressSub.innerHTML = `We’re scanning <strong>${d}</strong> and processing the results. Large sites can take <strong>up to ~5 minutes</strong>.`;
+        } else {
+          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
+          progressSub.innerHTML = `We’re analyzing <strong>${d}</strong> and processing the results. This can take <strong>2 minutes or more</strong>.`;
+        }
+      }
 
       const start = Date.now();
 
@@ -466,38 +497,30 @@
         if (s < 8) {
           stageEl.textContent = "Fetching and parsing the website…";
           spinnerLabel.textContent = "Processing results…";
-          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
         } else if (s < 20) {
           stageEl.textContent = "Extracting structure and crawl signals…";
           spinnerLabel.textContent = "Analyzing site signals…";
-          spinnerHint.textContent = "Some sites respond slowly or block automated requests.";
         } else if (s < 45) {
           stageEl.textContent = "Evaluating trust, clarity, and alignment…";
           spinnerLabel.textContent = "Scoring and summarizing…";
-          spinnerHint.textContent = "We’re compiling your analysis into a readable report.";
         } else if (s < 75) {
           stageEl.textContent = "Generating the analysis report…";
           spinnerLabel.textContent = "Finalizing report…";
-          spinnerHint.textContent = "This may take longer for large or heavily scripted sites.";
-        } else if (s < 120) {
-          stageEl.textContent = "Still working — this site is taking longer than typical.";
+        } else if (s < 180) {
+          stageEl.textContent = "Still working. Large sites may take several minutes.";
           spinnerLabel.textContent = "Still analyzing…";
-          spinnerHint.textContent = "We’ll show your results as soon as they’re ready.";
-        } else if (s < 240) {
-          stageEl.textContent = "Still working. Large sites can take several minutes.";
+        } else if (s < 300) {
+          stageEl.textContent = "Still working. We’re continuing to process the site and generate your report.";
           spinnerLabel.textContent = "Still analyzing…";
-          spinnerHint.textContent = "We’re continuing to process the site and generate your report.";
         } else {
           stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
           spinnerLabel.textContent = "Still analyzing…";
-          spinnerHint.textContent = "If this continues, the site may be throttling requests or the engine is under heavy load.";
         }
       }, 800);
 
       return () => clearInterval(interval);
     }
 
-    // Fetch with timeouts (AbortController)
     async function fetchWithTimeout(url, opts = {}) {
       const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
       const controller = new AbortController();
@@ -510,25 +533,18 @@
       }
     }
 
-    // One-time retry helper: try primary base, then alternate base on failure.
-    async function fetchWithRetry(primaryUrl, altUrl, opts, isOkFn) {
+    async function fetchTryPrimaryThenAlt(primaryUrl, altUrl, opts) {
       let lastErr = null;
-
       try {
         const r1 = await fetchWithTimeout(primaryUrl, opts);
-        if (isOkFn(r1)) return { res: r1, usedAlt: false };
+        if (r1 && r1.ok) return { res: r1, usedAlt: false };
         lastErr = new Error(`HTTP ${r1.status}`);
       } catch (e) {
         lastErr = e;
       }
-
-      try {
-        const r2 = await fetchWithTimeout(altUrl, opts);
-        if (isOkFn(r2)) return { res: r2, usedAlt: true };
-        throw new Error(`HTTP ${r2.status}`);
-      } catch (e2) {
-        throw (e2 || lastErr || new Error("Request failed"));
-      }
+      const r2 = await fetchWithTimeout(altUrl, opts);
+      if (r2 && r2.ok) return { res: r2, usedAlt: true };
+      throw new Error(`HTTP ${r2.status} (alt). Last: ${lastErr && lastErr.message ? lastErr.message : 'unknown'}`);
     }
 
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
@@ -607,24 +623,76 @@
       window.location.href = `full-report.html?${q}`;
     });
 
+    async function scoreLoop(primaryBase, altBase, url) {
+      const scoreBand = document.getElementById("scoreBand");
+
+      const TOTAL_WINDOW_MS = 300000;     // 5 minutes total retry window
+      const ATTEMPT_TIMEOUT_MS = 120000;  // 2 minutes per attempt
+      const PAUSE_BETWEEN_MS = 15000;     // 15 seconds between attempts
+
+      const start = Date.now();
+      let attempt = 0;
+
+      while ((Date.now() - start) < TOTAL_WINDOW_MS) {
+        attempt += 1;
+
+        // Keep messaging neutral; do not flip to "unable" mid-stream.
+        scoreBand.textContent = (attempt === 1)
+          ? "Computing score…"
+          : "Computing score… (still working)";
+
+        const primaryUrl = `${primaryBase}/api/score?url=${encodeURIComponent(url)}`;
+        const altUrl = `${altBase}/api/score?url=${encodeURIComponent(url)}`;
+
+        try {
+          const { res } = await fetchTryPrimaryThenAlt(primaryUrl, altUrl, { timeoutMs: ATTEMPT_TIMEOUT_MS });
+          const j = await res.json();
+
+          if (!j || typeof j.score !== 'number' || !j.pillars) {
+            throw new Error("Invalid score payload");
+          }
+
+          renderScoreCard(j.score, j.pillars, j.highlights || []);
+          sessionStorage.setItem('sniperank:data', JSON.stringify(j));
+          return;
+        } catch (e) {
+          console.error('Score attempt failed:', e);
+
+          if ((Date.now() - start) + PAUSE_BETWEEN_MS >= TOTAL_WINDOW_MS) break;
+          await new Promise(r => setTimeout(r, PAUSE_BETWEEN_MS));
+        }
+      }
+
+      // After retry window: final, neutral state (still not "broken").
+      document.getElementById("scoreNumber").textContent = "—";
+      scoreBand.textContent = "Score unavailable for this site right now.";
+      // Keep placeholder pillars; do not blank them.
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
         document.getElementById('summary-results').innerHTML =
           "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
+        document.getElementById("scoreBand").textContent = "No URL provided";
+        renderScorePending();
         return;
       }
 
       document.getElementById("current-url").textContent = targetUrl;
 
+      // Always show a non-empty score UI immediately.
+      renderScorePending();
+
+      const domain = extractDomain(targetUrl);
+
       showOverlay();
-      const stopMessaging = startOverlayMessaging();
+      const stopMessaging = startOverlayMessaging(domain);
 
       const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
       let apiBase = '';
 
-      // Base selection: lightweight HEAD probe (fast and does NOT depend on targetUrl size).
-      // If same-origin API is missing/down, use Render fallback.
+      // Probe same-origin quickly; fallback to Render if probe fails.
       try {
         const probe = await fetchWithTimeout('/api/score?url=' + encodeURIComponent('https://example.com'), {
           method: 'HEAD',
@@ -639,55 +707,25 @@
       const primaryBase = apiBase;
       const altBase = (primaryBase === '') ? FALLBACK_BASE : '';
 
-      // Parallel fetches with large-site-safe timeouts + one-time base retry.
-      const scorePrimaryUrl = `${primaryBase}/api/score?url=${encodeURIComponent(targetUrl)}`;
-      const scoreAltUrl     = `${altBase}/api/score?url=${encodeURIComponent(targetUrl)}`;
+      // Score retries in the background (not gating overlay).
+      scoreLoop(primaryBase, altBase, targetUrl);
 
+      // Report fetch gates overlay (primary value).
       const reportPrimaryUrl = `${primaryBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
       const reportAltUrl     = `${altBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
 
-      const SCORE_TIMEOUT_MS  = 120000;  // 2 minutes
-      const REPORT_TIMEOUT_MS = 480000;  // 8 minutes (large-site safe)
-
-      // Run both in parallel.
-      const scorePromise = (async () => {
-        try {
-          const { res } = await fetchWithRetry(
-            scorePrimaryUrl,
-            scoreAltUrl,
-            { timeoutMs: SCORE_TIMEOUT_MS },
-            (r) => r && r.ok
-          );
-          const j = await res.json();
-          renderScoreCard(j.score, j.pillars, j.highlights);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(j));
-        } catch (e) {
-          console.error('Score error:', e);
-          document.getElementById("scoreBand").textContent = "Unable to calculate score";
-        }
-      })();
-
-      const reportPromise = (async () => {
-        try {
-          const { res } = await fetchWithRetry(
-            reportPrimaryUrl,
-            reportAltUrl,
-            { timeoutMs: REPORT_TIMEOUT_MS },
-            (r) => r && r.ok
-          );
-          const html = await res.text();
-          const host = document.getElementById('summary-results');
-          host.innerHTML = html;
-          transformAIInsights(host);
-        } catch (e) {
-          console.error('Report error:', e);
-          document.getElementById('summary-results').innerHTML =
-            "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-        }
-      })();
+      const REPORT_TIMEOUT_MS = 480000; // 8 minutes
 
       try {
-        await Promise.allSettled([scorePromise, reportPromise]);
+        const { res } = await fetchTryPrimaryThenAlt(reportPrimaryUrl, reportAltUrl, { timeoutMs: REPORT_TIMEOUT_MS });
+        const html = await res.text();
+        const host = document.getElementById('summary-results');
+        host.innerHTML = html;
+        transformAIInsights(host);
+      } catch (e) {
+        console.error('Report error:', e);
+        document.getElementById('summary-results').innerHTML =
+          "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
       } finally {
         stopMessaging();
         hideOverlay();
@@ -696,4 +734,4 @@
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-1 -->
+<!-- Version footer: v2026.01.12-3 -->
