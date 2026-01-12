@@ -1,8 +1,17 @@
-/* 
-  api/full.js - v3.6.0 — PRODUCTION VERSION
+/*
+  api/full.js - v3.7.0 — PRODUCTION VERSION
   Purpose: Comprehensive AI SEO analysis (25 opportunities minimum)
   ENV Required: OPENAI_API_KEY
-  User-Agent: Normal browser (avoids blocking by CNN, Macy's, etc)
+
+  Key change (functionality):
+  - Stop "bot fingerprint" blocks by using consistent browser-like headers,
+    rotating realistic User-Agents, and adding a secondary fetch strategy
+    for 403/429/WAF-blocked sites.
+
+  Notes:
+  - This file does NOT change your response shape.
+  - If your other endpoints (api/score.js, report generator) still use default fetch/axios,
+    apply the SAME fetchHTML() helper there too.
 */
 
 import OpenAI from "openai";
@@ -13,61 +22,38 @@ export default async function handler(req, res) {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: "Missing URL parameter" });
 
-  // Check if we have OpenAI key
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
-
-  console.log("API Key status:", { hasOpenAI });
-
   if (!hasOpenAI) {
-    console.error("OPENAI_API_KEY not found");
     return res.status(200).json(fallbackPayload(url, "missing_api_key"));
   }
 
   try {
-    // Initialize OpenAI inside try block
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // Fetch website content
+    // Fetch website content with bot-avoidance + fallback
     let contentData = {};
-    try {
-      const htmlResp = await axios.get(url, {
-        headers: { 
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-          "Accept-Language": "en-US,en;q=0.9"
-        },
-        timeout: 15000
-      });
+    let fetchMeta = { mode: "direct", reason: "" };
 
-      const $ = cheerio.load(htmlResp.data);
-      contentData = {
-        textContent: $("body").text().replace(/\s+/g, " ").trim(),
-        pageTitle: $("title").text().trim(),
-        metaDescription: $('meta[name="description"]').attr("content")?.trim() || "",
-        headings: $("h1, h2, h3").map((i, el) => $(el).text().replace(/\s+/g, " ").trim()).get().join(" | ").slice(0, 2000),
-        images: $("img").length,
-        imagesWithAlt: $("img[alt]").length,
-        internalLinks: $("a[href^='/'], a[href*='" + new URL(url).hostname + "']").length,
-        hasSchema: $("script[type='application/ld+json']").length > 0
-      };
+    try {
+      const fetched = await fetchWebsiteContent(url);
+      contentData = fetched.contentData;
+      fetchMeta = fetched.fetchMeta;
     } catch (fetchError) {
-      console.error("Failed to fetch website:", fetchError.message);
-      return res.status(200).json(fallbackPayload(url, "fetch_failed"));
+      return res.status(200).json(fallbackPayload(url, `fetch_failed: ${fetchError.message}`));
     }
 
-    // Build AI prompt
     const analysisPrompt = buildEnhancedPrompt(url, contentData);
 
     // Call OpenAI
     let aiAnalysis = null;
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4-turbo",
+        model: process.env.OPENAI_MODEL || "gpt-4-turbo",
         temperature: 0.3,
         max_tokens: 4000,
         messages: [
-          { 
-            role: "system", 
+          {
+            role: "system",
             content: "You are an expert AI SEO analyst. Return ONLY valid JSON with no markdown formatting."
           },
           { role: "user", content: analysisPrompt }
@@ -76,33 +62,29 @@ export default async function handler(req, res) {
 
       const raw = completion?.choices?.[0]?.message?.content?.trim() || "";
       const jsonString = extractJSONObject(raw);
-      
+
       if (jsonString) {
         aiAnalysis = JSON.parse(jsonString);
-      } else {
-        console.error("Could not extract JSON from AI response");
       }
     } catch (aiError) {
-      console.error("AI analysis failed:", aiError.message);
-      return res.status(200).json(fallbackPayload(url, "ai_failed"));
+      return res.status(200).json(fallbackPayload(url, `ai_failed: ${aiError.message}`));
     }
 
     // Validate AI response
     if (!aiAnalysis || !Array.isArray(aiAnalysis.needsAttention) || aiAnalysis.needsAttention.length < 10) {
-      console.error("AI returned invalid/incomplete data");
       return res.status(200).json(fallbackPayload(url, "invalid_ai_response"));
     }
 
     // Calculate score
     const score = calculateScore(contentData, aiAnalysis);
 
-    // Return successful response (NO whatsWorking - deleted per user request)
+    // Return successful response (whatsWorking intentionally empty)
     return res.status(200).json({
       success: true,
       score,
       needsAttention: aiAnalysis.needsAttention.slice(0, 25),
       engineInsights: aiAnalysis.engineInsights?.slice(0, 5) || [],
-      whatsWorking: [], // Empty array so frontend doesn't break
+      whatsWorking: [],
       metrics: {
         technical: {
           imagesWithAlt: contentData.imagesWithAlt || 0,
@@ -114,32 +96,210 @@ export default async function handler(req, res) {
       },
       meta: {
         analyzedAt: new Date().toISOString(),
-        model: "gpt-4-turbo",
-        url
+        model: process.env.OPENAI_MODEL || "gpt-4-turbo",
+        url,
+        fetchMode: fetchMeta.mode,
+        fetchReason: fetchMeta.reason
       }
     });
-
   } catch (error) {
-    console.error("Handler error:", error);
-    return res.status(200).json(fallbackPayload(url, error.message));
+    return res.status(200).json(fallbackPayload(url, `handler_error: ${error.message}`));
   }
 }
 
-/* ---------- ENHANCED PROMPT ---------- */
+/* -------------------------
+   BOT-AVOIDANCE FETCH LAYER
+-------------------------- */
+
+const UA_POOL = [
+  // Chrome (Windows)
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  // Chrome (Mac)
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  // Safari (Mac)
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15",
+  // Edge (Windows)
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0"
+];
+
+function pickUA() {
+  return UA_POOL[Math.floor(Math.random() * UA_POOL.length)];
+}
+
+// A realistic baseline header set. (No "sec-ch-ua" here; many WAFs don’t require it,
+// but they DO penalize obviously-bot headers like axios/undici defaults.)
+function browserHeaders(targetUrl) {
+  const u = new URL(ensureProtocol(targetUrl));
+  return {
+    "User-Agent": pickUA(),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Referer": `${u.origin}/`
+  };
+}
+
+// Detect typical block responses (very pragmatic; not perfect)
+function looksBlocked(status, body) {
+  const s = Number(status || 0);
+  if (s === 403 || s === 429) return true;
+  const t = String(body || "").toLowerCase();
+  return (
+    t.includes("access denied") ||
+    t.includes("request blocked") ||
+    t.includes("unusual traffic") ||
+    t.includes("verify you are human") ||
+    t.includes("captcha") ||
+    t.includes("cloudflare") ||
+    t.includes("akamai") ||
+    t.includes("imperva") ||
+    t.includes("incapsula")
+  );
+}
+
+async function fetchHtmlDirect(targetUrl) {
+  const headers = browserHeaders(targetUrl);
+
+  // axios automatically sets Host; we keep the rest consistent
+  const resp = await axios.get(targetUrl, {
+    headers,
+    timeout: 20000,
+    maxRedirects: 5,
+    responseType: "text",
+    validateStatus: () => true
+  });
+
+  return resp;
+}
+
+// Secondary fetch path: use a text-render proxy when direct fetch is blocked.
+// This avoids your server identifying as axios/undici to the target site.
+// If the proxy fails, we fall back to direct failure handling.
+async function fetchHtmlViaJina(targetUrl) {
+  // r.jina.ai expects a full URL with protocol
+  const absolute = ensureProtocol(targetUrl);
+  const proxyUrl = `https://r.jina.ai/http://${absolute.replace(/^https?:\/\//i, "")}`;
+
+  const resp = await axios.get(proxyUrl, {
+    headers: {
+      "User-Agent": pickUA(),
+      "Accept": "text/plain,*/*;q=0.9",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Connection": "keep-alive"
+    },
+    timeout: 25000,
+    maxRedirects: 3,
+    responseType: "text",
+    validateStatus: () => true
+  });
+
+  return resp;
+}
+
+async function fetchWebsiteContent(targetUrl) {
+  const absoluteUrl = ensureProtocol(targetUrl);
+
+  // 1) Direct attempt
+  const direct = await fetchHtmlDirect(absoluteUrl);
+  const directBody = direct?.data || "";
+
+  if (direct.status >= 200 && direct.status < 400 && !looksBlocked(direct.status, directBody)) {
+    return {
+      contentData: parseContentData(absoluteUrl, directBody),
+      fetchMeta: { mode: "direct", reason: "" }
+    };
+  }
+
+  // 2) If blocked or bad status, try proxy strategy
+  const blocked = looksBlocked(direct.status, directBody);
+  if (blocked || direct.status === 0 || direct.status >= 400) {
+    const proxy = await fetchHtmlViaJina(absoluteUrl);
+
+    if (proxy.status >= 200 && proxy.status < 400) {
+      // Proxy returns text, not true HTML sometimes. Still useful for LLM.
+      const rawText = String(proxy.data || "");
+      const asHtml = wrapTextAsHtml(rawText, absoluteUrl);
+
+      return {
+        contentData: parseContentData(absoluteUrl, asHtml, { forceTextFromBody: rawText }),
+        fetchMeta: {
+          mode: "proxy",
+          reason: blocked ? `blocked_direct_${direct.status}` : `direct_http_${direct.status}`
+        }
+      };
+    }
+  }
+
+  // If we get here, both paths failed
+  throw new Error(`Blocked or unreachable (direct=${direct.status})`);
+}
+
+function parseContentData(url, html, opts = {}) {
+  const $ = cheerio.load(html || "");
+  const hostname = new URL(ensureProtocol(url)).hostname;
+
+  // If we had to fetch via a text proxy, we may already have clean text.
+  const bodyText =
+    opts.forceTextFromBody ||
+    $("body").text() ||
+    "";
+
+  const textContent = String(bodyText).replace(/\s+/g, " ").trim();
+
+  return {
+    textContent,
+    pageTitle: $("title").text().trim(),
+    metaDescription: $('meta[name="description"]').attr("content")?.trim() || "",
+    headings: $("h1, h2, h3")
+      .map((i, el) => $(el).text().replace(/\s+/g, " ").trim())
+      .get()
+      .join(" | ")
+      .slice(0, 2000),
+    images: $("img").length,
+    imagesWithAlt: $("img[alt]").length,
+    internalLinks: $(`a[href^='/'], a[href*='${hostname}']`).length,
+    hasSchema: $("script[type='application/ld+json']").length > 0
+  };
+}
+
+function wrapTextAsHtml(text, url) {
+  // Minimal wrapper so cheerio parsing still works in a predictable way
+  const safe = String(text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return `<!doctype html><html><head><title>${escapeHtml(url)}</title></head><body><pre>${safe}</pre></body></html>`;
+}
+
+function ensureProtocol(u) {
+  const s = String(u || "").trim();
+  if (!s) return s;
+  return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+}
+
+function escapeHtml(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/* ---------- PROMPT ---------- */
 function buildEnhancedPrompt(url, contentData) {
   return `
 You are an expert AI SEO specialist analyzing this website for AI search engine optimization.
 
 URL: ${url}
-Title: ${contentData.pageTitle || 'Not found'}
-Meta Description: ${contentData.metaDescription || 'MISSING'}
+Title: ${contentData.pageTitle || "Not found"}
+Meta Description: ${contentData.metaDescription || "MISSING"}
 
 TECHNICAL SEO:
 - Images: ${contentData.imagesWithAlt || 0}/${contentData.images || 0} have alt text
-- Schema Markup: ${contentData.hasSchema ? 'Present' : 'MISSING'}
+- Schema Markup: ${contentData.hasSchema ? "Present" : "MISSING"}
 - Internal Links: ${contentData.internalLinks || 0}
 
-Sample Content: ${(contentData.textContent || '').slice(0, 6000)}
+Sample Content: ${(contentData.textContent || "").slice(0, 6000)}
 
 CRITICAL INSTRUCTIONS:
 1. Return ONLY valid JSON - NO markdown, NO code blocks, NO explanations
@@ -150,30 +310,7 @@ JSON Structure:
 {
   "needsAttention": [
     "[PRIORITY: High] Issue title. Solution: Specific steps to fix. Impact: Expected measurable outcome.",
-    "[PRIORITY: High] Second issue...",
-    "[PRIORITY: High] Third issue...",
-    "[PRIORITY: High] Fourth issue...",
-    "[PRIORITY: High] Fifth issue...",
-    "[PRIORITY: Medium] Sixth issue...",
-    "[PRIORITY: Medium] Seventh issue...",
-    "[PRIORITY: Medium] Eighth issue...",
-    "[PRIORITY: Medium] Ninth issue...",
-    "[PRIORITY: Medium] Tenth issue...",
-    "[PRIORITY: Medium] Eleventh issue...",
-    "[PRIORITY: Medium] Twelfth issue...",
-    "[PRIORITY: Medium] Thirteenth issue...",
-    "[PRIORITY: Medium] Fourteenth issue...",
-    "[PRIORITY: Medium] Fifteenth issue...",
-    "[PRIORITY: Medium] Sixteenth issue...",
-    "[PRIORITY: Low] Seventeenth issue...",
-    "[PRIORITY: Low] Eighteenth issue...",
-    "[PRIORITY: Low] Nineteenth issue...",
-    "[PRIORITY: Low] Twentieth issue...",
-    "[PRIORITY: Low] Twenty-first issue...",
-    "[PRIORITY: Low] Twenty-second issue...",
-    "[PRIORITY: Low] Twenty-third issue...",
-    "[PRIORITY: Low] Twenty-fourth issue...",
-    "[PRIORITY: Low] Twenty-fifth issue..."
+    "... 25 total items ..."
   ],
   "engineInsights": [
     "ChatGPT: Specific optimization strategy",
@@ -186,7 +323,7 @@ JSON Structure:
 
 PRIORITY DISTRIBUTION:
 - High: 5-7 critical issues
-- Medium: 10-12 important improvements  
+- Medium: 10-12 important improvements
 - Low: 8-10 incremental enhancements
 
 Focus on AI-specific optimizations, not generic SEO advice. Be specific and actionable.
@@ -199,33 +336,27 @@ COUNT YOUR ITEMS - YOU MUST HAVE EXACTLY 25 IN needsAttention ARRAY!
 function calculateScore(contentData, aiAnalysis) {
   let score = 55; // Base score
 
-  // Technical factors
   if (contentData.metaDescription) score += 5;
   if (contentData.hasSchema) score += 8;
 
-  // Image optimization
   if (contentData.images > 0) {
     const altCoverage = contentData.imagesWithAlt / contentData.images;
     score += altCoverage * 10;
   }
 
-  // Internal linking
   if (contentData.internalLinks > 10) score += 5;
 
-  // AI analysis impact
   const issues = aiAnalysis.needsAttention?.length || 0;
-  score -= Math.min(issues * 0.8, 20); // Penalty for issues found
+  score -= Math.min(issues * 0.8, 20);
 
   return Math.max(20, Math.min(100, Math.round(score)));
 }
 
-/* ---------- HELPER FUNCTIONS ---------- */
+/* ---------- HELPERS ---------- */
 function extractJSONObject(text) {
-  // Remove markdown code blocks if present
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
   if (fenced) return fenced[1].trim();
 
-  // Find JSON object
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start !== -1 && end !== -1 && end > start) {
