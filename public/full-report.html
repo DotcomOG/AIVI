@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <!--
-  full-report.html
-  Version: v2026.01.12-5
+  full-report.html - COMPLETE VERSION WITH CORRECT COLORS
+  Version: v2026.01.12-1
   Critical = RED, Strategic = YELLOW, Incremental = ORANGE
 
-  Updates in this version:
-  1) Opportunity cards: compact spacing + expandable “Implementation guidance” (instead of always-visible fix text).
-  2) Replaced “How to fix” label with “Implementation guidance”.
-  3) Expanded section includes both guidance + expected impact (when present).
-  4) AI engine logos: updated to match analyze.html paths.
+  Change log (only):
+  1) Replaced older % progress-bar loader with spinner-based overlay (matches index→analyze style).
+  2) Updated LLM logo paths to match analyze.html.
 -->
 <html lang="en">
 <head>
@@ -57,18 +55,17 @@
     .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.95rem;font-weight:600;text-align:center}
 
     .report-section{margin:3rem 1.5rem}
-    .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.25rem;color:#111}
-    .section-subtitle{font-size:1.2rem;font-weight:700;margin:2.25rem 0 .65rem;color:#111}
+    .section-title{font-size:1.4rem;font-weight:700;margin:0 0 1.5rem;color:#111}
+    .section-subtitle{font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem;color:#111}
 
-    /* Opportunities */
     .opportunity-item{
-      margin:1rem 0;            /* reduced spacing */
-      padding:1.1rem 1.15rem;   /* slightly tighter */
+      margin:2rem 0;
+      padding:1.5rem;
       border:1px solid #f0f0f0;
       border-radius:8px;
       background:#fafafa;
     }
-    .opportunity-item:last-child{margin-bottom:1rem}
+    .opportunity-item:last-child{margin-bottom:2rem}
 
     .priority-high{background:#fef2f2;border-left:4px solid #dc3545}
     .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
@@ -76,65 +73,15 @@
 
     .opportunity-list{list-style:none;padding:0;margin:0}
     .opportunity-item::before{content:"";margin-right:0}
+    .item-text{font-size:1.05rem;line-height:1.6;margin:0}
 
-    .opp-header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:.75rem;
-    }
-    .item-text{font-size:1.05rem;line-height:1.6;margin:0;color:#111}
+    .fix-callout{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
+    .fix-callout strong{color:#111;font-weight:600}
+    .fix-title{font-weight:600;color:#495057;margin-bottom:.25rem}
 
-    .expand-btn{
-      border:1px solid rgba(0,0,0,.12);
-      background:#fff;
-      color:#111;
-      width:34px;height:34px;
-      border-radius:8px;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 auto;
-      transition:transform .12s ease, background .12s ease;
-      margin-top:-2px;
-    }
-    .expand-btn:hover{background:#f2f2f2}
-    .expand-btn[aria-expanded="true"]{transform:rotate(180deg)}
-    .chev{
-      width:0;height:0;
-      border-left:6px solid transparent;
-      border-right:6px solid transparent;
-      border-top:8px solid #111;
-      display:block;
-    }
+    .address-callout{background:#e8f4fd;border:1px solid #b8daff;border-radius:8px;padding:.75rem 1rem;margin:1.5rem 0;font-size:.95rem;line-height:1.5}
+    .address-title{font-weight:600;color:#0056b3;margin-bottom:.25rem}
 
-    .opp-details{
-      display:none;
-      margin-top:.85rem;
-      padding-top:.85rem;
-      border-top:1px dashed rgba(0,0,0,.14);
-    }
-    .opp-details.is-open{display:block}
-
-    .callout{
-      background:#f8f9fa;
-      border:1px solid #e9ecef;
-      border-radius:8px;
-      padding:.75rem 1rem;
-      margin:.65rem 0 0;
-      font-size:.95rem;
-      line-height:1.55;
-      color:#333;
-    }
-    .callout .title{
-      font-weight:700;
-      color:#111;
-      margin:0 0 .25rem;
-      font-size:.92rem;
-    }
-
-    /* AI insights */
     .ai-insights{margin:1.5rem 0}
     .ai-row{display:grid;grid-template-columns:140px 1fr;gap:1rem 1.5rem;align-items:start;padding:1.5rem 0;border-bottom:1px dashed var(--border);margin:0 1rem}
     .ai-row:last-child{border-bottom:0}
@@ -143,14 +90,25 @@
     .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .ai-text{font-size:1.05rem;line-height:1.6;color:#333}
 
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .progress-title{font-weight:700;font-size:18px}
-    .progress-pct{color:#666;font-size:16px;font-weight:600}
-    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
-    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+    /* Spinner Overlay (matches analyze/index→analyze pattern) */
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-title{font-weight:800;font-size:18px;margin:0 0 10px;color:#111}
+    .progress-sub{color:#555;font-size:14px;line-height:1.45;margin:0 0 14px}
+    .progress-stage{color:#666;font-size:14px;line-height:1.45;margin:0}
+
+    .spinner-wrap{display:flex;gap:14px;align-items:center;margin:10px 0 8px}
+    .spinner{
+      width:42px;height:42px;border-radius:50%;
+      border:4px solid #e9eef7;
+      border-top-color:#3182CE;
+      animation:spin 0.95s linear infinite;
+      flex:0 0 auto;
+    }
+    .spinner-meta{display:flex;flex-direction:column;gap:2px}
+    .spinner-label{font-weight:800;color:#111;font-size:14px}
+    .spinner-hint{color:#666;font-size:13px;line-height:1.35}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
     .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -233,7 +191,7 @@
 
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
-      .ai-row{grid-template-columns:1fr; margin:0}
+      .ai-row{grid-template-columns:1fr}
       .ai-logo{justify-content:flex-start}
     }
   </style>
@@ -270,19 +228,19 @@
     <p>These are specific, actionable improvements that will enhance how AI systems interpret, trust, and represent your website. Items are grouped by urgency.</p>
 
     <h4 class="section-subtitle">Critical Priorities</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1rem;">High-impact changes that should be addressed first.</p>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">High-impact changes that should be addressed first.</p>
     <ul class="opportunity-list" id="opportunitiesCritical">
       <li class="opportunity-item priority-high"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Strategic Improvements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1rem;">Meaningful improvements that require more coordination.</p>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Meaningful improvements that require more coordination.</p>
     <ul class="opportunity-list" id="opportunitiesStrategic">
       <li class="opportunity-item priority-medium"><p class="item-text">Loading...</p></li>
     </ul>
 
     <h4 class="section-subtitle">Incremental Enhancements</h4>
-    <p style="color:#666;font-size:.95rem;margin-bottom:1rem;">Smaller optimizations that compound over time.</p>
+    <p style="color:#666;font-size:.95rem;margin-bottom:1.5rem;">Smaller optimizations that compound over time.</p>
     <ul class="opportunity-list" id="opportunitiesIncremental">
       <li class="opportunity-item priority-low"><p class="item-text">Loading...</p></li>
     </ul>
@@ -300,16 +258,23 @@
     </div>
   </section>
 
-  <div class="overlay" id="progress-overlay">
+  <!-- Spinner Overlay (updated) -->
+  <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
-      <div class="progress-header">
-        <span class="progress-title">Generating Comprehensive Analysis</span>
-        <span class="progress-pct" id="progress-pct">0%</span>
+      <div class="progress-title" id="progress-title">Generating your full report</div>
+
+      <div class="spinner-wrap">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="spinner-meta">
+          <div class="spinner-label" id="spinner-label">Processing results…</div>
+          <div class="spinner-hint" id="spinner-hint">This can take 2 minutes or more on complex sites.</div>
+        </div>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div class="progress-eta">Analyzing AI accessibility patterns, content structure, and optimization opportunities...</div>
+
+      <p class="progress-sub" id="progress-sub">
+        We’re analyzing the site and assembling your full report. This can take <strong>2 minutes or more</strong>.
+      </p>
+      <p class="progress-stage" id="progress-stage">Starting analysis…</p>
     </div>
   </div>
 
@@ -405,6 +370,84 @@
         .replace(/'/g,'&#39;');
     }
 
+    function extractDomain(u){
+      if (!u) return '';
+      try {
+        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
+        const { hostname } = new URL(withProto);
+        return hostname.replace(/^www\./i,'');
+      } catch {
+        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
+        return (m ? m[1] : '').replace(/^www\./i,'');
+      }
+    }
+
+    const LARGE_SITE_HOSTS = new Set([
+      'cnn.com','nytimes.com','bbc.com','theguardian.com','washingtonpost.com','wsj.com',
+      'reddit.com','wikipedia.org','amazon.com','linkedin.com','facebook.com','x.com','twitter.com'
+    ]);
+
+    function showOverlay(){
+      document.getElementById('progress-overlay').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function hideOverlay(){
+      document.getElementById('progress-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function startOverlayMessaging(domain){
+      const stageEl = document.getElementById('progress-stage');
+      const spinnerLabel = document.getElementById('spinner-label');
+      const spinnerHint = document.getElementById('spinner-hint');
+      const progressSub = document.getElementById('progress-sub');
+
+      const d = (domain || '').toLowerCase();
+      const isLarge = LARGE_SITE_HOSTS.has(d);
+
+      if (d) {
+        document.getElementById('progress-title').textContent = `Generating report for ${d}`;
+        if (isLarge) {
+          spinnerHint.textContent = "Large sites can take up to ~5 minutes to analyze accurately.";
+          progressSub.innerHTML = `We’re scanning <strong>${d}</strong> and generating your full report. Large sites can take <strong>up to ~5 minutes</strong>.`;
+        } else {
+          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
+          progressSub.innerHTML = `We’re analyzing <strong>${d}</strong> and generating your full report. This can take <strong>2 minutes or more</strong>.`;
+        }
+      }
+
+      const start = Date.now();
+
+      const interval = setInterval(() => {
+        const s = Math.floor((Date.now() - start) / 1000);
+
+        if (s < 8) {
+          stageEl.textContent = "Fetching and parsing the website…";
+          spinnerLabel.textContent = "Processing results…";
+        } else if (s < 20) {
+          stageEl.textContent = "Extracting structure and crawl signals…";
+          spinnerLabel.textContent = "Analyzing site signals…";
+        } else if (s < 45) {
+          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
+          spinnerLabel.textContent = "Scoring and summarizing…";
+        } else if (s < 75) {
+          stageEl.textContent = "Generating your full report…";
+          spinnerLabel.textContent = "Finalizing report…";
+        } else if (s < 180) {
+          stageEl.textContent = "Still working. Large sites may take several minutes.";
+          spinnerLabel.textContent = "Still analyzing…";
+        } else if (s < 300) {
+          stageEl.textContent = "Still working. We’re continuing to process the site and build your report.";
+          spinnerLabel.textContent = "Still analyzing…";
+        } else {
+          stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
+          spinnerLabel.textContent = "Still analyzing…";
+        }
+      }, 800);
+
+      return () => clearInterval(interval);
+    }
+
     function normalizeList(input){
       if (!Array.isArray(input)) return [];
       const out = [];
@@ -483,36 +526,6 @@
       }
     }
 
-    function startProgress() {
-      document.getElementById('progress-overlay').style.display = 'flex';
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 3;
-        if (progress >= 95) {
-          progress = 95;
-          clearInterval(interval);
-        }
-        progressFill.style.width = progress + '%';
-        progressPct.textContent = Math.round(progress) + '%';
-      }, 150);
-
-      return interval;
-    }
-
-    function stopProgress() {
-      const progressFill = document.getElementById('progress-fill');
-      const progressPct = document.getElementById('progress-pct');
-      progressFill.style.transition = 'width 0.5s ease';
-      progressFill.style.width = '100%';
-      progressPct.textContent = '100%';
-      setTimeout(() => {
-        document.getElementById('progress-overlay').style.display = 'none';
-      }, 800);
-    }
-
     document.getElementById('breakdownBtn').addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('breakdown-modal').style.display = 'flex';
@@ -528,20 +541,6 @@
       }
     });
 
-    // Expand/collapse behavior for opportunities (event delegation)
-    document.addEventListener('click', (e) => {
-      const btn = e.target && (e.target.closest ? e.target.closest('[data-expand-btn="1"]') : null);
-      if (!btn) return;
-
-      const id = btn.getAttribute('data-target');
-      const details = document.getElementById(id);
-      if (!details) return;
-
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-      details.classList.toggle('is-open', !isOpen);
-    });
-
     document.getElementById("copyBtn").addEventListener("click", async () => {
       const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
       const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
@@ -551,7 +550,13 @@
         ...document.querySelectorAll('#opportunitiesCritical .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesStrategic .opportunity-item .item-text'),
         ...document.querySelectorAll('#opportunitiesIncremental .opportunity-item .item-text')
-      ].slice(0, 12).map(el => el.textContent.trim());
+      ].slice(0, 12).map(el => {
+        const text = el.textContent.trim();
+        const mainText = text.split('Impact:')[0].trim();
+        const fixCallout = el.parentNode.querySelector('.fix-callout');
+        const fix = fixCallout ? fixCallout.textContent.replace(/How to fix.*?:/, '').trim() : '';
+        return fix ? `${mainText.split(' - ')[0]} - ${fix.split('.')[0]}.` : mainText;
+      });
 
       const aiInsights = [...document.querySelectorAll('.ai-row .ai-text')].map(el => {
         const logoImg = el.parentNode.querySelector('.ai-logo img');
@@ -607,82 +612,6 @@
         "<div class='ai-row'><div class='ai-logo'><span class='ai-fallback'>AI</span></div><div class='ai-text'>No engine insights were returned for this scan.</div></div>";
     }
 
-    function parseOpportunityLine(line){
-      const raw = String(line || '').trim();
-
-      // Extract and remove [PRIORITY: X]
-      const priorityMatch = raw.match(/\[PRIORITY:\s*([^\]]+)\]/i);
-      const priorityTag = priorityMatch ? priorityMatch[1].trim().toLowerCase() : '';
-      const withoutPriority = raw.replace(/\[PRIORITY:\s*[^\]]+\]\s*/i, '').trim();
-
-      // Split on Solution / Impact
-      const parts = withoutPriority.split('Solution:');
-      const issue = (parts[0] || '').trim();
-
-      let solution = '';
-      let impact = '';
-
-      if (parts[1]) {
-        const solutionAndMaybeImpact = parts[1].trim();
-        const impactParts = solutionAndMaybeImpact.split('Impact:');
-        solution = (impactParts[0] || '').trim();
-        impact = (impactParts[1] || '').trim();
-      }
-
-      return { priorityTag, issue, solution, impact };
-    }
-
-    function priorityClassFrom(issue, priorityTag){
-      if (priorityTag.includes('high')) return 'priority-high';
-      if (priorityTag.includes('medium')) return 'priority-medium';
-      if (priorityTag.includes('low')) return 'priority-low';
-
-      // fallback heuristics (kept conservative)
-      const s = String(issue || '');
-      if (s.includes('Missing') || s.includes('Critical')) return 'priority-high';
-      if (s.includes('Limited') || s.includes('Weak')) return 'priority-medium';
-      return 'priority-low';
-    }
-
-    let oppIdCounter = 0;
-    function renderOpportunityHTML(issue, solution, impact, priorityCls){
-      oppIdCounter += 1;
-      const id = `opp-details-${oppIdCounter}`;
-
-      const hasDetails = !!(solution || impact);
-
-      return `
-        <li class="opportunity-item ${esc(priorityCls)}">
-          <div class="opp-header">
-            <p class="item-text">${esc(issue)}</p>
-            ${hasDetails ? `
-              <button class="expand-btn" type="button" aria-expanded="false" data-expand-btn="1" data-target="${esc(id)}" title="Show details">
-                <span class="chev" aria-hidden="true"></span>
-              </button>
-            ` : ''}
-          </div>
-
-          ${hasDetails ? `
-            <div class="opp-details" id="${esc(id)}">
-              ${solution ? `
-                <div class="callout">
-                  <div class="title">Implementation guidance</div>
-                  <div>${esc(solution)}</div>
-                </div>
-              ` : ''}
-
-              ${impact ? `
-                <div class="callout">
-                  <div class="title">Expected impact</div>
-                  <div>${esc(impact)}</div>
-                </div>
-              ` : ''}
-            </div>
-          ` : ''}
-        </li>
-      `;
-    }
-
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
@@ -696,7 +625,10 @@
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      const progressTimer = startProgress();
+      const domain = extractDomain(targetUrl);
+
+      showOverlay();
+      const stopMessaging = startOverlayMessaging(domain);
 
       try {
         const apiBase = await getApiBaseForScore(targetUrl);
@@ -709,7 +641,7 @@
           sessionStorage.setItem('sniperank:data', JSON.stringify(scoreJson));
         }catch(e){
           console.error('Score error:', e);
-          document.getElementById("scoreBand").textContent = "Score unavailable for this site right now.";
+          document.getElementById("scoreBand").textContent = "Unable to calculate score";
         }
 
         let apiResponse;
@@ -737,15 +669,25 @@
           const incremental = [];
 
           needsAttentionLines.forEach(line => {
-            const parsed = parseOpportunityLine(line);
-            const priority = priorityClassFrom(parsed.issue, parsed.priorityTag);
+            const parts = String(line).split('Solution:');
+            const issueRaw = parts[0].trim();
+            const solution = parts[1] ? parts[1].trim() : '';
 
-            const html = renderOpportunityHTML(
-              parsed.issue,
-              parsed.solution,
-              parsed.impact,
-              priority
-            );
+            let priority = 'priority-low';
+            if (issueRaw.includes('[PRIORITY: High]') || issueRaw.includes('Missing') || issueRaw.includes('Critical')) {
+              priority = 'priority-high';
+            } else if (issueRaw.includes('[PRIORITY: Medium]') || issueRaw.includes('Limited') || issueRaw.includes('Weak')) {
+              priority = 'priority-medium';
+            }
+
+            const issue = issueRaw.replace(/\[PRIORITY: [^\]]+\]/, '').trim();
+
+            const html = `
+              <li class="opportunity-item ${priority}">
+                <p class="item-text">${esc(issue)}</p>
+                ${solution ? `<div class="fix-callout"><div class="fix-title">How to fix:</div>${esc(solution.split('Impact:')[0].trim())}</div>` : ''}
+              </li>
+            `;
 
             if (priority === 'priority-high') critical.push(html);
             else if (priority === 'priority-medium') strategic.push(html);
@@ -763,7 +705,6 @@
         }
 
         if (engineInsightLines.length > 0) {
-          // Match analyze.html logo paths
           const engineMap = {
             'ChatGPT': '/img/chatgpt-logo.png',
             'Claude': '/img/claude.jpeg',
@@ -798,11 +739,11 @@
         document.getElementById("scoreBand").textContent = "Error loading full report";
         setNoDataState();
       } finally {
-        clearInterval(progressTimer);
-        stopProgress();
+        stopMessaging();
+        hideOverlay();
       }
     });
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-5 -->
+<!-- Version footer: v2026.01.12-1 -->
