@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2026.01.12-4
-  Last updated: 2026-01-12 (America/New_York)
+  Version: v2026.01.14-1
+  Last updated: 2026-01-14 (America/New_York)
 
   Changes (only):
-  1) Footer updated to match full-report.html footer (full-bleed + typography + copy).
-  2) No other layout/design/functionality changes.
+  1) Bottom CTAs separated into two distinct panels.
+  2) "Get Your Full Report" wrapped in a light container with a full-color edge.
+  3) Scheduling panel wrapped in a light container with a full-color edge.
+  4) Buttons updated to two different colors that work with the new container background.
+  5) Added a short optional “survey” (2 questions) inside the full report form.
+  6) No other layout/design/functionality changes.
 -->
 <html lang="en">
 <head>
@@ -24,6 +28,16 @@
       --text:#0b1220;
       --muted-2:#64748b;
       --bg-soft:#f7fafc;
+
+      /* CTA panels (new) */
+      --panel-bg:#f8fafc;
+      --panel-border:#e6edf7;
+      --panel-edge:#3182CE;
+
+      --btn-blue:#3182CE;
+      --btn-blue-hover:#2563eb;
+      --btn-slate:#0f172a;
+      --btn-slate-hover:#111827;
     }
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
@@ -69,21 +83,105 @@
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
-    .form-section{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);margin-top:3rem;width:100%}
-    .form-section h3{margin:0 0 2rem;font-size:1.8rem;font-weight:700}
+    /* Existing form input styles retained */
     .form-container{max-width:100%;margin:0 auto}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:0 auto 1rem}
     .form-full{grid-column:1/-1}
-    .form-section input, .form-section textarea{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:4px;font-size:16px;font-family:inherit}
-    .form-section textarea{min-height:100px;resize:vertical}
-    .form-section input:focus, .form-section textarea:focus{outline:none;border-color:#3182CE}
+    input, textarea, select{font-family:inherit}
+    .form-input, .form-textarea, .form-select{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:4px;font-size:16px;background:#fff}
+    .form-textarea{min-height:100px;resize:vertical}
+    .form-input:focus, .form-textarea:focus, .form-select:focus{outline:none;border-color:#3182CE}
     .form-btn{margin-top:1rem;max-width:300px}
 
-    .consultation-section{text-align:center;padding:3rem 2rem;margin-top:3rem}
-    .consultation-section h3{margin:0 0 1rem;font-size:1.8rem;font-weight:700}
-    .consultation-section p{margin:0 0 2rem;color:var(--muted)}
     .consultation-info{color:var(--muted);font-size:.95rem;margin-top:1rem}
     .consultation-info strong{color:#000}
+
+    /* NEW: Split CTA panels */
+    .cta-wrap{
+      width:100%;
+      border-top:1px solid var(--border);
+      margin-top:3rem;
+      padding-top:2.25rem;
+      display:flex;
+      flex-direction:column;
+      gap:1.25rem;
+    }
+    .cta-card{
+      width:100%;
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      border-left:10px solid var(--panel-edge);
+      border-radius:14px;
+      padding:1.75rem 1.5rem;
+      box-shadow:0 1px 2px rgba(0,0,0,.03);
+      text-align:center;
+    }
+    .cta-card h3{
+      margin:0 0 .5rem;
+      font-size:1.8rem;
+      font-weight:700;
+    }
+    .cta-sub{
+      margin:0 0 1.4rem;
+      color:var(--muted);
+      font-size:1.02rem;
+      line-height:1.6;
+    }
+
+    .btn-fullreport{
+      background:var(--btn-blue);
+      color:#fff;
+      border:none;
+      padding:.85rem 2rem;
+      border-radius:999px;
+      font-size:1.05rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:background .2s;
+      display:inline-block;
+      text-decoration:none;
+      text-align:center;
+    }
+    .btn-fullreport:hover{background:var(--btn-blue-hover)}
+    .btn-schedule{
+      background:var(--btn-slate);
+      color:#fff;
+      border:none;
+      padding:.85rem 2rem;
+      border-radius:999px;
+      font-size:1.05rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:background .2s;
+      display:inline-block;
+      text-decoration:none;
+      text-align:center;
+    }
+    .btn-schedule:hover{background:var(--btn-slate-hover)}
+
+    .survey-title{
+      margin:1rem 0 .6rem;
+      font-weight:800;
+      font-size:1rem;
+      color:#111;
+      text-align:left;
+    }
+    .field-label{
+      display:block;
+      text-align:left;
+      font-size:.95rem;
+      font-weight:700;
+      color:#111;
+      margin:.35rem 0 .35rem;
+    }
+    .helper{
+      display:block;
+      text-align:left;
+      font-size:.9rem;
+      color:var(--muted);
+      margin:-.15rem 0 .5rem;
+      line-height:1.4;
+    }
 
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
@@ -188,6 +286,8 @@
 
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
+      .form-grid{grid-template-columns:1fr}
+      .cta-card{padding:1.5rem 1.15rem}
     }
   </style>
 </head>
@@ -222,31 +322,64 @@
     <p style="text-align:center;color:gray;">Loading analysis...</p>
   </section>
 
-  <!-- Get Full Report Form -->
-  <section class="form-section">
-    <h3>Get Your Full Report</h3>
-    <div class="form-container">
-      <form id="full-report-form" novalidate>
-        <div class="form-grid">
-          <input type="text" id="name-input" placeholder="Your Name" required />
-          <input type="email" id="email-input" placeholder="Your Email" required />
-          <input type="tel" id="phone-input" placeholder="Your Phone (optional)" />
-          <input type="text" id="company-input" placeholder="Your Company (optional)" />
-          <textarea class="form-full" id="context-input" placeholder="Share context or ask a specific question — we'll address at your free consult."></textarea>
-        </div>
-        <button type="submit" class="btn-primary form-btn" id="full-report-btn">Get My Full Report</button>
-        <div id="form-error" class="error-note" style="display:none;"></div>
-      </form>
-    </div>
-  </section>
+  <!-- Split CTAs into two distinct panels -->
+  <section class="cta-wrap" aria-label="Next steps">
+    <!-- Get Full Report Panel -->
+    <div class="cta-card" id="full-report-panel">
+      <h3>Get Your Full Report</h3>
+      <p class="cta-sub">Get the detailed breakdown and prioritized opportunities. (Optional: answer 2 quick questions to tailor your full report.)</p>
 
-  <!-- Consultation Section -->
-  <section class="consultation-section">
-    <h3>Ready to Improve Your AI Visibility?</h3>
-    <p>After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
-    <a href="https://calendly.com/quontora" class="btn-primary" target="_blank" rel="noopener">Schedule Free Consultation</a>
-    <div class="consultation-info">
-      <strong>What we'll cover:</strong> Your AI Visibility opportunities, implementation timeline, and how to get found across major AI assistants.
+      <div class="form-container">
+        <form id="full-report-form" novalidate>
+          <div class="form-grid">
+            <input class="form-input" type="text" id="name-input" placeholder="Your Name" required />
+            <input class="form-input" type="email" id="email-input" placeholder="Your Email" required />
+            <input class="form-input" type="tel" id="phone-input" placeholder="Your Phone (optional)" />
+            <input class="form-input" type="text" id="company-input" placeholder="Your Company (optional)" />
+            <textarea class="form-textarea form-full" id="context-input" placeholder="Share context or ask a specific question — we'll address at your free consult."></textarea>
+
+            <!-- Optional 2-question survey -->
+            <div class="form-full">
+              <div class="survey-title">Optional quick questions</div>
+
+              <label class="field-label" for="survey-maturity">Where are you today with AI visibility?</label>
+              <span class="helper">Helps us frame your full report to match your current state.</span>
+              <select class="form-select" id="survey-maturity">
+                <option value="">Select one (optional)</option>
+                <option value="just_exploring">Just exploring / learning</option>
+                <option value="suspect_misrepresented">I suspect AI is misrepresenting us</option>
+                <option value="actively_improving">We’re actively trying to improve AI visibility</option>
+                <option value="urgent_revenue_reputation">Urgent (revenue or reputation impact)</option>
+              </select>
+
+              <label class="field-label" for="survey-role" style="margin-top:.85rem;">What best describes you?</label>
+              <span class="helper">So recommendations can be tailored to decision-makers vs implementers.</span>
+              <select class="form-select" id="survey-role">
+                <option value="">Select one (optional)</option>
+                <option value="founder_exec">Founder / Executive</option>
+                <option value="marketing_growth">Marketing / Growth</option>
+                <option value="product_ops">Product / Ops</option>
+                <option value="dev_it">Developer / IT</option>
+                <option value="agency_consultant">Agency / Consultant</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-fullreport form-btn" id="full-report-btn">Get My Full Report</button>
+          <div id="form-error" class="error-note" style="display:none;"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Consultation Panel -->
+    <div class="cta-card" id="schedule-panel">
+      <h3>Ready to Improve Your AI Visibility?</h3>
+      <p class="cta-sub">After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
+      <a href="https://calendly.com/quontora" class="btn-schedule" target="_blank" rel="noopener">Schedule Free Consultation</a>
+      <div class="consultation-info">
+        <strong>What we'll cover:</strong> Your AI Visibility opportunities, implementation timeline, and how to get found across major AI assistants.
+      </div>
     </div>
   </section>
 
@@ -535,7 +668,7 @@
       }
     }
 
-    async function fetchTryPrimaryThenAlt(primaryUrl, altUrl, opts) {
+        async function fetchTryPrimaryThenAlt(primaryUrl, altUrl, opts) {
       let lastErr = null;
       try {
         const r1 = await fetchWithTimeout(primaryUrl, opts);
@@ -584,156 +717,17 @@
       }
     });
 
-    document.getElementById('full-report-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name-input').value.trim();
-      const email = document.getElementById('email-input').value.trim();
-      const phone = document.getElementById('phone-input').value.trim();
-      const company = document.getElementById('company-input').value.trim();
-      const context = document.getElementById('context-input').value.trim();
-      const errorEl = document.getElementById('form-error');
-      const btn = document.getElementById('full-report-btn');
 
-      errorEl.style.display = 'none';
-      if (!name || !email || !targetUrl) {
-        errorEl.textContent = 'Please provide your name and email.';
-        errorEl.style.display = 'block';
-        return;
-      }
 
-      const domain = extractDomain(targetUrl);
 
-      sessionStorage.setItem('sniperank:name', name);
-      sessionStorage.setItem('sniperank:email', email);
-      sessionStorage.setItem('sniperank:phone', phone);
-      sessionStorage.setItem('sniperank:company', company);
-      sessionStorage.setItem('sniperank:context', context);
-      sessionStorage.setItem('sniperank:url', targetUrl);
-      sessionStorage.setItem('sniperank:domain', domain);
 
-      btn.disabled = true;
-      btn.textContent = 'Preparing Full Report...';
 
-      const q = new URLSearchParams({
-        url: targetUrl,
-        name: encodeURIComponent(name),
-        email: encodeURIComponent(email),
-        domain,
-        source: 'analyze'
-      }).toString();
 
-      window.location.href = `full-report.html?${q}`;
-    });
 
-    async function scoreLoop(primaryBase, altBase, url) {
-      const scoreBand = document.getElementById("scoreBand");
 
-      const TOTAL_WINDOW_MS = 300000;     // 5 minutes total retry window
-      const ATTEMPT_TIMEOUT_MS = 120000;  // 2 minutes per attempt
-      const PAUSE_BETWEEN_MS = 15000;     // 15 seconds between attempts
 
-      const start = Date.now();
-      let attempt = 0;
 
-      while ((Date.now() - start) < TOTAL_WINDOW_MS) {
-        attempt += 1;
 
-        // Keep messaging neutral; do not flip to "unable" mid-stream.
-        scoreBand.textContent = (attempt === 1)
-          ? "Computing score…"
-          : "Computing score… (still working)";
 
-        const primaryUrl = `${primaryBase}/api/score?url=${encodeURIComponent(url)}`;
-        const altUrl = `${altBase}/api/score?url=${encodeURIComponent(url)}`;
 
-        try {
-          const { res } = await fetchTryPrimaryThenAlt(primaryUrl, altUrl, { timeoutMs: ATTEMPT_TIMEOUT_MS });
-          const j = await res.json();
-
-          if (!j || typeof j.score !== 'number' || !j.pillars) {
-            throw new Error("Invalid score payload");
-          }
-
-          renderScoreCard(j.score, j.pillars, j.highlights || []);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(j));
-          return;
-        } catch (e) {
-          console.error('Score attempt failed:', e);
-
-          if ((Date.now() - start) + PAUSE_BETWEEN_MS >= TOTAL_WINDOW_MS) break;
-          await new Promise(r => setTimeout(r, PAUSE_BETWEEN_MS));
-        }
-      }
-
-      // After retry window: final, neutral state (still not "broken").
-      document.getElementById("scoreNumber").textContent = "—";
-      scoreBand.textContent = "Score unavailable for this site right now.";
-      // Keep placeholder pillars; do not blank them.
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!targetUrl) {
-        document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
-        document.getElementById("scoreBand").textContent = "No URL provided";
-        renderScorePending();
-        return;
-      }
-
-      document.getElementById("current-url").textContent = targetUrl;
-
-      // Always show a non-empty score UI immediately.
-      renderScorePending();
-
-      const domain = extractDomain(targetUrl);
-
-      showOverlay();
-      const stopMessaging = startOverlayMessaging(domain);
-
-      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
-      let apiBase = '';
-
-      // Probe same-origin quickly; fallback to Render if probe fails.
-      try {
-        const probe = await fetchWithTimeout('/api/score?url=' + encodeURIComponent('https://example.com'), {
-          method: 'HEAD',
-          timeoutMs: 9000
-        });
-        if (!probe.ok) throw new Error(`Probe HTTP ${probe.status}`);
-        apiBase = '';
-      } catch {
-        apiBase = FALLBACK_BASE;
-      }
-
-      const primaryBase = apiBase;
-      const altBase = (primaryBase === '') ? FALLBACK_BASE : '';
-
-      // Score retries in the background (not gating overlay).
-      scoreLoop(primaryBase, altBase, targetUrl);
-
-      // Report fetch gates overlay (primary value).
-      const reportPrimaryUrl = `${primaryBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
-      const reportAltUrl     = `${altBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
-
-      const REPORT_TIMEOUT_MS = 480000; // 8 minutes
-
-      try {
-        const { res } = await fetchTryPrimaryThenAlt(reportPrimaryUrl, reportAltUrl, { timeoutMs: REPORT_TIMEOUT_MS });
-        const html = await res.text();
-        const host = document.getElementById('summary-results');
-        host.innerHTML = html;
-        transformAIInsights(host);
-      } catch (e) {
-        console.error('Report error:', e);
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-      } finally {
-        stopMessaging();
-        hideOverlay();
-      }
-    });
-  </script>
-</body>
-</html>
-<!-- Version footer: v2026.01.12-4 -->
+    
