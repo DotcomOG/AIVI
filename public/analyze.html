@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2026.01.12-5
+  Version: v2026.01.12-6
   Last updated: 2026-01-14 (America/New_York)
 
   Changes (only):
@@ -9,6 +9,8 @@
      - “Get Your Full Report”
      - “Schedule Free Consultation”
      No changes to typography, spacing system elsewhere, header/score/summary/footer, JS, or max-width/layout flow.
+  2) Added a short, lightweight explainer blurb under “Get Your Full Report” to clarify value + reduce friction.
+     (Bottom CTA area only.)
 -->
 <html lang="en">
 <head>
@@ -102,6 +104,15 @@
     }
     .cta-card-lite .form-section{border-top:0}
     .cta-card-lite .consultation-section{padding:3rem 2rem}
+
+    /* Full Report value blurb (CTA-local only) */
+    .cta-value{
+      max-width:560px;
+      margin: -1.1rem auto 1.4rem;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+    }
 
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
@@ -247,6 +258,11 @@
         <!-- Get Full Report Form -->
         <section class="form-section">
           <h3>Get Your Full Report</h3>
+
+          <p class="cta-value">
+            Your full report turns this summary into a clear action plan — what AI systems can and can’t read, where trust signals are missing, and the highest-impact fixes to improve how you show up across major AI assistants.
+          </p>
+
           <div class="form-container">
             <form id="full-report-form" novalidate>
               <div class="form-grid">
@@ -763,4 +779,4 @@
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-5 -->
+<!-- Version footer: v2026.01.12-6 -->
