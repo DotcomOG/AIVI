@@ -1,823 +1,479 @@
 <!DOCTYPE html>
 <!--
-  AI Visibility Index (AIVI) Index Page
-  Version: v2026.01.07-1@
+  index.html
+  Version: v2026.01.15-1
+  Last updated: 2026-01-15 (America/New_York)
 
-Last updated: 2026-01-07 (America/New_York)
+  Changes (only):
+  1) Removed all “Index” references (positioning now “AI Visibility Report”).
+  2) Reduced bold/visual weight across body copy to prevent a crowded look.
+  3) Removed duplicate “Reveal My AI Visibility” text inside the same box (single title + single button).
+  4) Kept the same basic page structure and user flow: URL -> analyze.html (query param + localStorage).
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Visibility Index (AIVI) — Visibility for the Age of AI</title>
-  <meta name="description" content="AIVI reveals how modern AI systems interpret, trust, and represent your website — before customers ever see you." />
+  <title>AI Visibility Report</title>
+  <meta name="description" content="See how AI systems interpret and describe your brand — and where that interpretation breaks down." />
 
   <style>
     :root{
-      --max-width:1200px;
-      --pad-h:2rem;
-      --pad-v:3vh;
-
-      --primary:#3182CE;
-      --primary-dark:#2563EB;
-      --accent:#E53E3E;
-
-      --text:#0b1220;
-      --muted:#475569;
-      --muted-2:#64748b;
-
-      --border:#e2e8f0;
-      --bg:#ffffff;
-      --bg-soft:#f7fafc;
-      --bg-soft-2:#f1f5f9;
-
-      --shadow:0 14px 40px rgba(2,6,23,.10);
-      --shadow-soft:0 10px 28px rgba(49,130,206,.16), 0 2px 6px rgba(2,6,23,.05);
-
-      --radius:14px;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#dbeafe;
+      --soft:#eff6ff;
+      --soft2:#f8fafc;
+      --accent:#2563eb;
+      --accent2:#ef4444;
+      --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --radius: 16px;
+      --max: 1040px;
     }
 
-    /* Keep any existing legacy rotator styles (harmless) */
-    /* ROTATOR VISIBILITY FIX */
-    #rotatorWindow{
-      display:inline-block;
-      vertical-align:baseline;
-      min-width:12ch;
-      overflow:hidden;
-    }
-    #rotatorWindow .rotator-word{
-      display:block;
-      white-space:nowrap;
-      color:var(--accent, #E53E3E);
-      font-weight:900;
-      line-height:1;
-    }
-
-    *{margin:0;padding:0;box-sizing:border-box}
+    *{ box-sizing:border-box; }
     body{
-      font-family:Helvetica, Arial, sans-serif;
-      background:var(--bg);
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      line-height:1.6;
-      overflow-x:hidden;
+      background:#fff;
     }
-    a{color:var(--primary);text-decoration:none}
-    a:hover{text-decoration:underline}
 
-    .wrap{max-width:var(--max-width);margin:0 auto;padding:0 var(--pad-h)}
-    .section{padding:3.2rem 0}
-    .section-tight{padding:2.2rem 0}
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
 
-    /* Header */
-    header{
-      padding:calc(var(--pad-v) + .5rem) 0 0;
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:28px 22px 70px;
     }
-    .header-row{
+
+    /* Top bar */
+    .topbar{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:1rem;
-      max-width:var(--max-width);
-      margin:0 auto;
-      padding:0 var(--pad-h);
+      gap:18px;
+      margin-bottom:34px;
     }
+
     .brand{
       display:flex;
       flex-direction:column;
-      gap:.25rem;
-      min-width:0;
+      gap:6px;
+      line-height:1.1;
     }
-    h1.logo{
-      font-size:2.3rem;
-      font-weight:900;
-      letter-spacing:-.8px;
-      line-height:1;
-      margin:0;
-      color:#0b1220;
-      display:inline-flex;
-      gap:.35rem;
-      align-items:baseline;
-      flex-wrap:wrap;
-      white-space:nowrap;
-    }
-    h1.logo .blue{color:var(--primary)}
-    .subhead{
-      font-size:1.02rem;
+
+    .brand-title{
+      font-size:22px;
       font-weight:700;
+      letter-spacing:-0.02em;
+    }
+
+    .brand-title .muted{
       color:var(--muted);
+      font-weight:600;
+    }
+
+    .brand-sub{
       display:flex;
       align-items:center;
-      gap:.5rem;
+      gap:10px;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:500;
     }
-    .subhead .bolt{font-size:1.05rem}
 
-    .header-links{
+    .bolt{
+      font-size:14px;
+      transform: translateY(-1px);
+    }
+
+    .top-links{
+      text-align:right;
       display:flex;
       flex-direction:column;
-      align-items:flex-end;
-      gap:.35rem;
-      padding-top:.25rem;
-      min-width:0;
+      gap:6px;
+      padding-top:4px;
     }
-    .header-links .toplink{
-      font-size:.95rem;
-      font-weight:800;
-      color:#0b1220;
-      white-space:nowrap;
+
+    .top-links a{
+      font-size:14px;
+      font-weight:600;
+      color:var(--text);
+      opacity:.9;
     }
-    .powered-by{
-      font-size:.9rem;
-      color:#64748b;
-      white-space:nowrap;
+
+    .top-links .powered{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:500;
     }
-    .powered-by a{
-      color:var(--primary);
+
+    .top-links .powered a{
+      color:var(--accent);
       font-weight:700;
       text-decoration:none;
     }
-    .powered-by a:hover{text-decoration:underline}
+    .top-links .powered a:hover{ text-decoration:underline; }
 
     /* Hero */
     .hero{
-      padding:2.1rem 0 0;
-    }
-    .hero-grid{
-      max-width:var(--max-width);
-      margin:0 auto;
-      padding:0 var(--pad-h);
+      margin-bottom:22px;
     }
 
-    /* ===== HERO HEADER (HERO ONLY EDITS) ===== */
-    .heroHeadline{
-      margin:.4rem 0 .85rem;
-      font-weight:900;
-      line-height:1.04;
+    .hero h1{
+      margin:0 0 14px;
+      font-size:54px;
+      line-height:1.02;
+      letter-spacing:-0.03em;
+      font-weight:800;
       text-transform:uppercase;
-      color:#0b1220;
     }
 
-    /* Line 1: keep to one line on desktop; allow wrap on very small screens */
-    .heroTopLine{
-      display:block;
-      letter-spacing:.04em;
-      white-space:nowrap;
-      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
-      line-height:1.02;
-      margin:0 0 10px;
+    .hero h1 .accent{
+      color:var(--accent2);
     }
 
-    /* Slot loop (2D) */
-    .rotatorWrap{
-      display:inline-flex;
-      align-items:baseline;
-      gap:10px;
-      max-width:100%;
-    }
-
-    .slotViewport{
-      position:relative;
-      height:60px;                 /* one word tall */
-      overflow:hidden;
-      background:#fff;             /* pure white (match page) */
-      padding:0 16px;              /* safe inset prevents clipping */
-      max-width:100%;
-    }
-
-    .slotStack{
-      display:block;
-      will-change:transform;
-      transform:translateY(0);
-    }
-
-    .slotItem{
-      height:60px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:flex-start;  /* all words start at same left edge */
-      white-space:nowrap;
-
-      color:var(--accent);
-      font-weight:900;
-      letter-spacing:.02em;
-      font-size:clamp(2.05rem, 4.4vw, 3.6rem);
-      line-height:1.02;
-      padding-bottom:2px;
-    }
-    /* ===== END HERO ONLY EDITS ===== */
-
-    .hero-sub{
-      font-size:clamp(1.05rem, 1.6vw, 1.22rem);
-      color:var(--muted);
+    .hero p{
+      margin:0;
       max-width:860px;
-      line-height:1.8;
-      margin-bottom:1.35rem;
-      font-weight:600;
+      font-size:18px;
+      line-height:1.55;
+      color:#374151;
+      font-weight:500; /* not bold */
     }
 
-    /* CTA Panel */
-    .cta-panel{
-      background:radial-gradient(1000px 260px at 50% -10%, rgba(49,130,206,.22) 0%, rgba(255,255,255,0) 60%),
-                 linear-gradient(180deg, #f0f7ff 0%, #ffffff 72%);
-      border:2px solid rgba(49,130,206,.35);
-      border-radius:16px;
-      padding:1.35rem 1.35rem 1.15rem;
-      box-shadow:var(--shadow-soft);
-      margin:1.15rem 0 1.25rem;
+    /* Main card */
+    .card{
+      margin-top:18px;
+      background: linear-gradient(180deg, rgba(37,99,235,.10), rgba(239,246,255,.55));
+      border:1px solid rgba(37,99,235,.25);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
     }
-    .cta-top{
-      display:flex;
-      flex-direction:column;
-      gap:.5rem;
-      margin-bottom:1rem;
+
+    .card-title{
+      font-size:16px;
+      font-weight:700;
+      margin:0 0 6px;
+      color:#0f172a;
     }
-    .cta-title{
-      font-size:1.15rem;
-      font-weight:900;
-      letter-spacing:-.2px;
-    }
-    .cta-note{
+
+    .card-subtitle{
+      margin:0 0 14px;
+      font-size:13px;
       color:var(--muted);
-      font-size:.95rem;
       font-weight:600;
     }
 
-    .cta-form{
+    .form-row{
       display:flex;
-      gap:.75rem;
+      gap:12px;
       align-items:stretch;
+      margin-bottom:12px;
       flex-wrap:wrap;
     }
 
-    /* URL input width reduced on desktop */
-    .url-input{
-      flex:0 0 360px;
-      width:360px;
-      max-width:100%;
-      font-size:1.1rem;
-      padding:1rem 1.1rem;
-      border:2px solid var(--border);
+    .input{
+      flex:1 1 320px;
+      min-width:260px;
+      border:1px solid rgba(15,23,42,.18);
       border-radius:12px;
-      background:#fff;
-      transition:border-color .2s, box-shadow .2s;
-    }
-    .url-input:focus{
+      padding:12px 14px;
+      font-size:16px;
+      font-weight:500; /* not bold */
       outline:none;
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(49,130,206,.15);
+      background:#fff;
+    }
+
+    .input:focus{
+      border-color: rgba(37,99,235,.65);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
     }
 
     .btn{
-      border:none;
+      flex:0 0 auto;
+      border:0;
       border-radius:12px;
+      padding:12px 16px;
+      font-size:15px;
+      font-weight:800;
+      background:var(--accent);
+      color:#fff;
       cursor:pointer;
-      font-weight:900;
-      letter-spacing:-.2px;
-      transition:transform .12s ease, background .2s ease, box-shadow .2s ease;
-      text-decoration:none;
+      min-width:220px;
+      box-shadow: 0 8px 18px rgba(37,99,235,.22);
+    }
+
+    .btn:hover{ filter:brightness(0.98); }
+    .btn:active{ transform: translateY(1px); }
+
+    .divider{
+      height:1px;
+      background: rgba(15,23,42,.10);
+      margin:12px 0 10px;
+    }
+
+    .meta-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
+    .pill{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      gap:.5rem;
-      padding:1rem 1.2rem;
-      white-space:nowrap;
+      gap:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background: rgba(34,197,94,.12);
+      color: #166534;
+      border: 1px solid rgba(34,197,94,.20);
+      height:26px;
     }
-    .btn-primary{
-      background:var(--primary);
-      color:#fff;
-      min-width:220px;
-      box-shadow:0 10px 22px rgba(49,130,206,.22);
-      font-size:1.05rem;
+
+    .bullets{
+      margin:0;
+      padding-left:18px;
+      color:#374151;
+      font-size:13.5px;
+      line-height:1.55;
+      font-weight:500; /* not bold */
     }
-    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .btn-secondary{
-      background:#fff;
-      color:#111;
-      border:2px solid #111;
-      font-size:1rem;
-      padding:.95rem 1.1rem;
-    }
-    .btn-secondary:hover{transform:translateY(-1px)}
+
+    .bullets li{ margin:4px 0; }
+    .bullets b, .bullets strong{ font-weight:700; } /* keep emphasis available, but not everywhere */
 
     .error{
-      margin-top:.65rem;
-      font-size:.95rem;
-      color:var(--primary);
-      font-weight:700;
       display:none;
-      width:100%;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(239,68,68,.08);
+      border:1px solid rgba(239,68,68,.18);
+      color:#991b1b;
+      font-size:13px;
+      font-weight:600;
     }
-    .error.show{display:block}
 
-    .value-points{
-      margin-top:.95rem;
-      padding-top:.9rem;
-      border-top:1px solid rgba(226,232,240,.9);
-      display:flex;
-      gap:1rem;
-      flex-wrap:wrap;
-      align-items:flex-start;
-    }
-    .value-points .free-flag{
-      font-weight:900;
-      color:#16a34a;
-      background:rgba(22,163,74,.10);
-      border:1px solid rgba(22,163,74,.28);
-      padding:.2rem .6rem;
-      border-radius:999px;
-      font-size:.85rem;
-      line-height:1.2;
-      margin-right:.25rem;
-      height:fit-content;
-    }
-    .value-points ul{
-      margin:0;
-      padding-left:1.2rem;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.65;
-      font-size:.95rem;
-      flex:1;
-      min-width:260px;
-    }
-    .value-points li{margin:.35rem 0}
-
-    /* Two cards under CTA (kept from your layout idea) */
-    .hero-cards{
+    /* Two callout boxes */
+    .callouts{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:1.1rem;
-      margin:1.15rem 0 2rem;
-    }
-    .hcard{
-      border-radius:16px;
-      padding:1.15rem 1.15rem;
-      border:2px solid rgba(49,130,206,.45);
-      background:#fff;
-      box-shadow:0 10px 26px rgba(2,6,23,.06);
-    }
-    .hcard.alt{
-      border-color:rgba(229,62,62,.25);
-      background:rgba(229,62,62,.06);
-    }
-    .hcard h3{
-      font-size:1.05rem;
-      font-weight:900;
-      margin-bottom:.5rem;
-      letter-spacing:-.2px;
-    }
-    .hcard p{
-      color:var(--muted);
-      font-weight:700;
-      font-size:.95rem;
-      line-height:1.75;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+      margin-top:18px;
     }
 
-    /* Pillars */
-    .pillars{
-      background:var(--bg-soft);
-      border-top:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-    }
-    .title{
-      font-size:2.1rem;
-      font-weight:900;
-      letter-spacing:-.6px;
-      margin-bottom:.8rem;
-    }
-    .kicker{
-      color:var(--muted);
-      font-size:1.05rem;
-      font-weight:700;
-      max-width:920px;
-      line-height:1.85;
-    }
-    .pillars-grid{
-      display:grid;
-      grid-template-columns:repeat(4, minmax(0, 1fr));
-      gap:1.1rem;
-      margin-top:1.4rem;
-    }
-    .pillar{
+    .callout{
+      border-radius:var(--radius);
+      padding:16px 16px 14px;
+      border:1px solid rgba(37,99,235,.20);
       background:#fff;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:1.2rem 1.15rem;
-      box-shadow:0 10px 24px rgba(2,6,23,.05);
+      box-shadow: 0 8px 18px rgba(17,24,39,.06);
     }
-    .pillar .p-icon{
-      font-size:1.25rem;
-      margin-bottom:.55rem;
-    }
-    .pillar h4{
-      font-size:1.05rem;
-      font-weight:900;
-      letter-spacing:-.2px;
-      margin-bottom:.35rem;
+
+    .callout h3{
+      margin:0 0 8px;
+      font-size:15px;
+      font-weight:800;
       color:#0f172a;
     }
-    .pillar p{
-      font-size:.95rem;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.6;
+
+    .callout p{
+      margin:0;
+      font-size:13.5px;
+      line-height:1.55;
+      color:#374151;
+      font-weight:500; /* not bold */
     }
-    .pillars-footer{
-      margin-top:1.05rem;
-      color:var(--muted);
-      font-size:.98rem;
+
+    .callout.soft{
+      background: linear-gradient(180deg, rgba(37,99,235,.06), rgba(248,250,252,1));
+    }
+
+    .callout.warn{
+      border-color: rgba(239,68,68,.18);
+      background: linear-gradient(180deg, rgba(239,68,68,.05), rgba(255,255,255,1));
+    }
+
+    /* Section header below */
+    .section{
+      margin-top:34px;
+    }
+
+    .section h2{
+      margin:0 0 10px;
+      font-size:30px;
+      letter-spacing:-0.02em;
       font-weight:800;
     }
 
-    /* Footer */
-    footer{
-      margin-top:3rem;
-      border-top:1px solid var(--border);
-      background:var(--bg-soft);
-    }
-    .footer-inner{
-      max-width:var(--max-width);
-      margin:0 auto;
-      padding:2rem var(--pad-h) 1.25rem;
-      display:grid;
-      grid-template-columns:1.4fr 1fr 1fr;
-      gap:1.6rem;
-    }
-    .foot-brand h3{
-      font-size:1.1rem;
-      font-weight:900;
-      margin-bottom:.35rem;
-      letter-spacing:-.2px;
-    }
-    .foot-brand p{
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.7;
-      font-size:.95rem;
-    }
-    .disclaimer{
-      margin-top:.75rem;
-      color:var(--muted-2);
-      font-size:.85rem;
-      font-weight:800;
-      line-height:1.6;
-    }
-    .foot-col h4{
-      font-size:.95rem;
-      font-weight:900;
-      margin-bottom:.6rem;
-      color:#0f172a;
-    }
-    .foot-links{
-      list-style:none;
+    .section p{
       margin:0;
-      padding:0;
-      display:flex;
-      flex-direction:column;
-      gap:.45rem;
-    }
-    .foot-links a{
-      color:var(--muted);
-      font-weight:800;
-      text-decoration:none;
-    }
-    .foot-links a:hover{color:#0f172a;text-decoration:none}
-    .foot-bottom{
-      border-top:1px solid var(--border);
-      padding:1rem var(--pad-h);
-      max-width:var(--max-width);
-      margin:0 auto;
-      color:var(--muted-2);
-      font-size:.85rem;
-      font-weight:700;
+      color:#374151;
+      font-size:14.5px;
       line-height:1.6;
+      font-weight:500;
+      max-width:900px;
     }
 
     /* Responsive */
-    @media (max-width:1020px){
-      .pillars-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
-      .url-input{flex:1; width:100%}
-      .hero-cards{grid-template-columns:1fr}
-    }
-    @media (max-width:640px){
-      .header-row{flex-direction:column;align-items:flex-start}
-      .header-links{align-items:flex-start}
-      h1.logo{white-space:normal}
-
-      /* Mobile: let line 1 wrap if it must */
-      .heroTopLine{ white-space:normal; letter-spacing:.03em; margin-bottom:8px; }
-
-      .btn-primary{min-width:100%}
-      .cta-form{flex-direction:column}
-      .url-input{width:100%}
-      .value-points{flex-direction:column}
-      .value-points ul{min-width:0}
-      .footer-inner{grid-template-columns:1fr}
+    @media (max-width: 900px){
+      .hero h1{ font-size:40px; }
+      .callouts{ grid-template-columns:1fr; }
+      .btn{ min-width: 180px; }
     }
   </style>
 </head>
 
-<body id="top">
-  <!-- Header -->
-  <header>
-    <div class="header-row">
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
       <div class="brand">
-        <h1 class="logo">AI Visibility <span class="blue">Index</span></h1>
-        <div class="subhead"><span class="bolt">⚡</span> Visibility for the Age of AI</div>
+        <div class="brand-title">AI Visibility <span class="muted">Report</span></div>
+        <div class="brand-sub"><span class="bolt">⚡</span>Visibility for the Age of AI</div>
       </div>
 
-      <div class="header-links">
-        <a class="toplink" href="#how-it-works">Learn how the index works</a>
-        <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-grid">
-
-      <!-- HERO -->
-      <h2 class="heroHeadline" aria-label="Does AI describe your brand as">
-        <span class="heroTopLine">DOES AI DESCRIBE YOUR BRAND AS</span>
-        <span class="rotatorWrap">
-          <span id="slotViewport" class="slotViewport" aria-live="polite" aria-atomic="true">
-            <span id="slotStack" class="slotStack"></span>
-          </span>
-        </span>
-      </h2>
-
-      <div class="hero-sub">
-        The AI Visibility Index (AIVI) measures how AI systems currently interpret, trust, and represent your website — before customers ever see you.
-      </div>
-
-      <!-- Front-and-center CTA -->
-      <div class="cta-panel" id="analyze">
-        <div class="cta-top">
-          <div class="cta-title">Reveal My AI Visibility</div>
-          <div class="cta-note">Free AIVI Snapshot (Analyze)</div>
-        </div>
-
-        <form id="analyze-form" class="cta-form" novalidate>
-          <input id="url" type="text" class="url-input" placeholder="Enter a website URL" aria-label="Website URL" />
-          <button type="submit" class="btn btn-primary">Reveal My AI Visibility</button>
-          <div id="error-message" class="error" role="alert"></div>
-        </form>
-
-        <div class="value-points" aria-label="Snapshot details">
-          <span class="free-flag">Free</span>
-          <ul>
-            <li>High-level AIVI snapshot</li>
-            <li>Initial strengths and visibility gaps</li>
-            <li>How AI currently understands your site, how your brand is reconstructed</li>
-            <li>Delivered as a snapshot measurement, not monitoring or alerts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="hero-cards">
-        <div class="hcard">
-          <h3>You're not optimizing for AI, yet.</h3>
-          <p>
-            AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers, summaries,
-            and recommendations, often without your knowledge or control. AIVI makes that invisible layer visible.
-          </p>
-        </div>
-        <div class="hcard alt">
-          <h3>This is not SEO.</h3>
-          <p>
-            This is AI perception. If AI cannot clearly understand you, it cannot confidently recommend you.
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Pillars -->
-  <div class="pillars section" id="how-it-works">
-    <div class="wrap">
-      <div class="title">How AI "sees" a website</div>
-      <div class="kicker">AIVI analyzes four core layers of AI perception. Each layer contributes to a single, interpretable Index reading that reflects how AI is likely to understand and represent your website today.</div>
-
-      <div class="pillars-grid" role="list">
-        <div class="pillar" role="listitem">
-          <div class="p-icon">🧱</div>
-          <h4>Structural Legibility</h4>
-          <p>Can AI reliably parse, navigate, and segment your site?</p>
-        </div>
-        <div class="pillar" role="listitem">
-          <div class="p-icon">🗣️</div>
-          <h4>Semantic Clarity</h4>
-          <p>Does AI understand your offering, or fill in the gaps with assumptions?</p>
-        </div>
-        <div class="pillar" role="listitem">
-          <div class="p-icon">🏛️</div>
-          <h4>Authority Recognition</h4>
-          <p>Does AI treat your content as reference-worthy, or disposable?</p>
-        </div>
-        <div class="pillar" role="listitem">
-          <div class="p-icon">⚠️</div>
-          <h4>Representation Risk</h4>
-          <p>How likely AI is to misstate, oversimplify, or exclude your brand when generating answers.</p>
-        </div>
-      </div>
-
-      <div class="pillars-footer">
-        Each layer contributes to your AI Visibility Index reading — a single, interpretable signal of how AI systems perceive your presence.
+      <div class="top-links">
+        <a href="#how-it-works">Learn how it works</a>
+        <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
       </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="footer-inner">
-      <div class="foot-brand">
-        <h3>AI Visibility Index (AIVI)</h3>
+    <div class="hero">
+      <h1>DOES AI DESCRIBE YOUR BRAND AS <span class="accent">TRUSTWORTHY?</span></h1>
+      <p>
+        AIVI measures how AI systems interpret, trust, and represent your website — before customers ever see you.
+      </p>
+    </div>
+
+    <div class="card" aria-label="AIVI Snapshot">
+      <div class="card-title">Get your AI Visibility Snapshot</div>
+      <div class="card-subtitle">High-level analysis of how AI is likely to understand and represent your brand today.</div>
+
+      <form id="aiviForm" class="form-row" autocomplete="off">
+        <input
+          id="urlInput"
+          class="input"
+          type="text"
+          inputmode="url"
+          placeholder="Enter a website URL"
+          aria-label="Website URL"
+        />
+        <button class="btn" id="submitBtn" type="submit">Analyze My Brand</button>
+      </form>
+
+      <div class="divider"></div>
+
+      <div class="meta-row">
+        <span class="pill">Free snapshot</span>
+        <ul class="bullets">
+          <li>High-level visibility snapshot</li>
+          <li>Initial strengths and visibility gaps</li>
+          <li>How AI currently understands your site and reconstructs your brand</li>
+          <li>Delivered as a snapshot measurement (not monitoring or alerts)</li>
+        </ul>
+      </div>
+
+      <div id="errorBox" class="error" role="alert"></div>
+    </div>
+
+    <div class="callouts">
+      <div class="callout soft">
+        <h3>You’re not optimizing for AI, yet.</h3>
         <p>
-          AIVI summarizes observable AI perception signals to help teams understand how AI systems interpret, trust, and represent a website.
+          AI is already judging you. Large language models interpret, compress, and reconstruct your brand into answers,
+          summaries, and recommendations — often without your knowledge or control. AIVI makes that invisible layer visible.
         </p>
-        <div class="disclaimer">
-          AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
-        </div>
       </div>
 
-      <div class="foot-col">
-        <h4>Product</h4>
-        <ul class="foot-links">
-          <li><a href="#analyze">Free AIVI Snapshot</a></li>
-          <li><a href="#how-it-works">How the index works</a></li>
-        </ul>
-      </div>
-
-      <div class="foot-col">
-        <h4>Company</h4>
-        <ul class="foot-links">
-          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-          <li><a href="mailto:hello@quontora.com?subject=AIVI%20Question">Contact</a></li>
-        </ul>
+      <div class="callout warn">
+        <h3>This is not SEO.</h3>
+        <p>
+          This is AI perception. If AI cannot clearly understand you, it cannot confidently recommend you.
+        </p>
       </div>
     </div>
 
-    <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> AI Visibility Index (AIVI). A product of Quontora.</div>
-      <div style="margin-top:.35rem;">
-        Request-based access during early development. Pricing and availability may change.
-      </div>
+    <div class="section" id="how-it-works">
+      <h2>How AI “sees” a website</h2>
+      <p>
+        AIVI evaluates core layers of AI perception and synthesizes them into a clear snapshot of how your brand is likely
+        to be understood and represented by AI systems today.
+      </p>
     </div>
-  </footer>
+
+  </div>
 
   <script>
-    // Footer year
-    document.getElementById("footer-year").textContent = new Date().getFullYear();
+    (function () {
+      const form = document.getElementById("aiviForm");
+      const input = document.getElementById("urlInput");
+      const errorBox = document.getElementById("errorBox");
+      const submitBtn = document.getElementById("submitBtn");
 
-    // Basic URL validation
-    function isValidURL(input){
-      return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(input);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const analyzeForm = document.getElementById("analyze-form");
-      const urlInput = document.getElementById("url");
-      const errorDiv = document.getElementById("error-message");
-
-      if (analyzeForm && urlInput && errorDiv) {
-        analyzeForm.addEventListener("submit", (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-
-          let url = (urlInput.value || "").trim();
-          errorDiv.classList.remove("show");
-
-          if (!url) {
-            errorDiv.textContent = "Please enter a website URL";
-            errorDiv.classList.add("show");
-            return;
-          }
-          if (!isValidURL(url)) {
-            errorDiv.textContent = "Please enter a valid domain (e.g., example.com)";
-            errorDiv.classList.add("show");
-            return;
-          }
-          if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-
-          window.location.href = "analyze.html?url=" + encodeURIComponent(url);
-        });
+      function normalizeUrl(raw) {
+        const v = (raw || "").trim();
+        if (!v) return "";
+        // Accept plain domains and add https://
+        if (!/^https?:\/\//i.test(v)) return "https://" + v;
+        return v;
       }
 
-      // HERO SLOT ROTATOR (2D, continuous loop, downwards, 2s pause)
-      (function(){
-        const viewport = document.getElementById("slotViewport");
-        const stack = document.getElementById("slotStack");
-        if (!viewport || !stack) return;
+      function isValidUrl(u) {
+        try {
+          const url = new URL(u);
+          return !!url.hostname && (url.protocol === "http:" || url.protocol === "https:");
+        } catch (e) {
+          return false;
+        }
+      }
 
-        const baseWords = [
-          "TRUSTWORTHY?",
-          "AUTHORITATIVE?",
-          "CLEAR?",
-          "RELIABLE?",
-          "CREDIBLE?",
-          "UNDERSTANDABLE?",
-          "CONSISTENT?"
-        ];
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = "block";
+      }
 
-        // Duplicate list for seamless looping
-        const words = baseWords.concat(baseWords);
+      function clearError() {
+        errorBox.textContent = "";
+        errorBox.style.display = "none";
+      }
 
-        // Build DOM
-        stack.innerHTML = "";
-        const items = [];
-        words.forEach(w => {
-          const el = document.createElement("span");
-          el.className = "slotItem";
-          el.textContent = w;
-          stack.appendChild(el);
-          items.push(el);
-        });
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        clearError();
 
-        function measureAndLockWidth(){
-          const probe = document.createElement("span");
-          probe.className = "slotItem";
-          probe.style.position = "absolute";
-          probe.style.visibility = "hidden";
-          probe.style.left = "-9999px";
-          probe.style.top = "-9999px";
-          probe.style.height = "auto";
-          probe.style.width = "auto";
-          probe.style.transform = "none";
-          probe.style.paddingBottom = "2px";
-          document.body.appendChild(probe);
+        const normalized = normalizeUrl(input.value);
 
-          let maxW = 0;
-          baseWords.forEach(w => {
-            probe.textContent = w;
-            const wpx = Math.ceil(probe.getBoundingClientRect().width);
-            if (wpx > maxW) maxW = wpx;
-          });
-
-          document.body.removeChild(probe);
-
-          const cs = window.getComputedStyle(viewport);
-          const padL = parseFloat(cs.paddingLeft) || 0;
-          const padR = parseFloat(cs.paddingRight) || 0;
-
-          if (maxW > 0) {
-            const total = maxW + padL + padR;
-            viewport.style.width = total + "px";
-            viewport.style.minWidth = total + "px";
-          }
+        if (!normalized) {
+          showError("Please enter a website URL.");
+          return;
         }
 
-        const pauseMs = 2000;
-        const rollMs  = 650;
-
-        let index = 0;
-        let ticking = false;
-
-        function setY(y, animate){
-          stack.style.transition = animate ? `transform ${rollMs}ms cubic-bezier(.2,.9,.2,1)` : "none";
-          stack.style.transform = `translateY(${y}px)`;
+        if (!isValidUrl(normalized)) {
+          showError("That doesn’t look like a valid URL. Try something like example.com");
+          return;
         }
 
-        function step(){
-          if (ticking) return;
-          ticking = true;
+        // Keep compatibility: store and pass query param
+        try {
+          localStorage.setItem("aivi_target_url", normalized);
+        } catch (err) {}
 
-          const itemH = Math.round(items[0].getBoundingClientRect().height || 60);
+        submitBtn.disabled = true;
 
-          setTimeout(() => {
-            index += 1;
-            setY(-index * itemH, true);
-
-            setTimeout(() => {
-              if (index >= baseWords.length) {
-                index = 0;
-                setY(0, false);
-              }
-              ticking = false;
-              step();
-            }, rollMs);
-
-          }, pauseMs);
-        }
-
-        function init(){
-          measureAndLockWidth();
-          setY(0, false);
-          index = 0;
-          ticking = false;
-          step();
-        }
-
-        init();
-        window.addEventListener("resize", () => {
-          const itemH = Math.round((items[0]?.getBoundingClientRect().height) || 60);
-          measureAndLockWidth();
-          setY(-index * itemH, false);
-        });
-      })();
-    });
+        const next = "analyze.html?url=" + encodeURIComponent(normalized);
+        window.location.href = next;
+      });
+    })();
   </script>
 
-  <!-- Version: v2026.01.07-1 -->
+  <!-- Version: v2026.01.15-1 -->
 </body>
 </html>
