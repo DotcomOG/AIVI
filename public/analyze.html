@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2026.01.12-6
+  Version: v2026.01.12-7
   Last updated: 2026-01-14 (America/New_York)
 
   Changes (only):
@@ -9,8 +9,7 @@
      - “Get Your Full Report”
      - “Schedule Free Consultation”
      No changes to typography, spacing system elsewhere, header/score/summary/footer, JS, or max-width/layout flow.
-  2) Added a short, lightweight explainer blurb under “Get Your Full Report” to clarify value + reduce friction.
-     (Bottom CTA area only.)
+  2) Updated the Full Report explainer text (copy + line breaks) inside the Full Report CTA only.
 -->
 <html lang="en">
 <head>
@@ -107,11 +106,11 @@
 
     /* Full Report value blurb (CTA-local only) */
     .cta-value{
-      max-width:560px;
-      margin: -1.1rem auto 1.4rem;
-      color: var(--muted);
-      font-size: 1.02rem;
-      line-height: 1.6;
+      max-width:600px;
+      margin:-1.25rem auto 1.5rem;
+      color:var(--muted);
+      font-size:1.02rem;
+      line-height:1.6;
     }
 
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
@@ -260,7 +259,9 @@
           <h3>Get Your Full Report</h3>
 
           <p class="cta-value">
-            Your full report turns this summary into a clear action plan — what AI systems can and can’t read, where trust signals are missing, and the highest-impact fixes to improve how you show up across major AI assistants.
+            <strong>Full Report!</strong> <br>
+            Your full report gives you a clear action plan. <br>
+            See what AI can and can't read about your brand, where trust signals are missing, and the highest-impact fixes to improve how you show up across ChatGPT, Claude, Gemini, and more.
           </p>
 
           <div class="form-container">
@@ -779,4 +780,4 @@
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-6 -->
+<!-- Version footer: v2026.01.12-7 -->
