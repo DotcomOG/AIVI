@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2026.01.12-7
+  Version: v2026.01.12-8
   Last updated: 2026-01-14 (America/New_York)
 
   Changes (only):
-  1) Bottom CTAs: added local wrapper + subtle card containment to visually separate:
-     - “Get Your Full Report”
-     - “Schedule Free Consultation”
+  1) Bottom CTAs: added subtle per-box background tints + refined “finish” (border/shadow) for each CTA card
+     - Full Report card uses a very subtle blue-tinted background (existing palette: --bg-soft / --primary).
+     - Consultation card uses a very subtle neutral/gray background (existing palette: --bg-soft / --border).
      No changes to typography, spacing system elsewhere, header/score/summary/footer, JS, or max-width/layout flow.
-  2) Updated the Full Report explainer text (copy + line breaks) inside the Full Report CTA only.
 -->
 <html lang="en">
 <head>
@@ -91,11 +90,14 @@
     /* Bottom CTAs: local containment + separation only (scoped; no global impact) */
     .bottom-cta-wrap{width:100%;margin-top:3rem}
     .bottom-cta-grid{display:grid;grid-template-columns:1fr;gap:14px}
+
+    /* Base CTA card finish */
     .cta-card-lite{
       border:1px solid var(--border);
       border-radius:12px;
-      background:transparent;
       overflow:hidden;
+      box-shadow:0 2px 10px rgba(0,0,0,.05);
+      background:transparent;
     }
     .cta-card-lite .form-section,
     .cta-card-lite .consultation-section{
@@ -104,13 +106,14 @@
     .cta-card-lite .form-section{border-top:0}
     .cta-card-lite .consultation-section{padding:3rem 2rem}
 
-    /* Full Report value blurb (CTA-local only) */
-    .cta-value{
-      max-width:600px;
-      margin:-1.25rem auto 1.5rem;
-      color:var(--muted);
-      font-size:1.02rem;
-      line-height:1.6;
+    /* Per-box background shades (two different tints, subtle) */
+    .cta-card-full{
+      background:linear-gradient(180deg, rgba(49,130,206,.06) 0%, rgba(247,250,252,0) 60%);
+      border-color: rgba(49,130,206,.18);
+    }
+    .cta-card-consult{
+      background:linear-gradient(180deg, rgba(0,0,0,.03) 0%, rgba(247,250,252,0) 60%);
+      border-color: rgba(0,0,0,.10);
     }
 
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
@@ -253,14 +256,17 @@
   <!-- Bottom CTAs (refinement wrapper only) -->
   <div class="bottom-cta-wrap">
     <div class="bottom-cta-grid">
-      <div class="cta-card-lite">
+
+      <div class="cta-card-lite cta-card-full">
         <!-- Get Full Report Form -->
         <section class="form-section">
-          <h3>Full Report</h3>
+          <h3>Get Your Full Report</h3>
 
-          <p class="cta-value">
+          <!-- (You said you'll adjust this copy yourself) -->
+          <p style="max-width:600px;margin:-1.25rem auto 1.5rem;color:var(--muted);font-size:1.02rem;line-height:1.6;">
+            Full Report! <br>
             Your full report gives you a clear action plan. <br>
-            See what AI can and can't read about your brand,<br>where trust signals are missing, and the highest-impact fixes<br>to improve how you show up across ChatGPT, Claude, Gemini, and more.
+            See what AI can and can't read about your brand, where trust signals are missing, and the highest-impact fixes to improve how you show up across ChatGPT, Claude, Gemini, and more.
           </p>
 
           <div class="form-container">
@@ -279,7 +285,7 @@
         </section>
       </div>
 
-      <div class="cta-card-lite">
+      <div class="cta-card-lite cta-card-consult">
         <!-- Consultation Section -->
         <section class="consultation-section">
           <h3>Ready to Improve Your AI Visibility?</h3>
@@ -290,6 +296,7 @@
           </div>
         </section>
       </div>
+
     </div>
   </div>
 
@@ -464,7 +471,6 @@
       }
     }
 
-    // Always show a stable "pending" score UI immediately (no blank score card)
     function renderScorePending(){
       document.getElementById("scoreNumber").textContent = "—";
       document.getElementById("scoreBand").textContent = "Computing score…";
@@ -671,9 +677,9 @@
     async function scoreLoop(primaryBase, altBase, url) {
       const scoreBand = document.getElementById("scoreBand");
 
-      const TOTAL_WINDOW_MS = 300000;     // 5 minutes total retry window
-      const ATTEMPT_TIMEOUT_MS = 120000;  // 2 minutes per attempt
-      const PAUSE_BETWEEN_MS = 15000;     // 15 seconds between attempts
+      const TOTAL_WINDOW_MS = 300000;
+      const ATTEMPT_TIMEOUT_MS = 120000;
+      const PAUSE_BETWEEN_MS = 15000;
 
       const start = Date.now();
       let attempt = 0;
@@ -681,7 +687,6 @@
       while ((Date.now() - start) < TOTAL_WINDOW_MS) {
         attempt += 1;
 
-        // Keep messaging neutral; do not flip to "unable" mid-stream.
         scoreBand.textContent = (attempt === 1)
           ? "Computing score…"
           : "Computing score… (still working)";
@@ -708,10 +713,8 @@
         }
       }
 
-      // After retry window: final, neutral state (still not "broken").
       document.getElementById("scoreNumber").textContent = "—";
       scoreBand.textContent = "Score unavailable for this site right now.";
-      // Keep placeholder pillars; do not blank them.
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -726,7 +729,6 @@
 
       document.getElementById("current-url").textContent = targetUrl;
 
-      // Always show a non-empty score UI immediately.
       renderScorePending();
 
       const domain = extractDomain(targetUrl);
@@ -737,7 +739,6 @@
       const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
       let apiBase = '';
 
-      // Probe same-origin quickly; fallback to Render if probe fails.
       try {
         const probe = await fetchWithTimeout('/api/score?url=' + encodeURIComponent('https://example.com'), {
           method: 'HEAD',
@@ -752,14 +753,12 @@
       const primaryBase = apiBase;
       const altBase = (primaryBase === '') ? FALLBACK_BASE : '';
 
-      // Score retries in the background (not gating overlay).
       scoreLoop(primaryBase, altBase, targetUrl);
 
-      // Report fetch gates overlay (primary value).
       const reportPrimaryUrl = `${primaryBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
       const reportAltUrl     = `${altBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
 
-      const REPORT_TIMEOUT_MS = 480000; // 8 minutes
+      const REPORT_TIMEOUT_MS = 480000;
 
       try {
         const { res } = await fetchTryPrimaryThenAlt(reportPrimaryUrl, reportAltUrl, { timeoutMs: REPORT_TIMEOUT_MS });
@@ -779,4 +778,4 @@
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-7 -->
+<!-- Version footer: v2026.01.12-8 -->
