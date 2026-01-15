@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <!--
   index.html
-  Version: v2026.01.15-1
+  Version: v2026.01.15-2
   Last updated: 2026-01-15 (America/New_York)
 
   Changes (only):
-  1) Removed all “Index” references (positioning now “AI Visibility Report”).
-  2) Reduced bold/visual weight across body copy to prevent a crowded look.
-  3) Removed duplicate “Reveal My AI Visibility” text inside the same box (single title + single button).
-  4) Kept the same basic page structure and user flow: URL -> analyze.html (query param + localStorage).
+  1) Restored hero word rotation.
+  2) Restored the lower “How AI 'sees' a website” section + footer (the “bottom half”).
+  3) Removed “Learn how it works” from the top right.
+  4) Shortened the URL input width (~50%) while preserving the same flow to analyze.html.
+  5) Kept the “no Index references” direction (positioned as AI Visibility Report).
 -->
 <html lang="en">
 <head>
@@ -21,12 +22,14 @@
     :root{
       --text:#111827;
       --muted:#6b7280;
+      --muted2:#94a3b8;
       --border:#dbeafe;
       --soft:#eff6ff;
       --soft2:#f8fafc;
       --accent:#2563eb;
       --accent2:#ef4444;
       --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --shadow2: 0 10px 22px rgba(17,24,39,.06);
       --radius: 16px;
       --max: 1040px;
     }
@@ -97,13 +100,6 @@
       padding-top:4px;
     }
 
-    .top-links a{
-      font-size:14px;
-      font-weight:600;
-      color:var(--text);
-      opacity:.9;
-    }
-
     .top-links .powered{
       font-size:13px;
       color:var(--muted);
@@ -135,13 +131,33 @@
       color:var(--accent2);
     }
 
+    .rotator{
+      display:inline-block;
+      position:relative;
+      min-width:12ch;
+      white-space:nowrap;
+    }
+    .rotator .word{
+      display:inline-block;
+      transition: opacity 250ms ease, transform 250ms ease;
+      will-change: opacity, transform;
+    }
+    .rotator .word.fade-out{
+      opacity:0;
+      transform: translateY(2px);
+    }
+    .rotator .word.fade-in{
+      opacity:1;
+      transform: translateY(0);
+    }
+
     .hero p{
       margin:0;
       max-width:860px;
       font-size:18px;
       line-height:1.55;
       color:#374151;
-      font-weight:500; /* not bold */
+      font-weight:500;
     }
 
     /* Main card */
@@ -176,14 +192,16 @@
       flex-wrap:wrap;
     }
 
+    /* Shorter URL field (~50% of typical row) */
     .input{
-      flex:1 1 320px;
-      min-width:260px;
+      flex:0 1 420px;         /* key change: no longer “flex:1” */
+      width:420px;
+      max-width:100%;
       border:1px solid rgba(15,23,42,.18);
       border-radius:12px;
       padding:12px 14px;
       font-size:16px;
-      font-weight:500; /* not bold */
+      font-weight:500;
       outline:none;
       background:#fff;
     }
@@ -235,6 +253,7 @@
       color: #166534;
       border: 1px solid rgba(34,197,94,.20);
       height:26px;
+      flex: 0 0 auto;
     }
 
     .bullets{
@@ -243,11 +262,11 @@
       color:#374151;
       font-size:13.5px;
       line-height:1.55;
-      font-weight:500; /* not bold */
+      font-weight:500;
     }
 
     .bullets li{ margin:4px 0; }
-    .bullets b, .bullets strong{ font-weight:700; } /* keep emphasis available, but not everywhere */
+    .bullets b, .bullets strong{ font-weight:700; }
 
     .error{
       display:none;
@@ -274,7 +293,7 @@
       padding:16px 16px 14px;
       border:1px solid rgba(37,99,235,.20);
       background:#fff;
-      box-shadow: 0 8px 18px rgba(17,24,39,.06);
+      box-shadow: var(--shadow2);
     }
 
     .callout h3{
@@ -289,7 +308,7 @@
       font-size:13.5px;
       line-height:1.55;
       color:#374151;
-      font-weight:500; /* not bold */
+      font-weight:500;
     }
 
     .callout.soft{
@@ -301,7 +320,7 @@
       background: linear-gradient(180deg, rgba(239,68,68,.05), rgba(255,255,255,1));
     }
 
-    /* Section header below */
+    /* Lower content */
     .section{
       margin-top:34px;
     }
@@ -322,11 +341,121 @@
       max-width:900px;
     }
 
+    .layers{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:16px;
+    }
+
+    .layer-card{
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:14px;
+      padding:14px 14px 12px;
+      box-shadow: 0 10px 18px rgba(17,24,39,.04);
+    }
+
+    .layer-icon{
+      font-size:16px;
+      margin-bottom:10px;
+      opacity:.95;
+    }
+
+    .layer-title{
+      margin:0 0 8px;
+      font-size:14px;
+      font-weight:800;
+      color:#0f172a;
+    }
+
+    .layer-desc{
+      margin:0;
+      font-size:13px;
+      line-height:1.5;
+      color:#475569;
+      font-weight:500;
+    }
+
+    .section-note{
+      margin-top:14px;
+      font-size:13.5px;
+      color:#475569;
+      font-weight:600;
+    }
+
+    /* Footer */
+    .footer{
+      margin-top:44px;
+      border-top:1px solid rgba(15,23,42,.08);
+      padding-top:26px;
+      color:#475569;
+    }
+
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .footer h4{
+      margin:0 0 10px;
+      font-size:13px;
+      font-weight:800;
+      color:#0f172a;
+      letter-spacing:-0.01em;
+    }
+
+    .footer p{
+      margin:0 0 10px;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:500;
+      color:#475569;
+      max-width:420px;
+    }
+
+    .footer ul{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:13px;
+      font-weight:600;
+      color:#334155;
+    }
+
+    .footer a{
+      color:#334155;
+      text-decoration:none;
+    }
+    .footer a:hover{ text-decoration:underline; }
+
+    .footer-small{
+      margin-top:18px;
+      font-size:12px;
+      color:#64748b;
+      font-weight:600;
+      line-height:1.6;
+    }
+
     /* Responsive */
-    @media (max-width: 900px){
+    @media (max-width: 980px){
       .hero h1{ font-size:40px; }
       .callouts{ grid-template-columns:1fr; }
+      .layers{ grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 620px){
+      .layers{ grid-template-columns: 1fr; }
       .btn{ min-width: 180px; }
+      .input{ width:100%; flex-basis: 100%; }
+      .footer-grid{ grid-template-columns: 1fr; }
+      .topbar{ flex-direction:column; align-items:flex-start; }
+      .top-links{ text-align:left; }
     }
   </style>
 </head>
@@ -341,13 +470,17 @@
       </div>
 
       <div class="top-links">
-        <a href="#how-it-works">Learn how it works</a>
         <div class="powered">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
       </div>
     </div>
 
     <div class="hero">
-      <h1>DOES AI DESCRIBE YOUR BRAND AS <span class="accent">TRUSTWORTHY?</span></h1>
+      <h1>
+        DOES AI DESCRIBE YOUR BRAND AS
+        <span class="accent rotator" aria-label="rotating descriptor">
+          <span id="rotatingWord" class="word fade-in">TRUSTWORTHY?</span>
+        </span>
+      </h1>
       <p>
         AIVI measures how AI systems interpret, trust, and represent your website — before customers ever see you.
       </p>
@@ -401,18 +534,116 @@
       </div>
     </div>
 
+    <!-- Bottom half restored -->
     <div class="section" id="how-it-works">
       <h2>How AI “sees” a website</h2>
       <p>
-        AIVI evaluates core layers of AI perception and synthesizes them into a clear snapshot of how your brand is likely
-        to be understood and represented by AI systems today.
+        AIVI analyzes core layers of AI perception. Each layer contributes to a single, interpretable report reading that
+        reflects how AI is likely to understand and represent your website today.
       </p>
+
+      <div class="layers" aria-label="AIVI layers">
+        <div class="layer-card">
+          <div class="layer-icon">🧱</div>
+          <h3 class="layer-title">Structural Legibility</h3>
+          <p class="layer-desc">Can AI reliably parse, navigate, and segment your site?</p>
+        </div>
+
+        <div class="layer-card">
+          <div class="layer-icon">🗣️</div>
+          <h3 class="layer-title">Semantic Clarity</h3>
+          <p class="layer-desc">Does AI understand your offering, or fill in gaps with assumptions?</p>
+        </div>
+
+        <div class="layer-card">
+          <div class="layer-icon">🏛️</div>
+          <h3 class="layer-title">Authority Recognition</h3>
+          <p class="layer-desc">Does AI treat your content as reference-worthy, or disposable?</p>
+        </div>
+
+        <div class="layer-card">
+          <div class="layer-icon">⚠️</div>
+          <h3 class="layer-title">Representation Risk</h3>
+          <p class="layer-desc">How likely is AI to misstate, oversimplify, or exclude your brand in answers?</p>
+        </div>
+      </div>
+
+      <div class="section-note">
+        Each layer contributes to your AI visibility report reading — a single, interpretable signal of how AI systems perceive your presence.
+      </div>
     </div>
+
+    <footer class="footer" aria-label="Footer">
+      <div class="footer-grid">
+        <div>
+          <h4>AI Visibility Report (AIVI)</h4>
+          <p>
+            AIVI summarizes observable AI perception signals to help teams understand how AI systems interpret, trust, and
+            represent a website.
+          </p>
+          <p>
+            AIVI summarizes observable AI perception signals. It does not guarantee rankings, traffic, or outcomes.
+          </p>
+        </div>
+
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#aiviForm">Free AIVI Snapshot</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
+            <li><a href="mailto:hello@quontora.com">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-small">
+        © 2026 AI Visibility Report (AIVI). A product of Quontora.<br/>
+        Request-based access during early development. Pricing and availability may change.
+      </div>
+    </footer>
 
   </div>
 
   <script>
     (function () {
+      // --- Rotating hero word ---
+      const el = document.getElementById("rotatingWord");
+      const words = [
+        "TRUSTWORTHY?",
+        "UNDERSTANDABLE?",
+        "AUTHORITATIVE?",
+        "CLEAR?",
+        "RELEVANT?"
+      ];
+      let idx = 0;
+
+      function rotate() {
+        if (!el) return;
+
+        el.classList.remove("fade-in");
+        el.classList.add("fade-out");
+
+        window.setTimeout(() => {
+          idx = (idx + 1) % words.length;
+          el.textContent = words[idx];
+
+          el.classList.remove("fade-out");
+          el.classList.add("fade-in");
+        }, 260);
+      }
+
+      // Start rotation after first render
+      window.setTimeout(() => {
+        window.setInterval(rotate, 2200);
+      }, 900);
+
+      // --- Form flow to analyze.html (unchanged) ---
       const form = document.getElementById("aiviForm");
       const input = document.getElementById("urlInput");
       const errorBox = document.getElementById("errorBox");
@@ -421,7 +652,6 @@
       function normalizeUrl(raw) {
         const v = (raw || "").trim();
         if (!v) return "";
-        // Accept plain domains and add https://
         if (!/^https?:\/\//i.test(v)) return "https://" + v;
         return v;
       }
@@ -436,44 +666,47 @@
       }
 
       function showError(msg) {
+        if (!errorBox) return;
         errorBox.textContent = msg;
         errorBox.style.display = "block";
       }
 
       function clearError() {
+        if (!errorBox) return;
         errorBox.textContent = "";
         errorBox.style.display = "none";
       }
 
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        clearError();
+      if (form) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          clearError();
 
-        const normalized = normalizeUrl(input.value);
+          const normalized = normalizeUrl(input ? input.value : "");
 
-        if (!normalized) {
-          showError("Please enter a website URL.");
-          return;
-        }
+          if (!normalized) {
+            showError("Please enter a website URL.");
+            return;
+          }
 
-        if (!isValidUrl(normalized)) {
-          showError("That doesn’t look like a valid URL. Try something like example.com");
-          return;
-        }
+          if (!isValidUrl(normalized)) {
+            showError("That doesn’t look like a valid URL. Try something like example.com");
+            return;
+          }
 
-        // Keep compatibility: store and pass query param
-        try {
-          localStorage.setItem("aivi_target_url", normalized);
-        } catch (err) {}
+          try {
+            localStorage.setItem("aivi_target_url", normalized);
+          } catch (err) {}
 
-        submitBtn.disabled = true;
+          if (submitBtn) submitBtn.disabled = true;
 
-        const next = "analyze.html?url=" + encodeURIComponent(normalized);
-        window.location.href = next;
-      });
+          const next = "analyze.html?url=" + encodeURIComponent(normalized);
+          window.location.href = next;
+        });
+      }
     })();
   </script>
 
-  <!-- Version: v2026.01.15-1 -->
+  <!-- Version: v2026.01.15-2 -->
 </body>
 </html>
