@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   full-report.html
-  Version: v2026.01.16-3
+  Version: v2026.01.16-4
   Last updated: 2026-01-16
 -->
 <html lang="en">
@@ -10,253 +10,127 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AIVIndex™ – Full AI Visibility Report</title>
 
-  <!-- Uses your existing stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 
   <style>
-    /* Minimal safety styles only (won't fight your CSS) */
     .sr-wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 60px; }
-    .sr-top { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; align-items: baseline; }
-    .sr-brand h1 { margin: 0; font-size: 48px; letter-spacing: -0.02em; }
-    .sr-brand h2 { margin: 6px 0 0; font-size: 22px; font-weight: 600; }
-    .sr-meta { margin-top: 10px; font-size: 14px; opacity: 0.8; }
-    .sr-chip { display: inline-flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.03); }
-    .sr-intro { margin-top: 22px; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.12); background: #fff; }
-    .sr-intro h3 { margin: 0 0 8px; font-size: 16px; }
-    .sr-intro p { margin: 0; line-height: 1.5; opacity: 0.9; }
-    .sr-section { margin-top: 28px; }
-    .sr-section h3 { margin: 0 0 10px; font-size: 22px; }
-    .sr-section .sub { margin: 0 0 18px; opacity: 0.85; line-height: 1.5; }
-    .sr-box { border: 1px solid rgba(0,0,0,0.12); border-radius: 16px; background: #fff; overflow: hidden; }
-    .sr-item { padding: 14px 16px; border-top: 1px solid rgba(0,0,0,0.08); }
-    .sr-item:first-child { border-top: none; }
-    .sr-item .t { font-weight: 700; margin: 0 0 6px; }
-    .sr-item .i { margin: 0; opacity: 0.9; }
-    .sr-item .g { margin-top: 10px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); }
-    .sr-item .g .k { font-weight: 700; margin: 0 0 6px; }
-    .sr-item .g p { margin: 0; opacity: 0.9; }
-    .sr-error { margin-top: 18px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(180,0,0,0.25); background: rgba(180,0,0,0.06); }
-    .sr-error strong { display: block; margin-bottom: 6px; }
-    .sr-foot { margin-top: 44px; padding-top: 18px; border-top: 1px solid rgba(0,0,0,0.08); font-size: 13px; opacity: 0.75; }
-    .sr-link { color: inherit; text-decoration: underline; }
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .sr-top { display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+    .sr-brand h1 { margin:0; font-size:48px; }
+    .sr-brand h2 { margin:6px 0 0; font-size:22px; }
+    .sr-meta { margin-top:10px; font-size:14px; opacity:.8; }
+    .sr-chip { padding:10px 14px; border-radius:12px; border:1px solid rgba(0,0,0,.12); background:#f7f7f7; }
+    .sr-intro { margin-top:22px; padding:16px 18px; border-radius:16px; border:1px solid rgba(0,0,0,.12); }
+    .sr-section { margin-top:34px; }
+    .sr-section h3 { margin:0 0 8px; font-size:22px; }
+    .sr-sub { margin:0 0 16px; opacity:.85; }
+    .sr-box { border:1px solid rgba(0,0,0,.12); border-radius:16px; overflow:hidden; }
+    .sr-item { padding:14px 16px; border-top:1px solid rgba(0,0,0,.08); }
+    .sr-item:first-child { border-top:none; }
+    .sr-title { font-weight:700; margin:0 0 6px; }
+    .sr-impact { margin:0; opacity:.9; }
+    .sr-guidance { margin-top:10px; padding:12px; border-radius:12px; background:#f5f5f5; }
+    .sr-foot { margin-top:44px; padding-top:18px; border-top:1px solid rgba(0,0,0,.08); font-size:13px; opacity:.7; }
   </style>
 </head>
 
 <body>
-  <main class="sr-wrap">
-    <div class="sr-top">
-      <div class="sr-brand">
-        <h1>AIVIndex™</h1>
-        <h2>Full AI Visibility Report</h2>
-        <div class="sr-meta">
-          Powered by <a class="sr-link" href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
-        </div>
-      </div>
+<main class="sr-wrap">
 
-      <div class="sr-chip" id="srTargetChip" aria-live="polite">
-        <div><strong>Analysis for:</strong> <span id="srTarget">—</span></div>
+  <div class="sr-top">
+    <div class="sr-brand">
+      <h1>AIVIndex™</h1>
+      <h2>Full AI Visibility Report</h2>
+      <div class="sr-meta">Powered by <a href="https://quontora.com" target="_blank">Quontora</a></div>
+    </div>
+    <div class="sr-chip">
+      <strong>Analysis for:</strong> <span id="targetUrl">—</span>
+    </div>
+  </div>
+
+  <section class="sr-intro">
+    <h3>How AI currently interprets this site</h3>
+    <p>
+      This report evaluates how AI systems access, interpret, and represent this website.
+      The focus is AI visibility: clarity of meaning, trust signals, structural readability,
+      and alignment with the patterns AI relies on when generating answers.
+    </p>
+  </section>
+
+  <section class="sr-section">
+    <h3>Comprehensive Opportunities</h3>
+    <p class="sr-sub">
+      Specific, actionable improvements to strengthen how AI systems interpret, trust,
+      and represent your website. Items are grouped by urgency.
+    </p>
+
+    <div class="sr-box" id="oppsBox">
+      <div class="sr-item">
+        <p class="sr-title">Loading…</p>
       </div>
     </div>
+  </section>
 
-    <!-- TOP: scorecard removed; replaced with text -->
-    <section class="sr-intro">
-      <h3>How AI currently interprets this site</h3>
-      <p>
-        This report evaluates how AI systems access, interpret, and represent this website. The focus is AI visibility:
-        clarity of meaning, trust signals, structural readability, and alignment with the patterns AI relies on when generating answers.
-        The findings below highlight where interpretation is strong, where it is ambiguous, and where critical signals are missing or degraded.
-      </p>
-    </section>
+  <div class="sr-foot">
+    This page calls <code>/api/full</code> directly.
+  </div>
 
-    <section class="sr-section" id="srOps">
-      <h3>Comprehensive Opportunities</h3>
-      <p class="sub">
-        Specific, actionable improvements to strengthen how AI systems interpret, trust, and represent your website. Items are grouped by urgency.
-      </p>
+</main>
 
-      <div class="sr-box" id="srOpsBox">
+<script>
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get("url");
+  document.getElementById("targetUrl").textContent = url || "—";
+
+  if (!url) return;
+
+  const res = await fetch(`/api/full?url=${encodeURIComponent(url)}`);
+  if (!res.ok) {
+    document.getElementById("oppsBox").innerHTML =
+      '<div class="sr-item"><p class="sr-title">Analysis unavailable.</p></div>';
+    return;
+  }
+
+  const data = await res.json();
+
+  const box = document.getElementById("oppsBox");
+  box.innerHTML = "";
+
+  const groups = [
+    { title: "Critical Priorities", items: data.criticalPriorities || [] },
+    { title: "Strategic Improvements", items: data.strategicImprovements || [] },
+    { title: "Incremental Enhancements", items: data.incrementalEnhancements || [] }
+  ];
+
+  let rendered = false;
+
+  groups.forEach(group => {
+    if (!group.items.length) return;
+
+    box.insertAdjacentHTML("beforeend",
+      `<div class="sr-item"><p class="sr-title">${group.title}</p></div>`
+    );
+
+    group.items.forEach(item => {
+      box.insertAdjacentHTML("beforeend", `
         <div class="sr-item">
-          <p class="t">Loading…</p>
-          <p class="i">Fetching analysis from the API.</p>
+          <p class="sr-title">${item.title}</p>
+          <p class="sr-impact"><strong>Impact:</strong> ${item.impact}</p>
+          ${item.guidance ? `<div class="sr-guidance"><strong>Implementation guidance</strong><p>${item.guidance}</p></div>` : ``}
         </div>
-      </div>
+      `);
+      rendered = true;
+    });
+  });
 
-      <div class="sr-error" id="srErr" style="display:none;">
-        <strong>Analysis unavailable.</strong>
-        <div id="srErrMsg">—</div>
-      </div>
-    </section>
-
-    <div class="sr-foot">
-      This page calls <code>/api/full</code> directly. If it looks incomplete, the full analysis endpoint did not return usable data.
-    </div>
-  </main>
-
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const targetUrl = (params.get("url") || "").trim();
-
-      const targetEl = document.getElementById("srTarget");
-      const opsBox = document.getElementById("srOpsBox");
-      const errBox = document.getElementById("srErr");
-      const errMsg = document.getElementById("srErrMsg");
-
-      targetEl.textContent = targetUrl ? targetUrl : "—";
-
-      function safeText(v) {
-        if (v === null || v === undefined) return "";
-        return String(v);
-      }
-
-      function showError(message) {
-        errMsg.textContent = safeText(message || "Unable to fetch full analysis.");
-        errBox.style.display = "block";
-      }
-
-      function hideError() {
-        errBox.style.display = "none";
-      }
-
-      function normalizeGroups(data) {
-        if (!data || typeof data !== "object") return [];
-
-        // Preferred shape: { groups: [{ title, items: [...] }, ...] }
-        if (Array.isArray(data.groups)) return data.groups;
-
-        // Alternate: { opportunitiesGroups: [...] }
-        if (Array.isArray(data.opportunitiesGroups)) return data.opportunitiesGroups;
-
-        // Alternate buckets: { opportunities: { critical:[], strategic:[], incremental:[] } }
-        const opp = data.opportunities || data.opportunityBuckets || data.findings || null;
-        if (opp && typeof opp === "object") {
-          const groups = [];
-          const critical = Array.isArray(opp.critical) ? opp.critical : (Array.isArray(opp.criticalPriorities) ? opp.criticalPriorities : []);
-          const strategic = Array.isArray(opp.strategic) ? opp.strategic : (Array.isArray(opp.strategicImprovements) ? opp.strategicImprovements : []);
-          const incremental = Array.isArray(opp.incremental) ? opp.incremental : (Array.isArray(opp.incrementalEnhancements) ? opp.incrementalEnhancements : []);
-
-          if (critical.length) groups.push({ title: "Critical Priorities", items: critical });
-          if (strategic.length) groups.push({ title: "Strategic Improvements", items: strategic });
-          if (incremental.length) groups.push({ title: "Incremental Enhancements", items: incremental });
-
-          if (groups.length) return groups;
-        }
-
-        // Fallback: try a flat list
-        const flat = data.items || data.opportunities || data.list;
-        if (Array.isArray(flat)) return [{ title: "Opportunities", items: flat }];
-
-        return [];
-      }
-
-      function renderOpportunities(groups) {
-        const nodes = [];
-
-        (groups || []).forEach(group => {
-          const gTitle = safeText(group.title || "");
-          const items = Array.isArray(group.items) ? group.items : [];
-
-          if (!gTitle && items.length === 0) return;
-
-          // Group header row
-          const header = document.createElement("div");
-          header.className = "sr-item";
-          header.innerHTML = `<p class="t">${gTitle || "Opportunities"}</p>`;
-          nodes.push(header);
-
-          // Group items
-          items.forEach(it => {
-            const title = safeText(it.title || it.name || "Opportunity");
-            const impact = safeText(it.impact || it.impact_text || "");
-            const guidance = safeText(
-              it.guidance ||
-              it.implementation ||
-              it.implementation_guidance ||
-              it.implementationGuidance ||
-              it.recommendation ||
-              ""
-            );
-
-            const row = document.createElement("div");
-            row.className = "sr-item";
-            row.innerHTML = `
-              <p class="t">${title}</p>
-              ${impact ? `<p class="i"><strong>Impact:</strong> ${impact}</p>` : `<p class="i"></p>`}
-              ${guidance ? `
-                <div class="g">
-                  <p class="k">Implementation guidance</p>
-                  <p>${guidance}</p>
-                </div>` : ``}
-            `;
-            nodes.push(row);
-          });
-        });
-
-        if (nodes.length === 0) {
-          opsBox.innerHTML = `
-            <div class="sr-item">
-              <p class="t">No opportunities available.</p>
-              <p class="i">The API did not return opportunity groups for this run.</p>
-            </div>
-          `;
-          return;
-        }
-
-        opsBox.innerHTML = "";
-        nodes.forEach(n => opsBox.appendChild(n));
-      }
-
-      async function fetchJson(url) {
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          throw new Error(`HTTP ${res.status}${text ? " — " + text : ""}`);
-        }
-        return res.json();
-      }
-
-      (async function run() {
-        hideError();
-
-        if (!targetUrl) {
-          showError("Missing required URL. Add ?url=https://example.com to the address bar.");
-          opsBox.innerHTML = `
-            <div class="sr-item">
-              <p class="t">Nothing to analyze.</p>
-              <p class="i">Provide a URL using the <code>?url=</code> parameter.</p>
-            </div>
-          `;
-          return;
-        }
-
-        const fullEndpoint = `/api/full?url=${encodeURIComponent(targetUrl)}`;
-
-        try {
-          const data = await fetchJson(fullEndpoint);
-
-          // If the API reports an error shape, surface it
-          if (data && (data.error || data.errors)) {
-            const msg = data.error || (Array.isArray(data.errors) ? data.errors.join("; ") : safeText(data.errors));
-            if (msg) showError(msg);
-          }
-
-          const groups = normalizeGroups(data);
-          renderOpportunities(groups);
-        } catch (e) {
-          showError(e && e.message ? e.message : "Unable to fetch full analysis.");
-          opsBox.innerHTML = `
-            <div class="sr-item">
-              <p class="t">Analysis unavailable.</p>
-              <p class="i">The full analysis endpoint did not return data.</p>
-            </div>
-          `;
-        }
-      })();
-    })();
-  </script>
+  if (!rendered) {
+    box.innerHTML =
+      '<div class="sr-item"><p class="sr-title">No opportunities available.</p></div>';
+  }
+})();
+</script>
 
 </body>
 </html>
 
-<!-- Version: v2026.01.16-3 -->
+<!-- Version: v2026.01.16-4 -->
