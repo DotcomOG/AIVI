@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <!--
   full-report.html
-  Version: v2026.01.12-REV1
+  Version: v2026.01.16-REV1-FIX
+  Last updated: 2026-01-16
+
   Notes:
-  - Loader updated to spinner-style + text: full report can take up to ~5 minutes on large sites.
-  - Opportunities now use compact spacing + expandable "Implementation guidance" (replaces "How to fix").
-  - LLM logo paths aligned to analyze.html.
+  - This is the canonical Full Report UI (scorecard + prioritized opportunities + expandable guidance).
+  - Calls /api/score and /api/full (with Render fallback for /api/full).
+  - No extra files/folders required.
 -->
 <html lang="en">
 <head>
@@ -18,7 +20,6 @@
       --muted:#666; --border:#e5e5e5;
       --sr-radius:16px; --sr-border:#e6e6e9; --sr-shadow:0 10px 30px rgba(0,0,0,.12);
       --sr-text:#111; --sr-muted:#5b5b66; --sr-bg:#fff; --sr-pill-bg:#fafafb; --sr-gap:16px;
-      --btn-red:#dc3545; --btn-red-hover:#c82333;
       --primary:#3182CE;
       --text:#0b1220;
       --muted-2:#64748b;
@@ -34,7 +35,7 @@
     h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
     p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
 
-    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
+    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem;flex-wrap:wrap}
     .powered-by,.for-url{color:var(--muted);font-size:.95rem}
     .powered-by a{color:#3182CE;text-decoration:none;font-weight:600}
     .for-url strong{color:#000}
@@ -45,7 +46,7 @@
     .score-main{display:flex;align-items:baseline;gap:.5rem}
     .score-number{font-size:2.25rem;font-weight:800}
     .score-band{color:var(--muted);font-size:.95rem}
-    .btn-row{display:flex;gap:.5rem;align-items:center}
+    .btn-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
     .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.55rem .9rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;transition:.2s}
     .btn-ghost:hover{background:#f2f2f2}
     .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
@@ -55,16 +56,15 @@
 
     .lite-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:.75rem 1rem;border-radius:8px;margin:.25rem 0 1rem;font-size:.95rem;font-weight:600;text-align:center}
 
-    /* Tightened spacing */
-    .report-section{margin:1.75rem 0}
+    .report-section{margin:1.75rem 0;width:100%}
     .section-title{font-size:1.4rem;font-weight:700;margin:0 0 .75rem;color:#111}
     .section-subtitle{font-size:1.2rem;font-weight:800;margin:1.25rem 0 .35rem;color:#111}
     .section-subdesc{color:#666;font-size:.95rem;margin:0 0 .6rem}
 
     .opportunity-list{list-style:none;padding:0;margin:0}
     .opportunity-item{
-      margin:10px 0;               /* hairline spacing between items */
-      padding:14px 14px;           /* tighter */
+      margin:10px 0;
+      padding:14px 14px;
       border:1px solid #f0f0f0;
       border-radius:10px;
       background:#fafafa;
@@ -75,7 +75,6 @@
     .priority-medium{background:#fffbeb;border-left:4px solid #f59e0b}
     .priority-low{background:#fff7ed;border-left:4px solid #f97316}
 
-    /* Opportunity header row with chevron */
     .opp-head{
       display:flex;
       align-items:flex-start;
@@ -110,7 +109,7 @@
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      transition:background .2s, transform .2s;
+      transition:background .2s;
       margin-top:2px;
     }
     .opp-toggle:hover{background:rgba(255,255,255,.9)}
@@ -127,7 +126,6 @@
       margin-top:4px;
     }
 
-    /* Expanded panel */
     .opp-details{
       margin-top:10px;
       background:rgba(255,255,255,.72);
@@ -169,7 +167,6 @@
     .ai-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;width:120px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:700;color:#333;background:#f8f9fa}
     .ai-text{font-size:1.05rem;line-height:1.6;color:#333}
 
-    /* Spinner overlay (aligned with analyze.html style) */
     .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
     .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .progress-title{font-weight:900;font-size:18px;margin:0 0 10px;color:#111}
@@ -268,6 +265,7 @@
     }
 
     @media (max-width:640px){
+      .pillars{grid-template-columns:1fr}
       .footer-inner{grid-template-columns:1fr}
       .ai-row{grid-template-columns:1fr}
       .ai-logo{justify-content:flex-start}
@@ -334,11 +332,9 @@
     </div>
   </section>
 
-  <!-- Progress Overlay (spinner-style) -->
   <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
       <div class="progress-title" id="progress-title">Generating your full report</div>
-
       <div class="spinner-wrap">
         <div class="spinner" aria-hidden="true"></div>
         <div class="spinner-meta">
@@ -346,7 +342,6 @@
           <div class="spinner-hint" id="spinner-hint">Large sites can take up to ~5 minutes.</div>
         </div>
       </div>
-
       <p class="progress-sub" id="progress-sub">
         We’re analyzing the site and generating the full report. Large sites can take <strong>up to ~5 minutes</strong>.
       </p>
@@ -474,12 +469,7 @@
 
     function parseOpportunityLine(line){
       const raw = String(line || '').trim();
-
-      // Remove [PRIORITY: X]
       const cleaned = raw.replace(/\[PRIORITY:\s*[^\]]+\]\s*/i, '').trim();
-
-      // Split into Issue / Solution / Impact
-      // Expected: "Issue title. Solution: ... Impact: ..."
       const solutionMatch = cleaned.match(/\bSolution:\s*([\s\S]*?)(?:\bImpact:\s*|$)/i);
       const impactMatch = cleaned.match(/\bImpact:\s*([\s\S]*?)$/i);
 
@@ -706,7 +696,7 @@
 
     async function getApiBaseForScore(targetUrl){
       try{
-        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000 });
+        const probe = await fetchWithTimeout(`/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 12000, cache: "no-store" });
         if (!probe.ok) throw new Error('probe not ok');
         return '';
       }catch{
@@ -736,7 +726,7 @@
 
         // Score
         try{
-          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000 });
+          const scoreRes = await fetchWithTimeout(`${apiBase}/api/score?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 60000, cache: "no-store" });
           if (!scoreRes.ok) throw new Error('score not ok');
           const scoreJson = await scoreRes.json();
           renderScoreCardFromScoreApi(scoreJson);
@@ -746,31 +736,30 @@
           document.getElementById("scoreBand").textContent = "Score unavailable for this site right now.";
         }
 
-        // Full report
+        // Full report (Vercel first, Render fallback)
         let apiResponse;
         try {
-          apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 220000 });
+          apiResponse = await fetchWithTimeout(`/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 220000, cache: "no-store" });
           if (!apiResponse.ok) throw new Error('full not ok');
         } catch {
-          apiResponse = await fetchWithTimeout(`${FALLBACK_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 220000 });
+          apiResponse = await fetchWithTimeout(`${FALLBACK_BASE}/api/full?url=${encodeURIComponent(targetUrl)}`, { timeoutMs: 220000, cache: "no-store" });
         }
 
         if (!apiResponse.ok) throw new Error('API response not ok');
 
         const data = await apiResponse.json();
 
-        if (data.meta?.mode === 'lite-fallback' || data.success === false) {
+        if (data?.meta?.mode === 'lite-fallback' || data?.success === false) {
           document.getElementById('lite-banner').style.display = 'block';
         }
 
-        const needsAttentionLines = normalizeList(data.needsAttention);
-        const engineInsightLines = normalizeList(data.engineInsights);
+        const needsAttentionLines = normalizeList(data?.needsAttention);
+        const engineInsightLines = normalizeList(data?.engineInsights);
 
         if (needsAttentionLines.length > 0) {
           const critical = [];
           const strategic = [];
           const incremental = [];
-
           let idx = 0;
 
           needsAttentionLines.forEach(line => {
@@ -788,7 +777,6 @@
             const issue = parsed.issue || 'Opportunity';
             const solution = parsed.solution || '';
             const impact = parsed.impact || '';
-
             const detailsId = `opp_details_${idx}`;
 
             const html = `
@@ -838,7 +826,7 @@
           setNoDataState();
         }
 
-        // Engine insights - logo paths aligned to analyze.html
+        // Engine insights (logo paths aligned to analyze.html)
         if (engineInsightLines.length > 0) {
           const engineMap = {
             'ChatGPT': '/img/chatgpt-logo.png',
@@ -881,4 +869,4 @@
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-REV1 -->
+<!-- Version footer: v2026.01.16-REV1-FIX -->
