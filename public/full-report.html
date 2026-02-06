@@ -51,55 +51,161 @@
       align-items:center;
       justify-content:center;
       padding:1rem;
+      overflow-y:auto;
     }
     .paywall-overlay.hidden{display:none}
-    .paywall-box{
+    .paywall-box-wide{
       background:#fff;
-      border:2px solid var(--border);
+      border:1px solid var(--border);
       border-radius:16px;
       padding:2rem;
-      max-width:480px;
+      max-width:900px;
       width:100%;
       box-shadow:0 20px 60px rgba(0,0,0,.15);
       text-align:center;
+      margin:auto;
     }
-    .paywall-box h3{
+    .paywall-box-wide h3{
       font-size:1.6rem;
       margin:0 0 .5rem;
       font-weight:800;
     }
-    .paywall-box .subtitle{
+    .paywall-box-wide .subtitle{
       color:var(--muted);
       margin-bottom:1.5rem;
     }
     .paywall-form{margin-bottom:1.5rem}
-    .paywall-form input{
-      width:100%;
+    .form-row{display:flex;gap:.5rem;margin-bottom:.5rem}
+    .form-row input{
+      flex:1;
       padding:12px 14px;
       border:1px solid var(--border);
       border-radius:8px;
       font-size:15px;
+    }
+    .form-row input:focus{outline:none;border-color:var(--primary)}
+
+    /* Tier Grid */
+    .tier-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:1rem;
+      margin-bottom:1rem;
+      text-align:left;
+    }
+    .tier-card{
+      border:2px solid var(--border);
+      border-radius:12px;
+      padding:1.25rem;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    }
+    .tier-card.featured{
+      border-color:var(--primary);
+      box-shadow:0 4px 20px rgba(49,130,206,.15);
+    }
+    .tier-badge{
+      position:absolute;
+      top:-12px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#0b1220;
+      color:#fff;
+      font-size:.7rem;
+      font-weight:700;
+      padding:.35rem .75rem;
+      border-radius:20px;
+      white-space:nowrap;
+    }
+    .tier-label{
+      font-size:.75rem;
+      font-weight:700;
+      color:var(--primary);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      margin-bottom:.25rem;
+    }
+    .tier-name{
+      font-size:1.1rem;
+      font-weight:800;
+      margin-bottom:.5rem;
+      color:#111;
+    }
+    .tier-price{
+      font-size:1.8rem;
+      font-weight:800;
+      color:#111;
+      line-height:1;
+    }
+    .tier-price sup{font-size:1rem;vertical-align:top}
+    .tier-range{font-size:1rem;font-weight:600;color:var(--muted)}
+    .tier-plus{font-size:1.2rem;font-weight:600}
+    .tier-period{
+      font-size:.8rem;
+      color:var(--muted);
       margin-bottom:.5rem;
     }
-    .paywall-form input:focus{outline:none;border-color:var(--primary)}
-    .btn-stripe{
-      background:#635bff;
-      color:#fff;
-      border:none;
-      padding:1rem 2rem;
+    .tier-desc{
+      font-size:.85rem;
+      color:#555;
+      line-height:1.5;
+      margin:0 0 .75rem;
+    }
+    .tier-features{
+      list-style:none;
+      margin:0 0 1rem;
+      padding:0;
+      flex:1;
+    }
+    .tier-features li{
+      padding:.25rem 0;
+      font-size:.82rem;
+      color:#333;
+      display:flex;
+      align-items:flex-start;
+      gap:.4rem;
+    }
+    .tier-features li::before{
+      content:'✓';
+      color:#16a34a;
+      font-weight:700;
+      flex-shrink:0;
+    }
+    .tier-features li.highlight{
+      font-weight:600;
+      color:var(--primary);
+    }
+    .tier-features li.highlight::before{
+      content:'★';
+      color:var(--primary);
+    }
+    .tier-btn{
+      width:100%;
+      padding:.75rem 1rem;
+      border:2px solid #111;
       border-radius:8px;
-      font-size:1.1rem;
+      background:#fff;
+      color:#111;
+      font-size:.9rem;
       font-weight:700;
       cursor:pointer;
-      width:100%;
+      transition:all .15s;
     }
-    .btn-stripe:hover{background:#4b44cc}
-    .btn-stripe:disabled{background:#999;cursor:not-allowed}
+    .tier-btn:hover{background:#f5f5f5}
+    .tier-btn.primary{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+    .tier-btn.primary:hover{background:#2563eb;border-color:#2563eb}
+
     .paywall-divider{
       display:flex;
       align-items:center;
       gap:1rem;
-      margin:1.5rem 0;
+      margin:1rem 0;
       color:var(--muted);
       font-size:.85rem;
     }
@@ -109,27 +215,38 @@
       height:1px;
       background:var(--border);
     }
-    .code-section{text-align:left}
-    .code-section label{
-      display:block;
-      font-size:.9rem;
-      font-weight:600;
-      margin-bottom:.4rem;
+    .code-section{text-align:center}
+    .code-row{
+      display:flex;
+      gap:.5rem;
+      max-width:320px;
+      margin:0 auto;
     }
-    .code-row{display:flex;gap:.5rem}
-    .code-row input{flex:1;margin-bottom:0}
+    .code-row input{
+      flex:1;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      font-size:14px;
+    }
+    .code-row input:focus{outline:none;border-color:var(--primary)}
     .code-row button{
-      padding:12px 20px;
+      padding:10px 20px;
       background:#fff;
       border:2px solid #111;
-      border-radius:8px;
+      border-radius:6px;
       font-weight:700;
       cursor:pointer;
       white-space:nowrap;
     }
     .code-row button:hover{background:#f5f5f5}
-    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none}
+    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none;text-align:center}
     .error-msg.show{display:block}
+
+    @media(max-width:700px){
+      .tier-grid{grid-template-columns:1fr}
+      .form-row{flex-direction:column}
+    }
 
     /* ===== BRAND PROFILE CARD ===== */
     .brand-card{
@@ -262,24 +379,79 @@
 
   <!-- PAYWALL LIGHTBOX -->
   <div class="paywall-overlay" id="paywall">
-    <div class="paywall-box">
+    <div class="paywall-box-wide">
       <h3>Unlock Your Full Report</h3>
       <p class="subtitle">Analysis for <strong id="paywall-url">—</strong></p>
       
+      <!-- Shared Form Fields -->
       <div class="paywall-form">
-        <input type="text" id="field-name" placeholder="Your Name *" required />
-        <input type="email" id="field-email" placeholder="Email *" required />
-        <input type="tel" id="field-phone" placeholder="Phone" />
-        <input type="text" id="field-company" placeholder="Company / Organization" />
+        <div class="form-row">
+          <input type="text" id="field-name" placeholder="Your Name *" required />
+          <input type="email" id="field-email" placeholder="Email *" required />
+        </div>
+        <div class="form-row">
+          <input type="tel" id="field-phone" placeholder="Phone" />
+          <input type="text" id="field-company" placeholder="Company / Organization" />
+        </div>
       </div>
 
-      <button type="button" class="btn-stripe" id="pay-btn">Buy Full Report — $500</button>
-      <div id="pay-error" class="error-msg"></div>
+      <!-- Pricing Tiers -->
+      <div class="tier-grid">
+        <!-- Entry -->
+        <div class="tier-card">
+          <div class="tier-label">ENTRY</div>
+          <div class="tier-name">Diagnostic Report</div>
+          <div class="tier-price"><sup>$</sup>500</div>
+          <div class="tier-period">One-time report</div>
+          <p class="tier-desc">A complete AI interpretation snapshot with actionable insights.</p>
+          <ul class="tier-features">
+            <li>Multi-engine AI analysis</li>
+            <li>Narrative & trust gap breakdown</li>
+            <li>Source-level drivers identified</li>
+            <li>Executive-ready PDF report</li>
+          </ul>
+          <button type="button" class="tier-btn" id="btn-entry">Request Report →</button>
+        </div>
 
-      <div class="paywall-divider">or</div>
+        <!-- Core - Featured -->
+        <div class="tier-card featured">
+          <div class="tier-badge">MOST POPULAR</div>
+          <div class="tier-label">CORE</div>
+          <div class="tier-name">Deep Diagnostic</div>
+          <div class="tier-price"><sup>$</sup>1,500<span class="tier-range">–3,000</span></div>
+          <div class="tier-period">One-time + strategic guidance</div>
+          <p class="tier-desc">Comprehensive analysis with remediation priorities and optional strategy call.</p>
+          <ul class="tier-features">
+            <li class="highlight">Everything in Entry, plus:</li>
+            <li>Deeper narrative analysis</li>
+            <li>Priority remediation roadmap</li>
+            <li>Optional 30-min strategy call</li>
+          </ul>
+          <button type="button" class="tier-btn primary" id="btn-core">Get Started →</button>
+        </div>
 
+        <!-- Ongoing -->
+        <div class="tier-card">
+          <div class="tier-label">ONGOING</div>
+          <div class="tier-name">Monitoring & Advisory</div>
+          <div class="tier-price"><sup>$</sup>5,000<span class="tier-plus">+</span></div>
+          <div class="tier-period">Monthly or quarterly retainer</div>
+          <p class="tier-desc">Continuous monitoring, drift detection, and advisory access.</p>
+          <ul class="tier-features">
+            <li class="highlight">Everything in Core, plus:</li>
+            <li>Periodic re-analysis</li>
+            <li>Drift detection & alerts</li>
+            <li>Direct advisory access</li>
+          </ul>
+          <button type="button" class="tier-btn" id="btn-ongoing">Contact Us →</button>
+        </div>
+      </div>
+
+      <div id="tier-error" class="error-msg"></div>
+
+      <!-- Access Code -->
       <div class="code-section">
-        <label>Have an Access Code?</label>
+        <div class="paywall-divider">Have an access code?</div>
         <div class="code-row">
           <input type="text" id="access-code" placeholder="Enter code" />
           <button type="button" id="code-btn">Unlock</button>
@@ -346,7 +518,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
       Email Report
     </a>
-    <a class="action-btn primary" href="mailto:hello@quontora.com?subject=AIsubtext%20Report%20Follow-up">
+    <a class="action-btn primary" href="/cdn-cgi/l/email-protection#0e666b6262614e7f7b61607a617c6f206d6163317d7b6c646b6d7a334f477d7b6c7a6b767a2b3c3e5c6b7e617c7a2b3c3e486162626179237b7e">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
       Contact Us
     </a>
@@ -395,7 +567,7 @@
     <p>© 2026 AIsubtext™ by <a href="https://quontora.com" target="_blank">Quontora</a>. Results are observational. AI interpretation may vary.</p>
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ===== CONFIG =====
     const VALID_CODES = ['EZRA', 'ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
     const ENGINES = ['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Perplexity'];
@@ -461,22 +633,25 @@
       return null;
     }
 
-    // Pay button - Stripe checkout
-    document.getElementById('pay-btn').addEventListener('click', async () => {
-      const { name, email, phone, company } = getFormData();
-      const errorEl = document.getElementById('pay-error');
-      const btn = document.getElementById('pay-btn');
+    function showError(msg) {
+      const el = document.getElementById('tier-error');
+      el.textContent = msg;
+      el.classList.add('show');
+    }
 
-      errorEl.classList.remove('show');
+    function clearErrors() {
+      document.getElementById('tier-error').classList.remove('show');
       document.getElementById('code-error').classList.remove('show');
+    }
 
+    // Entry $500 - Stripe checkout
+    document.getElementById('btn-entry').addEventListener('click', async () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
       const err = validateRequired();
-      if (err) {
-        errorEl.textContent = err;
-        errorEl.classList.add('show');
-        return;
-      }
+      if (err) { showError(err); return; }
 
+      const btn = document.getElementById('btn-entry');
       btn.disabled = true;
       btn.textContent = 'Connecting...';
 
@@ -484,7 +659,7 @@
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: targetUrl, email, name, phone, company })
+          body: JSON.stringify({ url: targetUrl, email, name, phone, company, tier: 'entry' })
         });
         const data = await res.json();
         if (data.url) {
@@ -492,12 +667,43 @@
         } else {
           throw new Error(data.error || 'Checkout failed');
         }
-      } catch (err) {
-        errorEl.textContent = 'Payment error. Please try again.';
-        errorEl.classList.add('show');
+      } catch (e) {
+        showError('Payment error. Please try again or email hello@quontora.com');
         btn.disabled = false;
-        btn.textContent = 'Buy Full Report — $500';
+        btn.textContent = 'Request Report →';
       }
+    });
+
+    // Core $1,500-3,000 - Email request
+    document.getElementById('btn-core').addEventListener('click', () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const err = validateRequired();
+      if (err) { showError(err); return; }
+
+      const subject = encodeURIComponent('Deep Diagnostic Request: ' + targetUrl);
+      const body = encodeURIComponent(
+        `Hi,\n\nI'd like to request a Deep Diagnostic for:\n${targetUrl}\n\n` +
+        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
+        `Please send me more information about pricing and next steps.\n\nBest regards`
+      );
+      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
+    });
+
+    // Ongoing $5,000+ - Email request
+    document.getElementById('btn-ongoing').addEventListener('click', () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const err = validateRequired();
+      if (err) { showError(err); return; }
+
+      const subject = encodeURIComponent('Monitoring & Advisory Inquiry: ' + targetUrl);
+      const body = encodeURIComponent(
+        `Hi,\n\nI'm interested in ongoing Monitoring & Advisory services for:\n${targetUrl}\n\n` +
+        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
+        `Please contact me to discuss options.\n\nBest regards`
+      );
+      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
     });
 
     // Access code button
@@ -506,8 +712,7 @@
       const code = document.getElementById('access-code').value.trim().toUpperCase();
       const errorEl = document.getElementById('code-error');
 
-      errorEl.classList.remove('show');
-      document.getElementById('pay-error').classList.remove('show');
+      clearErrors();
 
       const err = validateRequired();
       if (err) {
@@ -528,7 +733,7 @@
         return;
       }
 
-      // Log lead info (you could send to /api/lead here)
+      // Log lead info
       console.log('Access code lead:', { name, email, phone, company, code, url: targetUrl });
 
       unlock();
@@ -718,15 +923,3 @@
         document.getElementById('critical-list').innerHTML = '<li class="item item-critical"><p class="item-text">Please try again or contact support.</p></li>';
         document.getElementById('strategic-list').innerHTML = '';
         document.getElementById('incremental-list').innerHTML = '';
-        document.getElementById('engine-cards').innerHTML = '';
-      } finally {
-        stopProgress();
-      }
-    }
-
-    // ===== INIT =====
-    loadReport();
-  </script>
-
-</body>
-</html>
