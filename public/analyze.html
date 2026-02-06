@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-  analyze.html - v2026.02.06-7
-  Free snapshot + pricing section at bottom 
+  analyze.html - v2026.02.06-9
+  Free snapshot + pricing section at bottom
 -->
 <html lang="en">
 <head>
@@ -51,21 +51,6 @@
       padding:.25rem .6rem;border-radius:20px;
       margin-bottom:.5rem;
     }
-
-    /* Score Card */
-    .score-card{
-      background:var(--bg-soft);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:1.5rem;
-      margin-bottom:1.5rem;
-    }
-    .score-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.75rem}
-    .score-label{font-size:1.1rem;font-weight:700;color:#1e293b}
-    .score-number{font-size:2.5rem;font-weight:800;color:var(--primary)}
-    .score-track{height:14px;border-radius:10px;background:#e2e8f0;overflow:hidden}
-    .score-fill{height:100%;border-radius:10px;width:0%;transition:width 1s ease}
-    .score-context{font-size:.9rem;color:var(--muted);margin-top:.5rem}
 
     /* Snapshot Sections */
     .snapshot-section{margin-bottom:1.5rem}
@@ -245,20 +230,10 @@
 
   <div id="snapshot-loading" class="loading">
     <div class="spinner"></div>
-    <p>Analyzing how AI systems see your brand...</p>
+    <p>Analyzing how AI systems see your brand... (30-60 seconds)</p>
   </div>
 
   <div id="snapshot-content" style="display:none;">
-    <!-- Score -->
-    <div class="score-card">
-      <div class="score-header">
-        <span class="score-label">AI Visibility Score</span>
-        <span class="score-number" id="score-number">—</span>
-      </div>
-      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
-      <div class="score-context" id="score-context">Based on analysis across 5 major AI engines.</div>
-    </div>
-
     <!-- What's Working (preview) -->
     <div class="snapshot-section">
       <h4 class="section-title">What's Working</h4>
@@ -307,8 +282,9 @@
 
     <!-- Tier Grid -->
     <div class="tier-grid">
-      <!-- Entry -->
-      <div class="tier-card">
+      <!-- Entry - Featured -->
+      <div class="tier-card featured">
+        <div class="tier-badge">INSTANT DELIVERY</div>
         <div class="tier-label">ENTRY</div>
         <div class="tier-name">Diagnostic Report</div>
         <div class="tier-price"><sup>$</sup>500</div>
@@ -320,15 +296,14 @@
           <li>Source-level drivers identified</li>
           <li>Executive-ready PDF report</li>
         </ul>
-        <button type="button" class="tier-btn" id="btn-entry">Request Report →</button>
+        <button type="button" class="tier-btn primary" id="btn-entry">Pay $500 →</button>
       </div>
 
-      <!-- Core - Featured -->
-      <div class="tier-card featured">
-        <div class="tier-badge">MOST POPULAR</div>
+      <!-- Core -->
+      <div class="tier-card">
         <div class="tier-label">CORE</div>
         <div class="tier-name">Deep Diagnostic</div>
-        <div class="tier-price"><sup>$</sup>1,500<span class="tier-range">–3,000</span></div>
+        <div class="tier-price"><sup>$</sup>1,500<span class="tier-plus">+</span></div>
         <div class="tier-period">One-time + strategic guidance</div>
         <p class="tier-desc">Comprehensive analysis with remediation priorities and optional strategy call.</p>
         <ul class="tier-features">
@@ -337,7 +312,7 @@
           <li>Priority remediation roadmap</li>
           <li>Optional 30-min strategy call</li>
         </ul>
-        <button type="button" class="tier-btn primary" id="btn-core">Get Started →</button>
+        <button type="button" class="tier-btn" id="btn-core">Get Started →</button>
       </div>
 
       <!-- Ongoing -->
@@ -391,23 +366,9 @@
       }
 
       try {
-        const res = await fetch(`/api/summary?url=${encodeURIComponent(targetUrl)}`);
+        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`);
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
-
-        // Render score
-        const score = data.score || data.overallScore || 50;
-        document.getElementById('score-number').textContent = score + '/100';
-        const fill = document.getElementById('score-fill');
-        fill.style.background = score >= 70 ? '#10b981' : score >= 45 ? '#f59e0b' : '#ef4444';
-        setTimeout(() => fill.style.width = score + '%', 100);
-
-        // Score context
-        const ctx = document.getElementById('score-context');
-        if (score >= 75) ctx.textContent = 'Strong AI visibility. Your brand is well-represented.';
-        else if (score >= 55) ctx.textContent = 'Moderate visibility. Key improvements can help.';
-        else if (score >= 35) ctx.textContent = 'Below average. AI likely gives generic descriptions.';
-        else ctx.textContent = 'Low visibility. Significant work needed.';
 
         // What's working (show 2-3)
         const good = data.whatsWorking || data.strengths || ['Strong brand name recognition', 'Clear product categories'];
@@ -488,7 +449,7 @@
           throw new Error(data.error || 'Checkout failed');
         }
       } catch (e) {
-        showError('Payment error. Email hello@quontora.com for assistance.');
+        showError('Payment error. Email yoram@quontora.ai for assistance.');
         btn.disabled = false;
         btn.textContent = 'Request Report →';
       }
@@ -507,7 +468,7 @@
         `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
         `Please send me pricing and next steps.\n\nBest regards`
       );
-      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:yoram@quontora.ai?subject=${subject}&body=${body}`;
     });
 
     // Ongoing $5,000+ - Email
@@ -523,7 +484,7 @@
         `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
         `Please contact me to discuss.\n\nBest regards`
       );
-      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:yoram@quontora.ai?subject=${subject}&body=${body}`;
     });
 
     // Access Code
