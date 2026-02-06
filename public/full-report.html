@@ -1,218 +1,732 @@
 <!DOCTYPE html>
 <!--
-  full-report.html
-  Version: v2026.01.16-2
-  Last updated: 2026-01-16
+  full-report.html - v2026.02.06-1
+  Lightbox paywall: report loads behind overlay, access code or payment removes it
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AIVIndex™ – Full AI Visibility Report</title>
-
-  <!-- Uses your existing stylesheet -->
-  <link rel="stylesheet" href="styles.css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AIsubtext™ — Full Report</title>
   <style>
-    /* Minimal safety styles only (won't fight your CSS) */
-    .sr-wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 60px; }
-    .sr-top { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; align-items: baseline; }
-    .sr-brand h1 { margin: 0; font-size: 48px; letter-spacing: -0.02em; }
-    .sr-brand h2 { margin: 6px 0 0; font-size: 22px; font-weight: 600; }
-    .sr-meta { margin-top: 10px; font-size: 14px; opacity: 0.8; }
-    .sr-chip { display: inline-flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.03); }
-    .sr-intro { margin-top: 22px; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.12); background: #fff; }
-    .sr-intro h3 { margin: 0 0 8px; font-size: 16px; }
-    .sr-intro p { margin: 0; line-height: 1.5; opacity: 0.9; }
-    .sr-section { margin-top: 28px; }
-    .sr-section h3 { margin: 0 0 10px; font-size: 22px; }
-    .sr-section .sub { margin: 0 0 18px; opacity: 0.85; line-height: 1.5; }
-    .sr-box { border: 1px solid rgba(0,0,0,0.12); border-radius: 16px; background: #fff; overflow: hidden; }
-    .sr-item { padding: 14px 16px; border-top: 1px solid rgba(0,0,0,0.08); }
-    .sr-item:first-child { border-top: none; }
-    .sr-item .t { font-weight: 700; margin: 0 0 6px; }
-    .sr-item .i { margin: 0; opacity: 0.9; }
-    .sr-item .g { margin-top: 10px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); }
-    .sr-item .g .k { font-weight: 700; margin: 0 0 6px; }
-    .sr-item .g p { margin: 0; opacity: 0.9; }
-    .sr-error { margin-top: 18px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(180,0,0,0.25); background: rgba(180,0,0,0.06); }
-    .sr-error strong { display: block; margin-bottom: 6px; }
-    .sr-foot { margin-top: 44px; padding-top: 18px; border-top: 1px solid rgba(0,0,0,0.08); font-size: 13px; opacity: 0.75; }
-    .sr-link { color: inherit; text-decoration: underline; }
+    :root{
+      --max-width:760px; --pad-v:3vh; --pad-h:2rem;
+      --muted:#666; --border:#e5e5e5;
+      --primary:#3182CE;
+      --primary-dark:#2563eb;
+      --text:#0b1220;
+      --muted-2:#64748b;
+      --bg-soft:#f7fafc;
+      --good-bg:#ecfdf5;
+      --good-border:#10b981;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+      background:#fff;color:#000;margin:0;
+      padding:var(--pad-v) var(--pad-h);
+      max-width:var(--max-width);
+      margin-inline:auto;
+    }
+    h1{font-size:2.5rem;font-weight:700;margin:0 0 .25rem}
+    h1 .ai{color:#0b1220}
+    h1 .subtext{color:var(--primary)}
+    h1 .tm{font-size:.9rem;vertical-align:super;color:#888}
+    h2{font-size:1.2rem;font-weight:600;margin:0 0 1.5rem;color:var(--muted)}
+    p{font-size:1.05rem;line-height:1.6;margin:0 0 1rem}
+
+    .info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
+    .powered-by{color:var(--muted);font-size:.9rem}
+    .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
+    .for-url{color:var(--muted);font-size:.9rem}
+    .for-url strong{color:#000}
+
+    /* ===== PAYWALL LIGHTBOX ===== */
+    .paywall-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(255,255,255,.97);
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1rem;
+    }
+    .paywall-overlay.hidden{display:none}
+    .paywall-box{
+      background:#fff;
+      border:2px solid var(--border);
+      border-radius:16px;
+      padding:2rem;
+      max-width:480px;
+      width:100%;
+      box-shadow:0 20px 60px rgba(0,0,0,.15);
+      text-align:center;
+    }
+    .paywall-box h3{
+      font-size:1.6rem;
+      margin:0 0 .5rem;
+      font-weight:800;
+    }
+    .paywall-box .subtitle{
+      color:var(--muted);
+      margin-bottom:1.5rem;
+    }
+    .paywall-form{margin-bottom:1.5rem}
+    .paywall-form input{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      font-size:15px;
+      margin-bottom:.5rem;
+    }
+    .paywall-form input:focus{outline:none;border-color:var(--primary)}
+    .btn-stripe{
+      background:#635bff;
+      color:#fff;
+      border:none;
+      padding:1rem 2rem;
+      border-radius:8px;
+      font-size:1.1rem;
+      font-weight:700;
+      cursor:pointer;
+      width:100%;
+    }
+    .btn-stripe:hover{background:#4b44cc}
+    .btn-stripe:disabled{background:#999;cursor:not-allowed}
+    .paywall-divider{
+      display:flex;
+      align-items:center;
+      gap:1rem;
+      margin:1.5rem 0;
+      color:var(--muted);
+      font-size:.85rem;
+    }
+    .paywall-divider::before,.paywall-divider::after{
+      content:'';
+      flex:1;
+      height:1px;
+      background:var(--border);
+    }
+    .code-section{text-align:left}
+    .code-section label{
+      display:block;
+      font-size:.9rem;
+      font-weight:600;
+      margin-bottom:.4rem;
+    }
+    .code-row{display:flex;gap:.5rem}
+    .code-row input{flex:1;margin-bottom:0}
+    .code-row button{
+      padding:12px 20px;
+      background:#fff;
+      border:2px solid #111;
+      border-radius:8px;
+      font-weight:700;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .code-row button:hover{background:#f5f5f5}
+    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none}
+    .error-msg.show{display:block}
+
+    /* ===== BRAND PROFILE CARD ===== */
+    .brand-card{
+      width:100%;
+      background:linear-gradient(135deg,#f8fafc 0%,#eef2ff 100%);
+      border:1px solid #e0e7ff;
+      border-radius:12px;
+      padding:1.5rem;
+      margin:0 0 2rem;
+      display:none;
+    }
+    .brand-card.show{display:block}
+    .brand-card-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+    .brand-card-header h3{font-size:1.3rem;font-weight:700;margin:0;color:#1e293b}
+    .brand-industry{background:#e0e7ff;color:#3730a3;font-size:.8rem;font-weight:600;padding:.2rem .6rem;border-radius:20px}
+    .brand-meta{display:grid;grid-template-columns:1fr 1fr;gap:.75rem 1.5rem;font-size:.95rem;line-height:1.55;color:#334155}
+    .brand-meta-label{font-weight:700;color:#1e293b;font-size:.85rem;text-transform:uppercase;letter-spacing:.3px;margin-bottom:.15rem}
+    .brand-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.25rem}
+    .brand-tag{background:#fff;border:1px solid #cbd5e1;color:#334155;font-size:.82rem;padding:.15rem .5rem;border-radius:6px}
+
+    /* ===== OVERALL SCORE ===== */
+    .score-section{width:100%;margin:0 0 2rem;display:none}
+    .score-section.show{display:block}
+    .score-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem}
+    .score-label{font-size:1.1rem;font-weight:700;color:#1e293b}
+    .score-number{font-size:2rem;font-weight:800;color:var(--primary)}
+    .score-track{height:14px;border-radius:10px;background:#e2e8f0;overflow:hidden}
+    .score-fill{height:100%;border-radius:10px;width:0%;transition:width .8s ease}
+    .score-context{font-size:.85rem;color:var(--muted-2);margin-top:.4rem}
+
+    /* ===== ACTION BUTTONS ===== */
+    .action-bar{
+      width:100%;display:flex;gap:.75rem;flex-wrap:wrap;
+      margin:0 0 1.5rem;padding:1rem;
+      background:var(--bg-soft);border-radius:10px;border:1px solid var(--border);
+    }
+    .action-btn{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:.6rem 1rem;font-size:.9rem;font-weight:600;
+      border-radius:8px;border:1px solid var(--border);
+      background:#fff;color:var(--text);cursor:pointer;
+      text-decoration:none;transition:all .15s ease;
+    }
+    .action-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .action-btn svg{width:18px;height:18px}
+    .action-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .action-btn.primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+
+    /* ===== REPORT SECTIONS ===== */
+    .report-section{margin:1.5rem 0;width:100%}
+    .section-title{font-size:1.4rem;font-weight:700;margin:0 0 .75rem;color:#111}
+    .section-subtitle{font-size:1.15rem;font-weight:700;margin:1.25rem 0 .5rem;color:#111}
+
+    .item-list{list-style:none;padding:0;margin:0;border:1px solid #f0f0f0;border-radius:10px;overflow:hidden}
+    .item{margin:0;padding:1rem;border-bottom:1px solid #ededed}
+    .item:last-child{border-bottom:0}
+    .item-good{background:var(--good-bg);border-left:4px solid var(--good-border)}
+    .item-critical{background:#fef2f2;border-left:4px solid #ef4444}
+    .item-strategic{background:#fffbeb;border-left:4px solid #f59e0b}
+    .item-incremental{background:#fff7ed;border-left:4px solid #fb923c}
+    .item-text{font-size:1.02rem;line-height:1.55;margin:0;color:#111}
+
+    .fix-details{margin-top:.6rem;border:1px solid #e9ecef;border-radius:10px;background:#f8f9fa;overflow:hidden}
+    .fix-summary{
+      list-style:none;cursor:pointer;user-select:none;
+      padding:.65rem .85rem;display:flex;align-items:center;
+      justify-content:space-between;gap:.75rem;
+      font-size:.95rem;font-weight:700;color:#273043;
+    }
+    .fix-summary::-webkit-details-marker{display:none}
+    .fix-chevron{transition:transform .15s ease}
+    details[open] .fix-chevron{transform:rotate(180deg)}
+    .fix-body{padding:.65rem .85rem .85rem;font-size:.95rem;line-height:1.6;color:#333}
+    .fix-body p{margin:.55rem 0}
+    .fix-body p:first-child{margin-top:0}
+    .fix-body p:last-child{margin-bottom:0}
+
+    /* ===== ENGINE CARDS ===== */
+    .engine-cards{display:flex;flex-direction:column;gap:1.25rem;margin:.75rem 0 0}
+    .engine-card{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
+    .engine-card-header{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border-bottom:1px solid #f0f0f0;background:#fafbfc}
+    .engine-logo{height:28px;width:auto;max-width:120px;object-fit:contain}
+    .engine-fallback{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:700;color:#333;background:#f1f5f9}
+    .engine-score-badge{margin-left:auto;font-size:.85rem;font-weight:700;padding:.25rem .65rem;border-radius:20px}
+    .engine-score-high{background:#dcfce7;color:#166534}
+    .engine-score-mid{background:#fef9c3;color:#854d0e}
+    .engine-score-low{background:#fee2e2;color:#991b1b}
+    .engine-card-body{padding:1.25rem}
+    .engine-perception{font-size:1rem;line-height:1.65;color:#1e293b;padding:1rem;background:#f8fafc;border-radius:8px;border-left:3px solid var(--primary);margin:0 0 1rem;font-style:italic}
+    .engine-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+    .engine-detail-box h5{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin:0 0 .4rem}
+    .engine-detail-box.strengths h5{color:#166534}
+    .engine-detail-box.gaps h5{color:#991b1b}
+    .engine-detail-box ul{margin:0;padding:0 0 0 1.1rem;font-size:.92rem;line-height:1.55;color:#334155}
+    .engine-detail-box li{margin:.3rem 0}
+    .engine-top-rec{font-size:.95rem;line-height:1.55;color:#1e293b;padding:.75rem 1rem;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe}
+    .engine-top-rec strong{color:#1e40af}
+
+    /* ===== PROGRESS OVERLAY ===== */
+    .progress-overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);display:none;align-items:center;justify-content:center;z-index:1000}
+    .progress-overlay.show{display:flex}
+    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(480px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-title{font-weight:700;font-size:18px}
+    .progress-pct{color:#666;font-size:16px;font-weight:600}
+    .progress-bar{height:12px;border-radius:8px;background:#eee;overflow:hidden;margin:12px 0}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3182CE,#1a73e8);border-radius:8px;width:0%;transition:width .3s ease}
+    .progress-eta{color:#666;font-size:14px;line-height:1.4}
+
+    /* ===== FOOTER ===== */
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+    footer a{color:var(--primary);text-decoration:none}
+
+    @media(max-width:640px){
+      .engine-details-grid{grid-template-columns:1fr}
+      .brand-meta{grid-template-columns:1fr}
+      .action-bar{flex-direction:column}
+      .action-btn{width:100%;justify-content:center}
+      .code-row{flex-direction:column}
+      .code-row button{width:100%}
+    }
+
+    @media print{
+      .paywall-overlay,.progress-overlay,.action-bar,footer{display:none!important}
+      body{max-width:100%!important;padding:.5in!important}
+    }
   </style>
 </head>
-
 <body>
-  <main class="sr-wrap">
-    <div class="sr-top">
-      <div class="sr-brand">
-        <h1>AIVIndex™</h1>
-        <h2>Full AI Visibility Report</h2>
-        <div class="sr-meta">
-          Powered by <a class="sr-link" href="https://quontora.com" target="_blank" rel="noopener">Quontora</a>
-        </div>
+
+  <!-- PAYWALL LIGHTBOX -->
+  <div class="paywall-overlay" id="paywall">
+    <div class="paywall-box">
+      <h3>Unlock Your Full Report</h3>
+      <p class="subtitle">Analysis for <strong id="paywall-url">—</strong></p>
+      
+      <div class="paywall-form">
+        <input type="text" id="field-name" placeholder="Your Name *" required />
+        <input type="email" id="field-email" placeholder="Email *" required />
+        <input type="tel" id="field-phone" placeholder="Phone" />
+        <input type="text" id="field-company" placeholder="Company / Organization" />
       </div>
 
-      <div class="sr-chip" id="srTargetChip" aria-live="polite">
-        <div><strong>Analysis for:</strong> <span id="srTarget">—</span></div>
+      <button type="button" class="btn-stripe" id="pay-btn">Buy Full Report — $500</button>
+      <div id="pay-error" class="error-msg"></div>
+
+      <div class="paywall-divider">or</div>
+
+      <div class="code-section">
+        <label>Have an Access Code?</label>
+        <div class="code-row">
+          <input type="text" id="access-code" placeholder="Enter code" />
+          <button type="button" id="code-btn">Unlock</button>
+        </div>
+        <div id="code-error" class="error-msg"></div>
       </div>
     </div>
+  </div>
 
-    <!-- TOP: scorecard removed; replaced with text -->
-    <section class="sr-intro">
-      <h3>How AI currently interprets this site</h3>
-      <p>
-        This report evaluates how AI systems access, interpret, and represent this website. The focus is AI visibility:
-        clarity of meaning, trust signals, structural readability, and alignment with the patterns AI relies on when generating answers.
-        The findings below highlight where interpretation is strong, where it is ambiguous, and where critical signals are missing or degraded.
-      </p>
-    </section>
-
-    <section class="sr-section" id="srOps">
-      <h3>Comprehensive Opportunities</h3>
-      <p class="sub">
-        Specific, actionable improvements to strengthen how AI systems interpret, trust, and represent your website. Items are grouped by urgency.
-      </p>
-
-      <div class="sr-box" id="srOpsBox">
-        <div class="sr-item">
-          <p class="t">Loading…</p>
-          <p class="i">Fetching analysis from the API.</p>
-        </div>
+  <!-- PROGRESS OVERLAY -->
+  <div class="progress-overlay" id="progress-overlay">
+    <div class="progress-panel">
+      <div class="progress-header">
+        <span class="progress-title">Generating Full Report</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
       </div>
-
-      <div class="sr-error" id="srErr" style="display:none;">
-        <strong>Analysis unavailable.</strong>
-        <div id="srErrMsg">—</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
       </div>
-    </section>
-
-    <div class="sr-foot">
-      If this looks incomplete, it usually means the full analysis endpoint did not return data. This page calls <code>/api/full</code> directly.
+      <div class="progress-eta">Analyzing your brand across 5 AI engines. This takes 30-90 seconds...</div>
     </div>
-  </main>
+  </div>
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const targetUrl = params.get("url") || "";
-      const targetEl = document.getElementById("srTarget");
-      const opsBox = document.getElementById("srOpsBox");
-      const errBox = document.getElementById("srErr");
-      const errMsg = document.getElementById("srErrMsg");
+  <!-- REPORT CONTENT -->
+  <h1><span class="ai">AI</span><span class="subtext">subtext</span><span class="tm">™</span></h1>
+  <h2>Full Report</h2>
 
-      targetEl.textContent = targetUrl ? targetUrl : "—";
+  <div class="info-row">
+    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank">Quontora</a></div>
+    <div class="for-url">Analysis for: <strong id="current-url">—</strong></div>
+  </div>
 
-      function safeText(v) {
-        if (v === null || v === undefined) return "";
-        return String(v);
-      }
+  <!-- Brand Profile -->
+  <div class="brand-card" id="brand-card">
+    <div class="brand-card-header">
+      <h3 id="brand-name">—</h3>
+      <span class="brand-industry" id="brand-industry">—</span>
+    </div>
+    <div class="brand-meta">
+      <div><div class="brand-meta-label">Positioning</div><div id="brand-positioning">—</div></div>
+      <div><div class="brand-meta-label">Audience</div><div id="brand-audience">—</div></div>
+      <div><div class="brand-meta-label">Key Offerings</div><div class="brand-tags" id="brand-offerings"></div></div>
+      <div><div class="brand-meta-label">Differentiators</div><div class="brand-tags" id="brand-differentiators"></div></div>
+    </div>
+  </div>
 
-      function renderOpportunities(groups) {
-        // groups expected as: [{ title: "Critical Priorities", items: [...] }, ...]
-        const nodes = [];
-        (groups || []).forEach(group => {
-          const gTitle = safeText(group.title || "");
-          const items = Array.isArray(group.items) ? group.items : [];
-          if (!gTitle && items.length === 0) return;
+  <!-- Score -->
+  <div class="score-section" id="score-section">
+    <div class="score-header">
+      <span class="score-label">Overall AI Visibility Score</span>
+      <span class="score-number" id="score-number">—</span>
+    </div>
+    <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+    <div class="score-context" id="score-context">Averaged across all five AI engines.</div>
+  </div>
 
-          const header = document.createElement("div");
-          header.className = "sr-item";
-          header.innerHTML = `<p class="t">${gTitle || "Opportunities"}</p>`;
-          nodes.push(header);
+  <!-- Action Buttons -->
+  <div class="action-bar">
+    <button class="action-btn" id="btn-print">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+      Print / Save PDF
+    </button>
+    <a class="action-btn" id="btn-email" href="#">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+      Email Report
+    </a>
+    <a class="action-btn primary" href="mailto:hello@quontora.com?subject=AIsubtext%20Report%20Follow-up">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+      Contact Us
+    </a>
+  </div>
 
-          items.forEach(it => {
-            const title = safeText(it.title || it.name || "Opportunity");
-            const impact = safeText(it.impact || "");
-            const guidance = safeText(it.guidance || it.implementation || it.implementation_guidance || "");
-
-            const row = document.createElement("div");
-            row.className = "sr-item";
-            row.innerHTML = `
-              <p class="t">${title}</p>
-              ${impact ? `<p class="i"><strong>Impact:</strong> ${impact}</p>` : `<p class="i"></p>`}
-              ${guidance ? `
-                <div class="g">
-                  <p class="k">Implementation guidance</p>
-                  <p>${guidance}</p>
-                </div>` : ``}
-            `;
-            nodes.push(row);
-          });
-        });
-
-        if (nodes.length === 0) {
-          opsBox.inner
-
-
-          <!-- =========================
-       FULL-REPORT.HTML (PART 2)
-       Continue from where I stopped
-       ========================= -->
-
-  <!-- REST OF PAGE CONTINUES UNCHANGED -->
-  <section id="opportunities">
-    <!-- existing content -->
+  <!-- What's Working -->
+  <section class="report-section">
+    <h3 class="section-title">What's Working</h3>
+    <p>Strengths that support how AI systems interpret and represent your brand.</p>
+    <ul class="item-list" id="good-list">
+      <li class="item item-good"><p class="item-text">Loading...</p></li>
+    </ul>
   </section>
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const targetUrl = params.get("url");
+  <!-- Needs Attention -->
+  <section class="report-section">
+    <h3 class="section-title">Needs Attention</h3>
+    <p>Improvements to enhance how AI systems interpret, trust, and represent your website.</p>
 
-      // If no URL provided, fail fast (but cleanly).
-      if (!targetUrl) {
-        console.error("Missing ?url= parameter");
+    <h4 class="section-subtitle">Critical Priorities</h4>
+    <ul class="item-list" id="critical-list">
+      <li class="item item-critical"><p class="item-text">Loading...</p></li>
+    </ul>
+
+    <h4 class="section-subtitle">Strategic Improvements</h4>
+    <ul class="item-list" id="strategic-list">
+      <li class="item item-strategic"><p class="item-text">Loading...</p></li>
+    </ul>
+
+    <h4 class="section-subtitle">Incremental Enhancements</h4>
+    <ul class="item-list" id="incremental-list">
+      <li class="item item-incremental"><p class="item-text">Loading...</p></li>
+    </ul>
+  </section>
+
+  <!-- Engine Insights -->
+  <section class="report-section">
+    <h3 class="section-title">AI Engine Insights</h3>
+    <p>How each major AI system perceives your brand based on your current web presence.</p>
+    <div class="engine-cards" id="engine-cards">
+      <div class="engine-card"><div class="engine-card-body"><p>Loading...</p></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 AIsubtext™ by <a href="https://quontora.com" target="_blank">Quontora</a>. Results are observational. AI interpretation may vary.</p>
+  </footer>
+
+  <script>
+    // ===== CONFIG =====
+    const VALID_CODES = ['EZRA', 'ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
+    const ENGINES = ['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Perplexity'];
+    const LOGO_SOURCES = {
+      ChatGPT: '/img/chatgpt-logo.png',
+      Claude: '/img/claude.jpeg',
+      Gemini: '/img/gemini-logo.png',
+      Copilot: '/img/copilot-logo.png',
+      Perplexity: '/img/perplexity-logo.png'
+    };
+
+    // ===== URL PARAMS =====
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get('url') || '';
+    const isPaid = params.get('paid') === 'true';
+    const codeFromUrl = (params.get('code') || '').toUpperCase();
+
+    // ===== ELEMENTS =====
+    const paywall = document.getElementById('paywall');
+    const progressOverlay = document.getElementById('progress-overlay');
+
+    // ===== HELPERS =====
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function isUnlocked() {
+      if (isPaid) return true;
+      if (VALID_CODES.includes(codeFromUrl)) return true;
+      if (sessionStorage.getItem('aisubtext:unlocked') === targetUrl) return true;
+      return false;
+    }
+
+    function unlock() {
+      sessionStorage.setItem('aisubtext:unlocked', targetUrl);
+      paywall.classList.add('hidden');
+    }
+
+    // ===== PAYWALL LOGIC =====
+    document.getElementById('paywall-url').textContent = targetUrl || 'your website';
+    document.getElementById('current-url').textContent = targetUrl || '—';
+
+    // Check if already unlocked
+    if (isUnlocked()) {
+      unlock();
+    }
+
+    // ===== SHARED FIELD VALIDATION =====
+    function getFormData() {
+      return {
+        name: document.getElementById('field-name').value.trim(),
+        email: document.getElementById('field-email').value.trim(),
+        phone: document.getElementById('field-phone').value.trim(),
+        company: document.getElementById('field-company').value.trim()
+      };
+    }
+
+    function validateRequired() {
+      const { name, email } = getFormData();
+      if (!name || !email) {
+        return 'Please enter your name and email.';
+      }
+      return null;
+    }
+
+    // Pay button - Stripe checkout
+    document.getElementById('pay-btn').addEventListener('click', async () => {
+      const { name, email, phone, company } = getFormData();
+      const errorEl = document.getElementById('pay-error');
+      const btn = document.getElementById('pay-btn');
+
+      errorEl.classList.remove('show');
+      document.getElementById('code-error').classList.remove('show');
+
+      const err = validateRequired();
+      if (err) {
+        errorEl.textContent = err;
+        errorEl.classList.add('show');
         return;
       }
 
-      // IMPORTANT FIX: call Vercel API routes under /api/*
-      const fullEndpoint = `/api/full?url=${encodeURIComponent(targetUrl)}`;
-      const scoreEndpoint = `/api/score?url=${encodeURIComponent(targetUrl)}`;
+      btn.disabled = true;
+      btn.textContent = 'Connecting...';
 
-      // Optional: expose data for any existing render code that expects it.
-      window.__AIVI__ = window.__AIVI__ || {};
-      window.__AIVI__.targetUrl = targetUrl;
-
-      // Helper: emit an event so existing code can hook in without refactors.
-      function emit(name, detail) {
-        try {
-          window.dispatchEvent(new CustomEvent(name, { detail }));
-        } catch (e) {
-          // older browsers
+      try {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: targetUrl, email, name, phone, company })
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Checkout failed');
         }
+      } catch (err) {
+        errorEl.textContent = 'Payment error. Please try again.';
+        errorEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Buy Full Report — $500';
+      }
+    });
+
+    // Access code button
+    document.getElementById('code-btn').addEventListener('click', () => {
+      const { name, email, phone, company } = getFormData();
+      const code = document.getElementById('access-code').value.trim().toUpperCase();
+      const errorEl = document.getElementById('code-error');
+
+      errorEl.classList.remove('show');
+      document.getElementById('pay-error').classList.remove('show');
+
+      const err = validateRequired();
+      if (err) {
+        errorEl.textContent = err;
+        errorEl.classList.add('show');
+        return;
       }
 
-      // Fetch score + full in parallel (if your current page uses both).
-      Promise.allSettled([
-        fetch(scoreEndpoint, { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject(new Error(`score HTTP ${r.status}`))),
-        fetch(fullEndpoint, { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject(new Error(`full HTTP ${r.status}`)))
-      ]).then(results => {
-        const scoreRes = results[0];
-        const fullRes = results[1];
+      if (!code) {
+        errorEl.textContent = 'Please enter an access code.';
+        errorEl.classList.add('show');
+        return;
+      }
 
-        if (scoreRes.status === "fulfilled") {
-          window.__AIVI__.score = scoreRes.value;
-          emit("aivi:score", scoreRes.value);
-        } else {
-          console.warn("Score fetch failed:", scoreRes.reason);
-          emit("aivi:score:error", { error: String(scoreRes.reason || "unknown") });
-        }
+      if (!VALID_CODES.includes(code)) {
+        errorEl.textContent = 'Invalid access code.';
+        errorEl.classList.add('show');
+        return;
+      }
 
-        if (fullRes.status === "fulfilled") {
-          window.__AIVI__.full = fullRes.value;
-          emit("aivi:full", fullRes.value);
-        } else {
-          console.warn("Full fetch failed:", fullRes.reason);
-          emit("aivi:full:error", { error: String(fullRes.reason || "unknown") });
+      // Log lead info (you could send to /api/lead here)
+      console.log('Access code lead:', { name, email, phone, company, code, url: targetUrl });
+
+      unlock();
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('code', code);
+      window.history.replaceState({}, '', newUrl);
+    });
+
+    // Enter key for code
+    document.getElementById('access-code').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('code-btn').click();
+    });
+
+    // ===== PROGRESS BAR =====
+    let progressTimer;
+    function startProgress() {
+      progressOverlay.classList.add('show');
+      const fill = document.getElementById('progress-fill');
+      const pct = document.getElementById('progress-pct');
+      let progress = 0;
+      progressTimer = setInterval(() => {
+        progress += Math.random() * 2;
+        if (progress >= 95) progress = 95;
+        fill.style.width = progress + '%';
+        pct.textContent = Math.round(progress) + '%';
+      }, 200);
+    }
+
+    function stopProgress() {
+      clearInterval(progressTimer);
+      document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-pct').textContent = '100%';
+      setTimeout(() => progressOverlay.classList.remove('show'), 500);
+    }
+
+    // ===== RENDER FUNCTIONS =====
+    function renderBrandProfile(bp) {
+      if (!bp || !bp.name) return;
+      document.getElementById('brand-card').classList.add('show');
+      document.getElementById('brand-name').textContent = bp.name;
+      document.getElementById('brand-industry').textContent = bp.industry || 'Unknown';
+      document.getElementById('brand-positioning').textContent = bp.positioning || '—';
+      document.getElementById('brand-audience').textContent = bp.audience || '—';
+      document.getElementById('brand-offerings').innerHTML = (bp.offerings || []).map(o => `<span class="brand-tag">${esc(o)}</span>`).join('');
+      document.getElementById('brand-differentiators').innerHTML = (bp.differentiators || []).map(d => `<span class="brand-tag">${esc(d)}</span>`).join('');
+    }
+
+    function renderScore(score) {
+      if (typeof score !== 'number' || score <= 0) return;
+      document.getElementById('score-section').classList.add('show');
+      document.getElementById('score-number').textContent = score + '/100';
+      const fill = document.getElementById('score-fill');
+      fill.style.background = score >= 70 ? '#10b981' : score >= 45 ? '#f59e0b' : '#ef4444';
+      setTimeout(() => fill.style.width = score + '%', 100);
+      const ctx = document.getElementById('score-context');
+      if (score >= 75) ctx.textContent = 'Strong AI visibility. Your brand is well-represented.';
+      else if (score >= 55) ctx.textContent = 'Moderate AI visibility. Key improvements can boost how AI describes you.';
+      else if (score >= 35) ctx.textContent = 'Below average. AI systems likely produce generic descriptions.';
+      else ctx.textContent = 'Low AI visibility. Significant work needed.';
+    }
+
+    function renderGoodList(items) {
+      const el = document.getElementById('good-list');
+      if (!items || !items.length) {
+        el.innerHTML = '<li class="item item-good"><p class="item-text">No specific strengths identified.</p></li>';
+        return;
+      }
+      el.innerHTML = items.map(item => `<li class="item item-good"><p class="item-text">${esc(item)}</p></li>`).join('');
+    }
+
+    function renderNeedsAttention(items) {
+      const critical = [], strategic = [], incremental = [];
+
+      (items || []).forEach(item => {
+        const issue = typeof item === 'object' ? item.issue : String(item);
+        const priority = typeof item === 'object' ? (item.priority || 'incremental') : 'incremental';
+        const impact = typeof item === 'object' ? item.impact : '';
+        const fix = typeof item === 'object' ? item.fix : '';
+
+        let cls = 'item-incremental';
+        if (priority === 'critical') cls = 'item-critical';
+        else if (priority === 'strategic') cls = 'item-strategic';
+
+        let html = `<li class="item ${cls}"><p class="item-text">${esc(issue)}</p>`;
+        if (impact || fix) {
+          html += `<details class="fix-details"><summary class="fix-summary"><span>Details & Recommendation</span><span class="fix-chevron">▾</span></summary><div class="fix-body">`;
+          if (impact) html += `<p><strong>Impact:</strong> ${esc(impact)}</p>`;
+          if (fix) html += `<p><strong>Recommendation:</strong> ${esc(fix)}</p>`;
+          html += '</div></details>';
         }
-      }).catch(err => {
-        console.error("Unexpected fetch failure:", err);
+        html += '</li>';
+
+        if (priority === 'critical') critical.push(html);
+        else if (priority === 'strategic') strategic.push(html);
+        else incremental.push(html);
       });
-    })();
+
+      document.getElementById('critical-list').innerHTML = critical.length ? critical.join('') : '<li class="item item-critical"><p class="item-text">No critical priorities.</p></li>';
+      document.getElementById('strategic-list').innerHTML = strategic.length ? strategic.join('') : '<li class="item item-strategic"><p class="item-text">No strategic improvements.</p></li>';
+      document.getElementById('incremental-list').innerHTML = incremental.length ? incremental.join('') : '<li class="item item-incremental"><p class="item-text">No incremental enhancements.</p></li>';
+    }
+
+    function scoreClass(s) { return s >= 65 ? 'engine-score-high' : s >= 40 ? 'engine-score-mid' : 'engine-score-low'; }
+
+    function renderEngineCards(data) {
+      if (!data) {
+        document.getElementById('engine-cards').innerHTML = '<p style="color:#666">Engine analysis unavailable.</p>';
+        return;
+      }
+
+      const html = ENGINES.map(engine => {
+        const d = data[engine];
+        if (!d) return '';
+
+        const logo = LOGO_SOURCES[engine];
+        const logoHtml = logo 
+          ? `<img class="engine-logo" src="${logo}" alt="${engine}" onerror="this.outerHTML='<span class=\\'engine-fallback\\'>${engine}</span>'">`
+          : `<span class="engine-fallback">${engine}</span>`;
+
+        const scoreBadge = typeof d.score === 'number' 
+          ? `<span class="engine-score-badge ${scoreClass(d.score)}">${d.score}/100</span>` 
+          : '';
+
+        const perception = d.brandPerception ? `<div class="engine-perception">${esc(d.brandPerception)}</div>` : '';
+
+        const strengths = d.strengths?.length 
+          ? `<div class="engine-detail-box strengths"><h5>Strengths</h5><ul>${d.strengths.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>` 
+          : '';
+
+        const gaps = d.gaps?.length 
+          ? `<div class="engine-detail-box gaps"><h5>Gaps</h5><ul>${d.gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>` 
+          : '';
+
+        const topRec = d.topRecommendation 
+          ? `<div class="engine-top-rec"><strong>Top Recommendation:</strong> ${esc(d.topRecommendation)}</div>` 
+          : '';
+
+        return `<div class="engine-card">
+          <div class="engine-card-header">${logoHtml}${scoreBadge}</div>
+          <div class="engine-card-body">${perception}${(strengths || gaps) ? `<div class="engine-details-grid">${strengths}${gaps}</div>` : ''}${topRec}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('engine-cards').innerHTML = html;
+    }
+
+    // ===== PRINT / EMAIL =====
+    document.getElementById('btn-print').addEventListener('click', () => {
+      document.querySelectorAll('details').forEach(d => d.open = true);
+      window.print();
+    });
+
+    function updateEmailLink() {
+      const subject = encodeURIComponent('AIsubtext Report for ' + targetUrl);
+      const body = encodeURIComponent('View report: ' + window.location.href);
+      document.getElementById('btn-email').href = `mailto:?subject=${subject}&body=${body}`;
+    }
+    updateEmailLink();
+
+    // ===== LOAD REPORT =====
+    async function loadReport() {
+      if (!targetUrl) {
+        document.getElementById('good-list').innerHTML = '<li class="item item-good"><p class="item-text">No URL provided.</p></li>';
+        document.getElementById('critical-list').innerHTML = '<li class="item item-critical"><p class="item-text">Please provide a URL to analyze.</p></li>';
+        document.getElementById('strategic-list').innerHTML = '';
+        document.getElementById('incremental-list').innerHTML = '';
+        document.getElementById('engine-cards').innerHTML = '';
+        return;
+      }
+
+      startProgress();
+
+      try {
+        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`, { signal: AbortSignal.timeout(300000) });
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        renderBrandProfile(data.brandProfile);
+        renderScore(data.overallScore);
+        renderGoodList(data.whatsWorking);
+        renderNeedsAttention(data.needsAttention);
+        renderEngineCards(data.engineInsights);
+
+      } catch (err) {
+        console.error('Report error:', err);
+        document.getElementById('good-list').innerHTML = `<li class="item item-good"><p class="item-text">Error loading report: ${esc(err.message)}</p></li>`;
+        document.getElementById('critical-list').innerHTML = '<li class="item item-critical"><p class="item-text">Please try again or contact support.</p></li>';
+        document.getElementById('strategic-list').innerHTML = '';
+        document.getElementById('incremental-list').innerHTML = '';
+        document.getElementById('engine-cards').innerHTML = '';
+      } finally {
+        stopProgress();
+      }
+    }
+
+    // ===== INIT =====
+    loadReport();
   </script>
 
 </body>
 </html>
-
-<!-- Version: v2026.01.16-1 -->
