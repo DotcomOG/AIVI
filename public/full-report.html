@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <!--
-  analyze.html - v2026.02.06-11
-  Free snapshot + pricing section at bottom
-  Updated to match full.js v4.0.0 response format
+  full-report.html - v2026.02.06-2
+  Full AI Visibility Report - matches full.js v4.0.0 response format
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AIsubtext - AI Visibility Snapshot</title>
+  <title>AIsubtext™ — Full Report</title>
   <style>
     :root{
-      --max-width:900px;
+      --max-width:800px;
       --primary:#3182CE;
+      --primary-dark:#2563eb;
       --muted:#666;
       --border:#e5e5e5;
       --bg-soft:#f7fafc;
@@ -32,473 +32,302 @@
     h1 .subtext{color:var(--primary)}
     h1 .tm{font-size:.9rem;vertical-align:super;color:#888}
     h2{font-size:1.2rem;font-weight:600;margin:0 0 1.5rem;color:var(--muted)}
-    p{font-size:1.05rem;line-height:1.6;margin:0 0 1rem}
 
-    .info-row{
-      display:flex;justify-content:space-between;align-items:center;
-      margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);
-      flex-wrap:wrap;gap:.5rem;
-    }
+    .info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
     .powered-by{color:var(--muted);font-size:.9rem}
     .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
     .for-url{color:var(--muted);font-size:.9rem}
     .for-url strong{color:#000}
 
-    /* Free Badge */
-    .free-badge{
-      display:inline-block;
-      background:#dcfce7;color:#166534;
-      font-size:.75rem;font-weight:700;
-      padding:.25rem .6rem;border-radius:20px;
-      margin-bottom:.5rem;
+    /* Paywall */
+    .paywall-overlay{
+      position:fixed;inset:0;
+      background:rgba(255,255,255,.97);
+      z-index:9999;
+      display:flex;align-items:center;justify-content:center;
+      padding:1rem;overflow-y:auto;
     }
+    .paywall-overlay.hidden{display:none}
+    .paywall-box{
+      background:#fff;border:1px solid var(--border);border-radius:16px;
+      padding:2rem;max-width:500px;width:100%;
+      box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center;
+    }
+    .paywall-box h3{font-size:1.5rem;margin:0 0 .5rem;font-weight:800}
+    .paywall-box .subtitle{color:var(--muted);margin-bottom:1.5rem}
+    .paywall-form input{
+      width:100%;padding:12px 14px;border:1px solid var(--border);
+      border-radius:8px;font-size:15px;margin-bottom:.5rem;
+    }
+    .paywall-form input:focus{outline:none;border-color:var(--primary)}
+    .btn-pay{
+      width:100%;padding:1rem;background:var(--primary);color:#fff;
+      border:none;border-radius:8px;font-size:1.1rem;font-weight:700;
+      cursor:pointer;margin-top:.5rem;
+    }
+    .btn-pay:hover{background:var(--primary-dark)}
+    .btn-pay:disabled{background:#999;cursor:not-allowed}
+    .paywall-divider{
+      display:flex;align-items:center;gap:1rem;margin:1.5rem 0;
+      color:var(--muted);font-size:.85rem;
+    }
+    .paywall-divider::before,.paywall-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .code-row{display:flex;gap:.5rem}
+    .code-row input{flex:1;margin-bottom:0}
+    .code-row button{
+      padding:12px 20px;background:#fff;border:2px solid #111;
+      border-radius:8px;font-weight:700;cursor:pointer;
+    }
+    .code-row button:hover{background:#f5f5f5}
+    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none}
+    .error-msg.show{display:block}
+
+    /* Loading */
+    .loading{text-align:center;padding:4rem 2rem}
+    .spinner{
+      width:50px;height:50px;
+      border:4px solid #e5e5e5;border-top-color:var(--primary);
+      border-radius:50%;animation:spin 1s linear infinite;
+      margin:0 auto 1.5rem;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading p{color:var(--muted);font-size:1.1rem}
 
     /* Brand Card */
     .brand-card{
       background:linear-gradient(135deg,#f8fafc 0%,#eef2ff 100%);
-      border:1px solid #e0e7ff;
-      border-radius:12px;
-      padding:1.25rem;
-      margin-bottom:1.5rem;
-      display:none;
+      border:1px solid #e0e7ff;border-radius:12px;
+      padding:1.5rem;margin-bottom:2rem;
     }
-    .brand-card.show{display:block}
-    .brand-card h3{font-size:1.2rem;font-weight:700;margin:0 0 .25rem;color:#1e293b}
+    .brand-card h3{font-size:1.4rem;font-weight:700;margin:0 0 .5rem;color:#1e293b}
     .brand-industry{
-      display:inline-block;
-      background:#e0e7ff;color:#3730a3;
-      font-size:.75rem;font-weight:600;
-      padding:.15rem .5rem;border-radius:12px;
-      margin-bottom:.5rem;
+      display:inline-block;background:#e0e7ff;color:#3730a3;
+      font-size:.75rem;font-weight:600;padding:.2rem .6rem;
+      border-radius:12px;margin-bottom:.75rem;
     }
-    .brand-positioning{font-size:.95rem;color:#334155;line-height:1.5;margin:0}
+    .brand-meta{display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:.95rem;color:#334155}
+    .brand-meta-label{font-weight:700;color:#1e293b;font-size:.8rem;text-transform:uppercase;letter-spacing:.3px;margin-bottom:.2rem}
+    .brand-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.25rem}
+    .brand-tag{background:#fff;border:1px solid #cbd5e1;color:#334155;font-size:.8rem;padding:.15rem .5rem;border-radius:6px}
 
-    /* Snapshot Sections */
-    .snapshot-section{margin-bottom:1.5rem}
-    .section-title{font-size:1.2rem;font-weight:700;margin:0 0 .5rem;color:#111}
-    .item-list{list-style:none;padding:0;margin:0;border:1px solid #f0f0f0;border-radius:10px;overflow:hidden}
-    .item{margin:0;padding:.75rem 1rem;border-bottom:1px solid #ededed;font-size:.95rem;line-height:1.5}
-    .item:last-child{border-bottom:0}
+    /* Sections */
+    .report-section{margin:2rem 0}
+    .section-title{font-size:1.3rem;font-weight:700;margin:0 0 1rem;color:#111}
+    .section-subtitle{font-size:1.1rem;font-weight:700;margin:1.5rem 0 .75rem;color:#333}
+
+    .item-list{list-style:none;padding:0;margin:0}
+    .item{padding:1rem;border-radius:8px;margin-bottom:.75rem;font-size:.95rem;line-height:1.6}
     .item-good{background:var(--good-bg);border-left:4px solid var(--good-border)}
-    .item-bad{background:#fef2f2;border-left:4px solid #ef4444}
+    .item-critical{background:#fef2f2;border-left:4px solid #ef4444}
+    .item-strategic{background:#fffbeb;border-left:4px solid #f59e0b}
+    .item-incremental{background:#f0f9ff;border-left:4px solid #3b82f6}
+    .item-title{font-weight:600;margin-bottom:.5rem;color:#111}
+    .item-detail{font-size:.9rem;color:#555;margin-top:.5rem}
+    .item-detail strong{color:#333}
 
-    /* Blur Teaser */
-    .blur-teaser{
-      position:relative;
-      padding:1.5rem;
-      background:#f8fafc;
-      border:1px solid var(--border);
-      border-radius:12px;
-      margin-bottom:2rem;
-      overflow:hidden;
+    /* Engine Cards */
+    .engine-grid{display:flex;flex-direction:column;gap:1.5rem}
+    .engine-card{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .engine-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1rem 1.25rem;background:#fafbfc;border-bottom:1px solid #f0f0f0;
     }
-    .blur-content{
-      filter:blur(4px);
-      user-select:none;
-      pointer-events:none;
+    .engine-name{font-size:1.1rem;font-weight:700;color:#111}
+    .engine-score{
+      font-size:.9rem;font-weight:700;padding:.3rem .75rem;border-radius:20px;
     }
-    .blur-overlay{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(255,255,255,.7);
+    .score-high{background:#dcfce7;color:#166534}
+    .score-mid{background:#fef9c3;color:#854d0e}
+    .score-low{background:#fee2e2;color:#991b1b}
+    .engine-body{padding:1.25rem}
+    .engine-perception{
+      font-size:1rem;line-height:1.6;color:#1e293b;
+      padding:1rem;background:#f8fafc;border-radius:8px;
+      border-left:3px solid var(--primary);margin-bottom:1rem;
+      font-style:italic;
     }
-    .blur-overlay p{
-      font-size:1.1rem;
-      font-weight:600;
-      color:#333;
-      text-align:center;
-      padding:0 1rem;
+    .engine-details{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+    .engine-detail h5{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin:0 0 .5rem}
+    .engine-detail.strengths h5{color:#166534}
+    .engine-detail.gaps h5{color:#991b1b}
+    .engine-detail ul{margin:0;padding:0 0 0 1.1rem;font-size:.9rem;line-height:1.5;color:#334155}
+    .engine-detail li{margin:.3rem 0}
+    .engine-rec{
+      font-size:.95rem;line-height:1.5;color:#1e293b;
+      padding:.75rem 1rem;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;
     }
-
-    /* Loading */
-    .loading{text-align:center;padding:3rem;color:var(--muted)}
-    .spinner{
-      width:40px;height:40px;
-      border:4px solid #e5e5e5;border-top-color:var(--primary);
-      border-radius:50%;animation:spin 1s linear infinite;
-      margin:0 auto 1rem;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* ===== PRICING SECTION ===== */
-    .pricing-section{
-      border-top:1px solid var(--border);
-      padding-top:2rem;
-      margin-top:2rem;
-    }
-    .pricing-section h3{
-      text-align:center;
-      font-size:1.5rem;
-      margin:0 0 .5rem;
-    }
-    .pricing-subtitle{
-      text-align:center;
-      color:var(--muted);
-      margin-bottom:1.5rem;
-    }
-
-    /* Shared Form */
-    .pricing-form{
-      max-width:600px;
-      margin:0 auto 1.5rem;
-    }
-    .form-row{display:flex;gap:.5rem;margin-bottom:.5rem}
-    .form-row input{
-      flex:1;
-      padding:12px 14px;
-      border:1px solid var(--border);
-      border-radius:8px;
-      font-size:15px;
-    }
-    .form-row input:focus{outline:none;border-color:var(--primary)}
-
-    /* Tier Grid */
-    .tier-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:1rem;
-      margin-bottom:1rem;
-    }
-    .tier-card{
-      border:2px solid var(--border);
-      border-radius:12px;
-      padding:1.25rem;
-      background:#fff;
-      display:flex;
-      flex-direction:column;
-      position:relative;
-    }
-    .tier-card.featured{
-      border-color:var(--primary);
-      box-shadow:0 4px 20px rgba(49,130,206,.15);
-    }
-    .tier-badge{
-      position:absolute;top:-12px;left:50%;transform:translateX(-50%);
-      background:#0b1220;color:#fff;font-size:.7rem;font-weight:700;
-      padding:.35rem .75rem;border-radius:20px;white-space:nowrap;
-    }
-    .tier-label{font-size:.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.25rem}
-    .tier-name{font-size:1.1rem;font-weight:800;margin-bottom:.5rem;color:#111}
-    .tier-price{font-size:1.8rem;font-weight:800;color:#111;line-height:1}
-    .tier-price sup{font-size:1rem;vertical-align:top}
-    .tier-range{font-size:1rem;font-weight:600;color:var(--muted)}
-    .tier-plus{font-size:1.2rem;font-weight:600}
-    .tier-period{font-size:.8rem;color:var(--muted);margin-bottom:.5rem}
-    .tier-desc{font-size:.85rem;color:#555;line-height:1.5;margin:0 0 .75rem}
-    .tier-features{list-style:none;margin:0 0 1rem;padding:0;flex:1}
-    .tier-features li{padding:.25rem 0;font-size:.82rem;color:#333;display:flex;align-items:flex-start;gap:.4rem}
-    .tier-features li::before{content:'✓';color:#16a34a;font-weight:700;flex-shrink:0}
-    .tier-features li.highlight{font-weight:600;color:var(--primary)}
-    .tier-features li.highlight::before{content:'★';color:var(--primary)}
-    .tier-btn{
-      width:100%;padding:.75rem 1rem;border:2px solid #111;border-radius:8px;
-      background:#fff;color:#111;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;
-    }
-    .tier-btn:hover{background:#f5f5f5}
-    .tier-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-    .tier-btn.primary:hover{background:#2563eb;border-color:#2563eb}
-    .tier-btn:disabled{background:#999;color:#fff;border-color:#999;cursor:not-allowed}
-
-    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none;text-align:center}
-    .error-msg.show{display:block}
-
-    /* Access Code */
-    .code-section{margin-top:1.5rem;text-align:center}
-    .code-divider{
-      display:flex;align-items:center;gap:1rem;margin-bottom:1rem;
-      color:var(--muted);font-size:.85rem;
-    }
-    .code-divider::before,.code-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-    .code-row{display:flex;gap:.5rem;max-width:320px;margin:0 auto}
-    .code-row input{
-      flex:1;padding:10px 12px;border:1px solid var(--border);
-      border-radius:6px;font-size:14px;
-    }
-    .code-row input:focus{outline:none;border-color:var(--primary)}
-    .code-row button{
-      padding:10px 20px;background:#fff;border:2px solid #111;
-      border-radius:6px;font-weight:700;cursor:pointer;white-space:nowrap;
-    }
-    .code-row button:hover{background:#f5f5f5}
+    .engine-rec strong{color:#1e40af}
 
     /* Footer */
-    footer{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
     footer a{color:var(--primary);text-decoration:none}
 
-    @media(max-width:700px){
-      .tier-grid{grid-template-columns:1fr}
-      .form-row{flex-direction:column}
+    @media(max-width:600px){
+      .brand-meta{grid-template-columns:1fr}
+      .engine-details{grid-template-columns:1fr}
       .code-row{flex-direction:column}
       .code-row button{width:100%}
+    }
+    @media print{
+      .paywall-overlay{display:none!important}
     }
   </style>
 </head>
 <body>
 
+  <!-- PAYWALL -->
+  <div class="paywall-overlay" id="paywall">
+    <div class="paywall-box">
+      <h3>Unlock Your Full Report</h3>
+      <p class="subtitle">Analysis for <strong id="paywall-url">—</strong></p>
+      
+      <div class="paywall-form">
+        <input type="text" id="field-name" placeholder="Your Name *" />
+        <input type="email" id="field-email" placeholder="Email *" />
+        <input type="tel" id="field-phone" placeholder="Phone" />
+        <input type="text" id="field-company" placeholder="Company / Organization" />
+        <button type="button" class="btn-pay" id="btn-pay">Pay $500 — Get Full Report</button>
+        <div id="pay-error" class="error-msg"></div>
+      </div>
+
+      <div class="paywall-divider">or enter access code</div>
+
+      <div class="code-row">
+        <input type="text" id="access-code" placeholder="Access code" />
+        <button type="button" id="code-btn">Unlock</button>
+      </div>
+      <div id="code-error" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
   <h1><span class="ai">AI</span><span class="subtext">subtext</span><span class="tm">™</span></h1>
-  <h2>AI Visibility Snapshot</h2>
+  <h2>Full Report</h2>
 
   <div class="info-row">
     <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">—</strong></div>
   </div>
 
-  <!-- FREE SNAPSHOT -->
-  <div class="free-badge">FREE SNAPSHOT</div>
-
-  <div id="snapshot-loading" class="loading">
+  <!-- LOADING -->
+  <div id="loading" class="loading">
     <div class="spinner"></div>
-    <p>Analyzing how AI systems see your brand...</p>
-    <p style="font-size:.85rem;color:#999;">This typically takes 30-60 seconds</p>
+    <p>Generating your full AI visibility report...</p>
+    <p style="font-size:.9rem;color:#999">This typically takes 30-60 seconds</p>
   </div>
 
-  <div id="snapshot-content" style="display:none;">
-    <!-- Brand Card -->
+  <!-- REPORT CONTENT -->
+  <div id="report-content" style="display:none;">
+
+    <!-- Brand Profile -->
     <div class="brand-card" id="brand-card">
       <h3 id="brand-name">—</h3>
       <span class="brand-industry" id="brand-industry">—</span>
-      <p class="brand-positioning" id="brand-positioning">—</p>
+      <p id="brand-positioning" style="margin:0 0 1rem;color:#334155;line-height:1.5">—</p>
+      <div class="brand-meta">
+        <div>
+          <div class="brand-meta-label">Target Audience</div>
+          <div id="brand-audience">—</div>
+        </div>
+        <div>
+          <div class="brand-meta-label">Key Offerings</div>
+          <div class="brand-tags" id="brand-offerings"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- What's Working (preview) -->
-    <div class="snapshot-section">
-      <h4 class="section-title">What's Working</h4>
+    <!-- What's Working -->
+    <section class="report-section">
+      <h3 class="section-title">✅ What's Working</h3>
+      <p style="color:var(--muted);margin-bottom:1rem">Strengths that help AI systems understand and represent your brand accurately.</p>
       <ul class="item-list" id="good-list"></ul>
-    </div>
+    </section>
 
-    <!-- Needs Attention (preview) -->
-    <div class="snapshot-section">
-      <h4 class="section-title">Needs Attention</h4>
-      <ul class="item-list" id="bad-list"></ul>
-    </div>
+    <!-- Needs Attention -->
+    <section class="report-section">
+      <h3 class="section-title">⚠️ Needs Attention</h3>
+      <p style="color:var(--muted);margin-bottom:1rem">Issues affecting how AI systems interpret and represent your brand.</p>
+      
+      <h4 class="section-subtitle">🔴 Critical Priorities</h4>
+      <ul class="item-list" id="critical-list"></ul>
+      
+      <h4 class="section-subtitle">🟡 Strategic Improvements</h4>
+      <ul class="item-list" id="strategic-list"></ul>
+      
+      <h4 class="section-subtitle">🔵 Incremental Enhancements</h4>
+      <ul class="item-list" id="incremental-list"></ul>
+    </section>
 
-    <!-- Blurred Teaser -->
-    <div class="blur-teaser">
-      <div class="blur-content">
-        <p><strong>🔴 Critical Priority:</strong> Your homepage lacks the structured signals that AI systems use to generate accurate brand summaries. This causes ChatGPT and Claude to describe you generically...</p>
-        <p><strong>🤖 ChatGPT:</strong> "This appears to be a company that provides various services..." — missing your key differentiators and market position...</p>
-        <p><strong>🤖 Claude:</strong> Recognizes your industry but conflates you with competitors due to missing authority signals...</p>
-        <p><strong>🟡 Strategic Fix:</strong> Implement schema markup and restructure your About page to emphasize unique value propositions...</p>
-      </div>
-      <div class="blur-overlay">
-        <p>🔒 Unlock the full report to see all findings, per-engine analysis, and specific recommendations</p>
-      </div>
-    </div>
+    <!-- Engine Insights -->
+    <section class="report-section">
+      <h3 class="section-title">🤖 AI Engine Insights</h3>
+      <p style="color:var(--muted);margin-bottom:1rem">How each major AI system perceives your brand.</p>
+      <div class="engine-grid" id="engine-grid"></div>
+    </section>
+
   </div>
 
-  <div id="snapshot-error" style="display:none;text-align:center;padding:2rem;">
-    <p style="color:#c00;font-weight:600;" id="error-message">Error loading snapshot. Please try again.</p>
-    <button onclick="location.reload()" style="margin-top:1rem;padding:.5rem 1.5rem;border:2px solid #111;border-radius:6px;background:#fff;font-weight:600;cursor:pointer;">Retry</button>
+  <!-- ERROR -->
+  <div id="error-content" style="display:none;text-align:center;padding:3rem;">
+    <p style="color:#c00;font-size:1.1rem;font-weight:600" id="error-message">Error loading report.</p>
+    <button onclick="location.reload()" style="margin-top:1rem;padding:.75rem 2rem;border:2px solid #111;border-radius:8px;background:#fff;font-weight:600;cursor:pointer">Try Again</button>
   </div>
-
-  <!-- PRICING SECTION -->
-  <section class="pricing-section">
-    <h3>Get Your Full Report</h3>
-    <p class="pricing-subtitle">Detailed findings, priority fixes, and AI engine insights</p>
-
-    <!-- Shared Form -->
-    <div class="pricing-form">
-      <div class="form-row">
-        <input type="text" id="field-name" placeholder="Your Name *" required />
-        <input type="email" id="field-email" placeholder="Email *" required />
-      </div>
-      <div class="form-row">
-        <input type="tel" id="field-phone" placeholder="Phone" />
-        <input type="text" id="field-company" placeholder="Company / Organization" />
-      </div>
-    </div>
-
-    <!-- Tier Grid -->
-    <div class="tier-grid">
-      <!-- Entry - Featured -->
-      <div class="tier-card featured">
-        <div class="tier-badge">INSTANT DELIVERY</div>
-        <div class="tier-label">ENTRY</div>
-        <div class="tier-name">Diagnostic Report</div>
-        <div class="tier-price"><sup>$</sup>500</div>
-        <div class="tier-period">One-time report</div>
-        <p class="tier-desc">A complete AI interpretation snapshot with actionable insights.</p>
-        <ul class="tier-features">
-          <li>Multi-engine AI analysis</li>
-          <li>Narrative & trust gap breakdown</li>
-          <li>Source-level drivers identified</li>
-          <li>Executive-ready PDF report</li>
-        </ul>
-        <button type="button" class="tier-btn primary" id="btn-entry">Pay $500 →</button>
-      </div>
-
-      <!-- Core -->
-      <div class="tier-card">
-        <div class="tier-label">CORE</div>
-        <div class="tier-name">Deep Diagnostic</div>
-        <div class="tier-price"><sup>$</sup>1,500<span class="tier-plus">+</span></div>
-        <div class="tier-period">One-time + strategic guidance</div>
-        <p class="tier-desc">Comprehensive analysis with remediation priorities and optional strategy call.</p>
-        <ul class="tier-features">
-          <li class="highlight">Everything in Entry, plus:</li>
-          <li>Deeper narrative analysis</li>
-          <li>Priority remediation roadmap</li>
-          <li>Optional 30-min strategy call</li>
-        </ul>
-        <button type="button" class="tier-btn" id="btn-core">Get Started →</button>
-      </div>
-
-      <!-- Ongoing -->
-      <div class="tier-card">
-        <div class="tier-label">ONGOING</div>
-        <div class="tier-name">Monitoring & Advisory</div>
-        <div class="tier-price"><sup>$</sup>5,000<span class="tier-plus">+</span></div>
-        <div class="tier-period">Monthly or quarterly retainer</div>
-        <p class="tier-desc">Continuous monitoring, drift detection, and advisory access.</p>
-        <ul class="tier-features">
-          <li class="highlight">Everything in Core, plus:</li>
-          <li>Periodic re-analysis</li>
-          <li>Drift detection & alerts</li>
-          <li>Direct advisory access</li>
-        </ul>
-        <button type="button" class="tier-btn" id="btn-ongoing">Contact Us →</button>
-      </div>
-    </div>
-
-    <div id="tier-error" class="error-msg"></div>
-
-    <!-- Access Code -->
-    <div class="code-section">
-      <div class="code-divider">Have an access code?</div>
-      <div class="code-row">
-        <input type="text" id="access-code" placeholder="Enter code" />
-        <button type="button" id="code-btn">Unlock</button>
-      </div>
-      <div id="code-error" class="error-msg"></div>
-    </div>
-  </section>
 
   <footer>
     <p>© 2026 AIsubtext™ by <a href="https://quontora.com" target="_blank">Quontora</a></p>
   </footer>
 
   <script>
+    // ===== CONFIG =====
     const VALID_CODES = ['EZRA', 'ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
+    const ENGINES = ['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Perplexity'];
+
+    // ===== URL PARAMS =====
     const params = new URLSearchParams(window.location.search);
     const targetUrl = params.get('url') || '';
+    const isPaid = params.get('paid') === 'true';
+    const codeFromUrl = (params.get('code') || '').toUpperCase();
 
+    document.getElementById('paywall-url').textContent = targetUrl || 'your website';
     document.getElementById('current-url').textContent = targetUrl || '—';
 
-    // ===== LOAD FREE SNAPSHOT =====
-    async function loadSnapshot() {
-      if (!targetUrl) {
-        document.getElementById('snapshot-loading').style.display = 'none';
-        document.getElementById('error-message').innerHTML = 'No URL provided. <a href="index.html">Go back</a> and enter a website.';
-        document.getElementById('snapshot-error').style.display = 'block';
+    // ===== UNLOCK LOGIC =====
+    function isUnlocked() {
+      if (isPaid) return true;
+      if (codeFromUrl && VALID_CODES.includes(codeFromUrl)) return true;
+      if (sessionStorage.getItem('aisubtext:unlocked') === targetUrl) return true;
+      return false;
+    }
+
+    function unlock() {
+      sessionStorage.setItem('aisubtext:unlocked', targetUrl);
+      document.getElementById('paywall').classList.add('hidden');
+      loadReport();
+    }
+
+    // Check unlock on load
+    if (isUnlocked()) {
+      document.getElementById('paywall').classList.add('hidden');
+      loadReport();
+    }
+
+    // ===== PAYWALL HANDLERS =====
+    document.getElementById('btn-pay').addEventListener('click', async () => {
+      const name = document.getElementById('field-name').value.trim();
+      const email = document.getElementById('field-email').value.trim();
+      const phone = document.getElementById('field-phone').value.trim();
+      const company = document.getElementById('field-company').value.trim();
+      const errorEl = document.getElementById('pay-error');
+      const btn = document.getElementById('btn-pay');
+
+      errorEl.classList.remove('show');
+
+      if (!name || !email) {
+        errorEl.textContent = 'Please enter your name and email.';
+        errorEl.classList.add('show');
         return;
       }
 
-      try {
-        // 5 minute timeout for slow analyses
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 300000);
-
-        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`, {
-          signal: controller.signal
-        });
-        clearTimeout(timeout);
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        
-        const data = await res.json();
-        console.log('API response:', data);
-
-        // Check for fallback/error response
-        if (data.meta?.mode === 'fallback') {
-          throw new Error(data.meta?.reason || 'Analysis failed');
-        }
-
-        // Render brand profile
-        if (data.brandProfile) {
-          const bp = data.brandProfile;
-          document.getElementById('brand-name').textContent = bp.name || '—';
-          document.getElementById('brand-industry').textContent = bp.industry || 'Unknown';
-          document.getElementById('brand-positioning').textContent = bp.positioning || '—';
-          document.getElementById('brand-card').classList.add('show');
-        }
-
-        // What's working (show up to 5)
-        const good = data.whatsWorking || [];
-        if (good.length > 0) {
-          document.getElementById('good-list').innerHTML = good.slice(0, 5).map(item =>
-            `<li class="item item-good">${esc(item)}</li>`
-          ).join('');
-        } else {
-          document.getElementById('good-list').innerHTML = '<li class="item item-good">Analysis complete - see full report for details</li>';
-        }
-
-        // Needs attention (show up to 5)
-        const bad = data.needsAttention || [];
-        if (bad.length > 0) {
-          const badItems = bad.slice(0, 5).map(item => {
-            const text = typeof item === 'object' ? item.issue : String(item);
-            return `<li class="item item-bad">${esc(text)}</li>`;
-          }).join('');
-          document.getElementById('bad-list').innerHTML = badItems;
-        } else {
-          document.getElementById('bad-list').innerHTML = '<li class="item item-bad">See full report for detailed recommendations</li>';
-        }
-
-        document.getElementById('snapshot-loading').style.display = 'none';
-        document.getElementById('snapshot-content').style.display = 'block';
-
-      } catch (err) {
-        console.error('Snapshot error:', err);
-        document.getElementById('snapshot-loading').style.display = 'none';
-        document.getElementById('error-message').textContent = err.name === 'AbortError' 
-          ? 'Analysis timed out. Please try again.' 
-          : `Error: ${err.message}`;
-        document.getElementById('snapshot-error').style.display = 'block';
-      }
-    }
-
-    function esc(s) {
-      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    // ===== FORM HANDLING =====
-    function getFormData() {
-      return {
-        name: document.getElementById('field-name').value.trim(),
-        email: document.getElementById('field-email').value.trim(),
-        phone: document.getElementById('field-phone').value.trim(),
-        company: document.getElementById('field-company').value.trim()
-      };
-    }
-
-    function validateRequired() {
-      const { name, email } = getFormData();
-      if (!name || !email) return 'Please enter your name and email.';
-      return null;
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('tier-error');
-      el.textContent = msg;
-      el.classList.add('show');
-    }
-
-    function clearErrors() {
-      document.getElementById('tier-error').classList.remove('show');
-      document.getElementById('code-error').classList.remove('show');
-    }
-
-    // Entry $500 - Stripe
-    document.getElementById('btn-entry').addEventListener('click', async () => {
-      clearErrors();
-      const { name, email, phone, company } = getFormData();
-      const err = validateRequired();
-      if (err) { showError(err); return; }
-
-      const btn = document.getElementById('btn-entry');
       btn.disabled = true;
       btn.textContent = 'Connecting...';
 
@@ -516,59 +345,19 @@
         } else {
           throw new Error(data.error || data.details || 'Checkout failed');
         }
-      } catch (e) {
-        console.error('Checkout error:', e);
-        showError('Payment error: ' + e.message + '. Email yoram@quontora.ai for assistance.');
+      } catch (err) {
+        console.error('Checkout error:', err);
+        errorEl.textContent = 'Payment error. Email yoram@quontora.ai for assistance.';
+        errorEl.classList.add('show');
         btn.disabled = false;
-        btn.textContent = 'Pay $500 →';
+        btn.textContent = 'Pay $500 — Get Full Report';
       }
     });
 
-    // Core $1,500+ - Email
-    document.getElementById('btn-core').addEventListener('click', () => {
-      clearErrors();
-      const { name, email, phone, company } = getFormData();
-      const err = validateRequired();
-      if (err) { showError(err); return; }
-
-      const subject = encodeURIComponent('Deep Diagnostic Request: ' + targetUrl);
-      const body = encodeURIComponent(
-        `Hi,\n\nI'd like to request a Deep Diagnostic for:\n${targetUrl}\n\n` +
-        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
-        `Please send me pricing and next steps.\n\nBest regards`
-      );
-      window.location.href = `mailto:yoram@quontora.ai?subject=${subject}&body=${body}`;
-    });
-
-    // Ongoing $5,000+ - Email
-    document.getElementById('btn-ongoing').addEventListener('click', () => {
-      clearErrors();
-      const { name, email, phone, company } = getFormData();
-      const err = validateRequired();
-      if (err) { showError(err); return; }
-
-      const subject = encodeURIComponent('Monitoring & Advisory Inquiry: ' + targetUrl);
-      const body = encodeURIComponent(
-        `Hi,\n\nI'm interested in ongoing Monitoring & Advisory for:\n${targetUrl}\n\n` +
-        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
-        `Please contact me to discuss.\n\nBest regards`
-      );
-      window.location.href = `mailto:yoram@quontora.ai?subject=${subject}&body=${body}`;
-    });
-
-    // Access Code
     document.getElementById('code-btn').addEventListener('click', () => {
-      clearErrors();
-      const { name, email, phone, company } = getFormData();
       const code = document.getElementById('access-code').value.trim().toUpperCase();
       const errorEl = document.getElementById('code-error');
-
-      const err = validateRequired();
-      if (err) {
-        errorEl.textContent = err;
-        errorEl.classList.add('show');
-        return;
-      }
+      errorEl.classList.remove('show');
 
       if (!code) {
         errorEl.textContent = 'Please enter an access code.';
@@ -582,16 +371,162 @@
         return;
       }
 
-      // Go to full report
-      window.location.href = `full-report.html?url=${encodeURIComponent(targetUrl)}&code=${encodeURIComponent(code)}`;
+      // Update URL
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('code', code);
+      window.history.replaceState({}, '', newUrl);
+
+      unlock();
     });
 
     document.getElementById('access-code').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') document.getElementById('code-btn').click();
     });
 
-    // Init
-    loadSnapshot();
+    // ===== LOAD REPORT =====
+    async function loadReport() {
+      if (!targetUrl) {
+        showError('No URL provided.');
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('report-content').style.display = 'none';
+      document.getElementById('error-content').style.display = 'none';
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 300000);
+
+        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        console.log('Full report data:', data);
+
+        if (data.meta?.mode === 'fallback') {
+          throw new Error(data.meta?.reason || 'Analysis failed');
+        }
+
+        renderReport(data);
+
+      } catch (err) {
+        console.error('Report error:', err);
+        showError(err.name === 'AbortError' ? 'Request timed out.' : err.message);
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-message').textContent = msg;
+      document.getElementById('error-content').style.display = 'block';
+    }
+
+    // ===== RENDER REPORT =====
+    function renderReport(data) {
+      // Brand Profile
+      if (data.brandProfile) {
+        const bp = data.brandProfile;
+        document.getElementById('brand-name').textContent = bp.name || '—';
+        document.getElementById('brand-industry').textContent = bp.industry || 'Unknown';
+        document.getElementById('brand-positioning').textContent = bp.positioning || '—';
+        document.getElementById('brand-audience').textContent = bp.audience || '—';
+        
+        const offerings = bp.offerings || [];
+        document.getElementById('brand-offerings').innerHTML = offerings.length 
+          ? offerings.map(o => `<span class="brand-tag">${esc(o)}</span>`).join('')
+          : '<span class="brand-tag">—</span>';
+      }
+
+      // What's Working
+      const good = data.whatsWorking || [];
+      document.getElementById('good-list').innerHTML = good.length
+        ? good.map(item => `<li class="item item-good">${esc(item)}</li>`).join('')
+        : '<li class="item item-good">No specific strengths identified.</li>';
+
+      // Needs Attention
+      const issues = data.needsAttention || [];
+      const critical = [], strategic = [], incremental = [];
+
+      issues.forEach(item => {
+        const issue = typeof item === 'object' ? item.issue : String(item);
+        const priority = typeof item === 'object' ? (item.priority || 'incremental') : 'incremental';
+        const impact = typeof item === 'object' ? item.impact : '';
+        const fix = typeof item === 'object' ? item.fix : '';
+
+        let cls = 'item-incremental';
+        if (priority === 'critical') cls = 'item-critical';
+        else if (priority === 'strategic') cls = 'item-strategic';
+
+        let html = `<li class="item ${cls}"><div class="item-title">${esc(issue)}</div>`;
+        if (impact || fix) {
+          html += '<div class="item-detail">';
+          if (impact) html += `<strong>Impact:</strong> ${esc(impact)}<br>`;
+          if (fix) html += `<strong>Fix:</strong> ${esc(fix)}`;
+          html += '</div>';
+        }
+        html += '</li>';
+
+        if (priority === 'critical') critical.push(html);
+        else if (priority === 'strategic') strategic.push(html);
+        else incremental.push(html);
+      });
+
+      document.getElementById('critical-list').innerHTML = critical.length ? critical.join('') : '<li class="item item-critical">No critical issues identified.</li>';
+      document.getElementById('strategic-list').innerHTML = strategic.length ? strategic.join('') : '<li class="item item-strategic">No strategic improvements identified.</li>';
+      document.getElementById('incremental-list').innerHTML = incremental.length ? incremental.join('') : '<li class="item item-incremental">No incremental enhancements identified.</li>';
+
+      // Engine Insights
+      const engines = data.engineInsights || {};
+      const engineHtml = ENGINES.map(name => {
+        const e = engines[name];
+        if (!e) return '';
+
+        const score = e.score;
+        const scoreClass = score >= 65 ? 'score-high' : score >= 45 ? 'score-mid' : 'score-low';
+        const scoreBadge = typeof score === 'number' ? `<span class="engine-score ${scoreClass}">${score}/100</span>` : '';
+
+        const strengths = (e.strengths || []).map(s => `<li>${esc(s)}</li>`).join('');
+        const gaps = (e.gaps || []).map(g => `<li>${esc(g)}</li>`).join('');
+
+        return `
+          <div class="engine-card">
+            <div class="engine-header">
+              <span class="engine-name">${name}</span>
+              ${scoreBadge}
+            </div>
+            <div class="engine-body">
+              ${e.brandPerception ? `<div class="engine-perception">"${esc(e.brandPerception)}"</div>` : ''}
+              <div class="engine-details">
+                <div class="engine-detail strengths">
+                  <h5>Strengths</h5>
+                  <ul>${strengths || '<li>—</li>'}</ul>
+                </div>
+                <div class="engine-detail gaps">
+                  <h5>Gaps</h5>
+                  <ul>${gaps || '<li>—</li>'}</ul>
+                </div>
+              </div>
+              ${e.topRecommendation ? `<div class="engine-rec"><strong>Top Recommendation:</strong> ${esc(e.topRecommendation)}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('engine-grid').innerHTML = engineHtml || '<p>No engine insights available.</p>';
+
+      // Show content
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('report-content').style.display = 'block';
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
   </script>
 
 </body>
