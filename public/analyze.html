@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <!--
-  analyze.html - v2026.02.06-5
-  Two pricing tiers side by side, fixed sessionStorage keys
+  analyze.html - v2026.02.06-7
+  Free snapshot + pricing section at bottom
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AIsubtext - AI Visibility Analysis</title>
+  <title>AIsubtext - AI Visibility Snapshot</title>
   <style>
     :root{
       --max-width:900px;
@@ -15,13 +15,13 @@
       --muted:#666;
       --border:#e5e5e5;
       --bg-soft:#f7fafc;
+      --good-bg:#ecfdf5;
+      --good-border:#10b981;
     }
     *{box-sizing:border-box}
     body{
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-      background:#fff;
-      color:#000;
-      margin:0;
+      background:#fff;color:#000;margin:0;
       padding:2rem;
       max-width:var(--max-width);
       margin-inline:auto;
@@ -31,326 +31,447 @@
     h1 .subtext{color:var(--primary)}
     h1 .tm{font-size:.9rem;vertical-align:super;color:#888}
     h2{font-size:1.2rem;font-weight:600;margin:0 0 1.5rem;color:var(--muted)}
-    
+    p{font-size:1.05rem;line-height:1.6;margin:0 0 1rem}
+
     .info-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:2rem;
-      padding-bottom:1rem;
-      border-bottom:1px solid var(--border);
-      flex-wrap:wrap;
-      gap:.5rem;
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);
+      flex-wrap:wrap;gap:.5rem;
     }
     .powered-by{color:var(--muted);font-size:.9rem}
     .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
     .for-url{color:var(--muted);font-size:.9rem}
     .for-url strong{color:#000}
 
-    /* Pricing Section */
+    /* Free Badge */
+    .free-badge{
+      display:inline-block;
+      background:#dcfce7;color:#166534;
+      font-size:.75rem;font-weight:700;
+      padding:.25rem .6rem;border-radius:20px;
+      margin-bottom:.5rem;
+    }
+
+    /* Score Card */
+    .score-card{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:1.5rem;
+      margin-bottom:1.5rem;
+    }
+    .score-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.75rem}
+    .score-label{font-size:1.1rem;font-weight:700;color:#1e293b}
+    .score-number{font-size:2.5rem;font-weight:800;color:var(--primary)}
+    .score-track{height:14px;border-radius:10px;background:#e2e8f0;overflow:hidden}
+    .score-fill{height:100%;border-radius:10px;width:0%;transition:width 1s ease}
+    .score-context{font-size:.9rem;color:var(--muted);margin-top:.5rem}
+
+    /* Snapshot Sections */
+    .snapshot-section{margin-bottom:1.5rem}
+    .section-title{font-size:1.2rem;font-weight:700;margin:0 0 .5rem;color:#111}
+    .item-list{list-style:none;padding:0;margin:0;border:1px solid #f0f0f0;border-radius:10px;overflow:hidden}
+    .item{margin:0;padding:.75rem 1rem;border-bottom:1px solid #ededed;font-size:.95rem;line-height:1.5}
+    .item:last-child{border-bottom:0}
+    .item-good{background:var(--good-bg);border-left:4px solid var(--good-border)}
+    .item-bad{background:#fef2f2;border-left:4px solid #ef4444}
+
+    /* Blur Teaser */
+    .blur-teaser{
+      position:relative;
+      padding:1.5rem;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:12px;
+      margin-bottom:2rem;
+      overflow:hidden;
+    }
+    .blur-content{
+      filter:blur(4px);
+      user-select:none;
+      pointer-events:none;
+    }
+    .blur-overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,.7);
+    }
+    .blur-overlay p{
+      font-size:1.1rem;
+      font-weight:600;
+      color:#333;
+      text-align:center;
+      padding:0 1rem;
+    }
+
+    /* Loading */
+    .loading{text-align:center;padding:3rem;color:var(--muted)}
+    .spinner{
+      width:40px;height:40px;
+      border:4px solid #e5e5e5;border-top-color:var(--primary);
+      border-radius:50%;animation:spin 1s linear infinite;
+      margin:0 auto 1rem;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ===== PRICING SECTION ===== */
+    .pricing-section{
+      border-top:1px solid var(--border);
+      padding-top:2rem;
+      margin-top:2rem;
+    }
     .pricing-section h3{
       text-align:center;
-      font-size:1.6rem;
+      font-size:1.5rem;
       margin:0 0 .5rem;
     }
-    .pricing-section .subtitle{
+    .pricing-subtitle{
       text-align:center;
       color:var(--muted);
       margin-bottom:1.5rem;
     }
 
-    .pricing-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:1.5rem;
-      margin-bottom:2rem;
+    /* Shared Form */
+    .pricing-form{
+      max-width:600px;
+      margin:0 auto 1.5rem;
     }
+    .form-row{display:flex;gap:.5rem;margin-bottom:.5rem}
+    .form-row input{
+      flex:1;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      font-size:15px;
+    }
+    .form-row input:focus{outline:none;border-color:var(--primary)}
 
-    .pricing-card{
+    /* Tier Grid */
+    .tier-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:1rem;
+      margin-bottom:1rem;
+    }
+    .tier-card{
       border:2px solid var(--border);
       border-radius:12px;
-      padding:1.5rem;
+      padding:1.25rem;
       background:#fff;
       display:flex;
       flex-direction:column;
+      position:relative;
     }
-    .pricing-card.featured{
+    .tier-card.featured{
       border-color:var(--primary);
-      box-shadow:0 4px 20px rgba(49,130,206,.12);
+      box-shadow:0 4px 20px rgba(49,130,206,.15);
     }
+    .tier-badge{
+      position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+      background:#0b1220;color:#fff;font-size:.7rem;font-weight:700;
+      padding:.35rem .75rem;border-radius:20px;white-space:nowrap;
+    }
+    .tier-label{font-size:.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.25rem}
+    .tier-name{font-size:1.1rem;font-weight:800;margin-bottom:.5rem;color:#111}
+    .tier-price{font-size:1.8rem;font-weight:800;color:#111;line-height:1}
+    .tier-price sup{font-size:1rem;vertical-align:top}
+    .tier-range{font-size:1rem;font-weight:600;color:var(--muted)}
+    .tier-plus{font-size:1.2rem;font-weight:600}
+    .tier-period{font-size:.8rem;color:var(--muted);margin-bottom:.5rem}
+    .tier-desc{font-size:.85rem;color:#555;line-height:1.5;margin:0 0 .75rem}
+    .tier-features{list-style:none;margin:0 0 1rem;padding:0;flex:1}
+    .tier-features li{padding:.25rem 0;font-size:.82rem;color:#333;display:flex;align-items:flex-start;gap:.4rem}
+    .tier-features li::before{content:'✓';color:#16a34a;font-weight:700;flex-shrink:0}
+    .tier-features li.highlight{font-weight:600;color:var(--primary)}
+    .tier-features li.highlight::before{content:'★';color:var(--primary)}
+    .tier-btn{
+      width:100%;padding:.75rem 1rem;border:2px solid #111;border-radius:8px;
+      background:#fff;color:#111;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;
+    }
+    .tier-btn:hover{background:#f5f5f5}
+    .tier-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .tier-btn.primary:hover{background:#2563eb;border-color:#2563eb}
+    .tier-btn:disabled{background:#999;color:#fff;border-color:#999;cursor:not-allowed}
 
-    .tier-label{
-      font-size:.8rem;
-      font-weight:700;
-      color:var(--primary);
-      text-transform:uppercase;
-      letter-spacing:.5px;
-      margin-bottom:.25rem;
-    }
-    .tier-name{
-      font-size:1.3rem;
-      font-weight:800;
-      margin-bottom:.5rem;
-    }
-    .tier-price{
-      font-size:2rem;
-      font-weight:800;
-      margin-bottom:.25rem;
-    }
-    .tier-desc{
-      font-size:.9rem;
-      color:var(--muted);
-      margin-bottom:1rem;
-      line-height:1.5;
-    }
-    .tier-features{
-      list-style:none;
-      margin:0 0 1.25rem;
-      padding:0;
-      flex:1;
-    }
-    .tier-features li{
-      padding:.35rem 0;
-      font-size:.9rem;
-      color:#333;
-      display:flex;
-      align-items:flex-start;
-      gap:.5rem;
-    }
-    .tier-features li::before{
-      content:'✓';
-      color:#16a34a;
-      font-weight:700;
-    }
-    .tier-features li.highlight{
-      font-weight:600;
-      color:var(--primary);
-    }
-    .tier-features li.highlight::before{
-      content:'★';
-      color:var(--primary);
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:.5rem;
-      margin-bottom:.75rem;
-    }
-    .form-full{grid-column:1/-1}
-    .pricing-card input{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:6px;
-      font-size:14px;
-      font-family:inherit;
-    }
-    .pricing-card input:focus{outline:none;border-color:var(--primary)}
-
-    .btn-stripe{
-      background:#635bff;
-      color:#fff;
-      border:none;
-      padding:.9rem 1.5rem;
-      border-radius:8px;
-      font-size:1rem;
-      font-weight:700;
-      cursor:pointer;
-      width:100%;
-    }
-    .btn-stripe:hover{background:#4b44cc}
-    .btn-stripe:disabled{background:#999;cursor:not-allowed}
-
-    .btn-outline{
-      background:#fff;
-      color:#111;
-      border:2px solid #111;
-      padding:.85rem 1.5rem;
-      border-radius:8px;
-      font-size:1rem;
-      font-weight:700;
-      cursor:pointer;
-      width:100%;
-      text-decoration:none;
-      text-align:center;
-      display:block;
-    }
-    .btn-outline:hover{background:#f5f5f5}
-
-    .error-msg{
-      color:#c00;
-      font-size:.85rem;
-      margin-top:.5rem;
-      display:none;
-    }
+    .error-msg{color:#c00;font-size:.85rem;margin-top:.5rem;display:none;text-align:center}
     .error-msg.show{display:block}
 
     /* Access Code */
-    .access-section{
-      background:var(--bg-soft);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:1.25rem;
-      margin-bottom:2rem;
+    .code-section{margin-top:1.5rem;text-align:center}
+    .code-divider{
+      display:flex;align-items:center;gap:1rem;margin-bottom:1rem;
+      color:var(--muted);font-size:.85rem;
     }
-    .access-section h4{margin:0 0 .75rem;font-size:1rem}
-    .access-row{
-      display:flex;
-      gap:.5rem;
-      flex-wrap:wrap;
+    .code-divider::before,.code-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .code-row{display:flex;gap:.5rem;max-width:320px;margin:0 auto}
+    .code-row input{
+      flex:1;padding:10px 12px;border:1px solid var(--border);
+      border-radius:6px;font-size:14px;
     }
-    .access-row input{
-      flex:1;
-      min-width:100px;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:6px;
-      font-size:14px;
+    .code-row input:focus{outline:none;border-color:var(--primary)}
+    .code-row button{
+      padding:10px 20px;background:#fff;border:2px solid #111;
+      border-radius:6px;font-weight:700;cursor:pointer;white-space:nowrap;
     }
-    .access-row input:focus{outline:none;border-color:var(--primary)}
-    .access-row button{
-      padding:10px 20px;
-      background:#fff;
-      border:2px solid #111;
-      border-radius:6px;
-      font-weight:700;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .access-row button:hover{background:#f5f5f5}
+    .code-row button:hover{background:#f5f5f5}
 
     /* Footer */
-    footer{
-      margin-top:2rem;
-      padding-top:1.5rem;
-      border-top:1px solid var(--border);
-      color:var(--muted);
-      font-size:.85rem;
-    }
+    footer{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
     footer a{color:var(--primary);text-decoration:none}
 
-    @media(max-width:650px){
-      .pricing-grid{grid-template-columns:1fr}
-      .form-grid{grid-template-columns:1fr}
-      .access-row{flex-direction:column}
-      .access-row input{width:100%}
-      .access-row button{width:100%}
+    @media(max-width:700px){
+      .tier-grid{grid-template-columns:1fr}
+      .form-row{flex-direction:column}
+      .code-row{flex-direction:column}
+      .code-row button{width:100%}
     }
   </style>
 </head>
 <body>
 
   <h1><span class="ai">AI</span><span class="subtext">subtext</span><span class="tm">™</span></h1>
-  <h2>AI Visibility Analysis</h2>
+  <h2>AI Visibility Snapshot</h2>
 
   <div class="info-row">
     <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank">Quontora</a></div>
     <div class="for-url">Analysis for: <strong id="current-url">—</strong></div>
   </div>
 
-  <!-- Pricing Section -->
-  <section class="pricing-section">
-    <h3>Unlock Your Full Report</h3>
-    <p class="subtitle">Choose the depth of analysis that fits your needs</p>
+  <!-- FREE SNAPSHOT -->
+  <div class="free-badge">FREE SNAPSHOT</div>
 
-    <div class="pricing-grid">
-      <!-- Entry: $500 -->
-      <div class="pricing-card featured">
-        <div class="tier-label">Entry</div>
+  <div id="snapshot-loading" class="loading">
+    <div class="spinner"></div>
+    <p>Analyzing how AI systems see your brand...</p>
+  </div>
+
+  <div id="snapshot-content" style="display:none;">
+    <!-- Score -->
+    <div class="score-card">
+      <div class="score-header">
+        <span class="score-label">AI Visibility Score</span>
+        <span class="score-number" id="score-number">—</span>
+      </div>
+      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+      <div class="score-context" id="score-context">Based on analysis across 5 major AI engines.</div>
+    </div>
+
+    <!-- What's Working (preview) -->
+    <div class="snapshot-section">
+      <h4 class="section-title">What's Working</h4>
+      <ul class="item-list" id="good-list"></ul>
+    </div>
+
+    <!-- Needs Attention (preview) -->
+    <div class="snapshot-section">
+      <h4 class="section-title">Needs Attention</h4>
+      <ul class="item-list" id="bad-list"></ul>
+    </div>
+
+    <!-- Blurred Teaser -->
+    <div class="blur-teaser">
+      <div class="blur-content">
+        <p><strong>Critical Priority:</strong> Your homepage meta description is missing key brand differentiators that AI systems use to generate accurate summaries...</p>
+        <p><strong>Strategic Improvement:</strong> Product pages lack structured data markup, causing AI assistants to miss pricing and availability information...</p>
+        <p><strong>Engine Insight:</strong> ChatGPT perceives your brand as a generic provider rather than the market leader you are...</p>
+      </div>
+      <div class="blur-overlay">
+        <p>🔒 Unlock the full report to see detailed findings, priority fixes, and AI engine insights</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="snapshot-error" style="display:none;text-align:center;padding:2rem;color:#c00;">
+    <p>Error loading snapshot. Please try again.</p>
+  </div>
+
+  <!-- PRICING SECTION -->
+  <section class="pricing-section">
+    <h3>Get Your Full Report</h3>
+    <p class="pricing-subtitle">Detailed findings, priority fixes, and AI engine insights</p>
+
+    <!-- Shared Form -->
+    <div class="pricing-form">
+      <div class="form-row">
+        <input type="text" id="field-name" placeholder="Your Name *" required />
+        <input type="email" id="field-email" placeholder="Email *" required />
+      </div>
+      <div class="form-row">
+        <input type="tel" id="field-phone" placeholder="Phone" />
+        <input type="text" id="field-company" placeholder="Company / Organization" />
+      </div>
+    </div>
+
+    <!-- Tier Grid -->
+    <div class="tier-grid">
+      <!-- Entry -->
+      <div class="tier-card">
+        <div class="tier-label">ENTRY</div>
         <div class="tier-name">Diagnostic Report</div>
-        <div class="tier-price">$500</div>
-        <div class="tier-desc">One-time report with actionable insights</div>
+        <div class="tier-price"><sup>$</sup>500</div>
+        <div class="tier-period">One-time report</div>
+        <p class="tier-desc">A complete AI interpretation snapshot with actionable insights.</p>
         <ul class="tier-features">
-          <li>Multi-engine AI analysis (5 engines)</li>
+          <li>Multi-engine AI analysis</li>
           <li>Narrative & trust gap breakdown</li>
           <li>Source-level drivers identified</li>
           <li>Executive-ready PDF report</li>
-          <li>Instant delivery</li>
         </ul>
-        <form id="entry-form" novalidate>
-          <div class="form-grid">
-            <input type="text" id="entry-name" placeholder="Your Name" required />
-            <input type="text" id="entry-company" placeholder="Company" />
-            <input type="email" id="entry-email" placeholder="Email" required class="form-full" />
-          </div>
-          <button type="submit" class="btn-stripe" id="entry-btn">Buy Report — $500</button>
-          <div id="entry-error" class="error-msg"></div>
-        </form>
+        <button type="button" class="tier-btn" id="btn-entry">Request Report →</button>
       </div>
 
-      <!-- Core: $1,500+ -->
-      <div class="pricing-card">
-        <div class="tier-label">Core</div>
+      <!-- Core - Featured -->
+      <div class="tier-card featured">
+        <div class="tier-badge">MOST POPULAR</div>
+        <div class="tier-label">CORE</div>
         <div class="tier-name">Deep Diagnostic</div>
-        <div class="tier-price">$1,500<span style="font-size:1.2rem">+</span></div>
-        <div class="tier-desc">Comprehensive analysis + strategic guidance</div>
+        <div class="tier-price"><sup>$</sup>1,500<span class="tier-range">–3,000</span></div>
+        <div class="tier-period">One-time + strategic guidance</div>
+        <p class="tier-desc">Comprehensive analysis with remediation priorities and optional strategy call.</p>
         <ul class="tier-features">
           <li class="highlight">Everything in Entry, plus:</li>
           <li>Deeper narrative analysis</li>
           <li>Priority remediation roadmap</li>
           <li>Optional 30-min strategy call</li>
-          <li>Custom scope for complex sites</li>
         </ul>
-        <a href="mailto:hello@quontora.com?subject=Deep%20Diagnostic%20Request" id="core-link" class="btn-outline">Request Deep Diagnostic →</a>
+        <button type="button" class="tier-btn primary" id="btn-core">Get Started →</button>
       </div>
+
+      <!-- Ongoing -->
+      <div class="tier-card">
+        <div class="tier-label">ONGOING</div>
+        <div class="tier-name">Monitoring & Advisory</div>
+        <div class="tier-price"><sup>$</sup>5,000<span class="tier-plus">+</span></div>
+        <div class="tier-period">Monthly or quarterly retainer</div>
+        <p class="tier-desc">Continuous monitoring, drift detection, and advisory access.</p>
+        <ul class="tier-features">
+          <li class="highlight">Everything in Core, plus:</li>
+          <li>Periodic re-analysis</li>
+          <li>Drift detection & alerts</li>
+          <li>Direct advisory access</li>
+        </ul>
+        <button type="button" class="tier-btn" id="btn-ongoing">Contact Us →</button>
+      </div>
+    </div>
+
+    <div id="tier-error" class="error-msg"></div>
+
+    <!-- Access Code -->
+    <div class="code-section">
+      <div class="code-divider">Have an access code?</div>
+      <div class="code-row">
+        <input type="text" id="access-code" placeholder="Enter code" />
+        <button type="button" id="code-btn">Unlock</button>
+      </div>
+      <div id="code-error" class="error-msg"></div>
     </div>
   </section>
 
-  <!-- Access Code Section -->
-  <section class="access-section">
-    <h4>Have an Access Code?</h4>
-    <form id="code-form" class="access-row" novalidate>
-      <input type="text" id="code-name" placeholder="Name" required />
-      <input type="email" id="code-email" placeholder="Email" required />
-      <input type="text" id="code-input" placeholder="Access Code" required />
-      <button type="submit">Unlock</button>
-    </form>
-    <div id="code-error" class="error-msg"></div>
-  </section>
-
   <footer>
-    <p>© 2026 AIsubtext by <a href="https://quontora.com" target="_blank">Quontora</a></p>
+    <p>© 2026 AIsubtext™ by <a href="https://quontora.com" target="_blank">Quontora</a></p>
   </footer>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetUrl = urlParams.get("url");
-    
-    if (targetUrl) {
-      document.getElementById("current-url").textContent = targetUrl;
-      document.getElementById("core-link").href = 
-        "mailto:hello@quontora.com?subject=Deep%20Diagnostic%20Request&body=URL:%20" + encodeURIComponent(targetUrl);
-    } else {
-      document.getElementById("current-url").textContent = "No URL provided";
+    const VALID_CODES = ['EZRA', 'ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get('url') || '';
+
+    document.getElementById('current-url').textContent = targetUrl || '—';
+
+    // ===== LOAD FREE SNAPSHOT =====
+    async function loadSnapshot() {
+      if (!targetUrl) {
+        document.getElementById('snapshot-loading').style.display = 'none';
+        document.getElementById('snapshot-error').innerHTML = '<p>No URL provided. <a href="index.html">Go back</a> and enter a website.</p>';
+        document.getElementById('snapshot-error').style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/summary?url=${encodeURIComponent(targetUrl)}`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        // Render score
+        const score = data.score || data.overallScore || 50;
+        document.getElementById('score-number').textContent = score + '/100';
+        const fill = document.getElementById('score-fill');
+        fill.style.background = score >= 70 ? '#10b981' : score >= 45 ? '#f59e0b' : '#ef4444';
+        setTimeout(() => fill.style.width = score + '%', 100);
+
+        // Score context
+        const ctx = document.getElementById('score-context');
+        if (score >= 75) ctx.textContent = 'Strong AI visibility. Your brand is well-represented.';
+        else if (score >= 55) ctx.textContent = 'Moderate visibility. Key improvements can help.';
+        else if (score >= 35) ctx.textContent = 'Below average. AI likely gives generic descriptions.';
+        else ctx.textContent = 'Low visibility. Significant work needed.';
+
+        // What's working (show 2-3)
+        const good = data.whatsWorking || data.strengths || ['Strong brand name recognition', 'Clear product categories'];
+        document.getElementById('good-list').innerHTML = good.slice(0, 3).map(item =>
+          `<li class="item item-good">${esc(item)}</li>`
+        ).join('');
+
+        // Needs attention (show 2-3)
+        const bad = data.needsAttention || data.issues || ['Missing structured data', 'Inconsistent brand messaging'];
+        const badItems = bad.slice(0, 3).map(item => {
+          const text = typeof item === 'object' ? item.issue : item;
+          return `<li class="item item-bad">${esc(text)}</li>`;
+        }).join('');
+        document.getElementById('bad-list').innerHTML = badItems;
+
+        document.getElementById('snapshot-loading').style.display = 'none';
+        document.getElementById('snapshot-content').style.display = 'block';
+
+      } catch (err) {
+        console.error('Snapshot error:', err);
+        document.getElementById('snapshot-loading').style.display = 'none';
+        document.getElementById('snapshot-error').style.display = 'block';
+      }
     }
 
-    // Valid codes - EZRA is owner master code
-    const VALID_CODES = ['ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER', 'EZRA'];
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ===== FORM HANDLING =====
+    function getFormData() {
+      return {
+        name: document.getElementById('field-name').value.trim(),
+        email: document.getElementById('field-email').value.trim(),
+        phone: document.getElementById('field-phone').value.trim(),
+        company: document.getElementById('field-company').value.trim()
+      };
+    }
+
+    function validateRequired() {
+      const { name, email } = getFormData();
+      if (!name || !email) return 'Please enter your name and email.';
+      return null;
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('tier-error');
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+
+    function clearErrors() {
+      document.getElementById('tier-error').classList.remove('show');
+      document.getElementById('code-error').classList.remove('show');
+    }
 
     // Entry $500 - Stripe
-    document.getElementById('entry-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('entry-name').value.trim();
-      const email = document.getElementById('entry-email').value.trim();
-      const company = document.getElementById('entry-company').value.trim();
-      const errorEl = document.getElementById('entry-error');
-      const btn = document.getElementById('entry-btn');
+    document.getElementById('btn-entry').addEventListener('click', async () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const err = validateRequired();
+      if (err) { showError(err); return; }
 
-      errorEl.classList.remove('show');
-
-      if (!name || !email) {
-        errorEl.textContent = 'Please enter your name and email.';
-        errorEl.classList.add('show');
-        return;
-      }
-      if (!targetUrl) {
-        errorEl.textContent = 'No URL to analyze.';
-        errorEl.classList.add('show');
-        return;
-      }
-
+      const btn = document.getElementById('btn-entry');
       btn.disabled = true;
       btn.textContent = 'Connecting...';
 
@@ -358,7 +479,7 @@
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: targetUrl, email, name, company })
+          body: JSON.stringify({ url: targetUrl, email, name, phone, company, tier: 'entry' })
         });
         const data = await res.json();
         if (data.url) {
@@ -366,47 +487,81 @@
         } else {
           throw new Error(data.error || 'Checkout failed');
         }
-      } catch (err) {
-        errorEl.textContent = 'Payment error. Please try again.';
-        errorEl.classList.add('show');
+      } catch (e) {
+        showError('Payment error. Email hello@quontora.com for assistance.');
         btn.disabled = false;
-        btn.textContent = 'Buy Report — $500';
+        btn.textContent = 'Request Report →';
       }
     });
 
-    // Access Code - uses sniperank: keys to match full-report.html
-    document.getElementById('code-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('code-name').value.trim();
-      const email = document.getElementById('code-email').value.trim();
-      const code = document.getElementById('code-input').value.trim().toUpperCase();
+    // Core $1,500+ - Email
+    document.getElementById('btn-core').addEventListener('click', () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const err = validateRequired();
+      if (err) { showError(err); return; }
+
+      const subject = encodeURIComponent('Deep Diagnostic Request: ' + targetUrl);
+      const body = encodeURIComponent(
+        `Hi,\n\nI'd like to request a Deep Diagnostic for:\n${targetUrl}\n\n` +
+        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
+        `Please send me pricing and next steps.\n\nBest regards`
+      );
+      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
+    });
+
+    // Ongoing $5,000+ - Email
+    document.getElementById('btn-ongoing').addEventListener('click', () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const err = validateRequired();
+      if (err) { showError(err); return; }
+
+      const subject = encodeURIComponent('Monitoring & Advisory Inquiry: ' + targetUrl);
+      const body = encodeURIComponent(
+        `Hi,\n\nI'm interested in ongoing Monitoring & Advisory for:\n${targetUrl}\n\n` +
+        `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\n\n` +
+        `Please contact me to discuss.\n\nBest regards`
+      );
+      window.location.href = `mailto:hello@quontora.com?subject=${subject}&body=${body}`;
+    });
+
+    // Access Code
+    document.getElementById('code-btn').addEventListener('click', () => {
+      clearErrors();
+      const { name, email, phone, company } = getFormData();
+      const code = document.getElementById('access-code').value.trim().toUpperCase();
       const errorEl = document.getElementById('code-error');
 
-      errorEl.classList.remove('show');
-
-      if (!name || !email || !code) {
-        errorEl.textContent = 'Please fill in all fields.';
+      const err = validateRequired();
+      if (err) {
+        errorEl.textContent = err;
         errorEl.classList.add('show');
         return;
       }
+
+      if (!code) {
+        errorEl.textContent = 'Please enter an access code.';
+        errorEl.classList.add('show');
+        return;
+      }
+
       if (!VALID_CODES.includes(code)) {
         errorEl.textContent = 'Invalid access code.';
         errorEl.classList.add('show');
         return;
       }
-      if (!targetUrl) {
-        errorEl.textContent = 'No URL to analyze.';
-        errorEl.classList.add('show');
-        return;
-      }
 
-      // Store with sniperank: prefix to match full-report.html expectations
-      sessionStorage.setItem('sniperank:name', name);
-      sessionStorage.setItem('sniperank:email', email);
-
-      window.location.href = 'full-report.html?url=' + encodeURIComponent(targetUrl) + '&code=' + encodeURIComponent(code);
+      // Go to full report
+      window.location.href = `full-report.html?url=${encodeURIComponent(targetUrl)}&code=${encodeURIComponent(code)}`;
     });
+
+    document.getElementById('access-code').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('code-btn').click();
+    });
+
+    // Init
+    loadSnapshot();
   </script>
 
 </body>
