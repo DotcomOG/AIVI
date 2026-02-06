@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/full.js": {
+      "maxDuration": 300
+    },
+    "api/checkout.js": {
+      "maxDuration": 30
+    }
+  }
+}
