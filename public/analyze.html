@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <!--
   analyze.html
-  Version: v2026.01.12-4
-  Last updated: 2026-01-12 (America/New_York)
+  Version: v2026.02.06-1
+  Last updated: 2026-02-06 (America/New_York)
 
-  Changes (only):
-  1) Footer updated to match full-report.html footer (full-bleed + typography + copy).
-  2) No other layout/design/functionality changes.
+  Changes:
+  1) Updated branding to AIsubtext
+  2) Added Stripe payment flow for $500 report
+  3) Kept access code option for promos/partners
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AiVi - AI Visibility Analysis</title>
+  <title>AIsubtext - AI Visibility Analysis</title>
   <style>
     :root{
       --max-width:760px; --pad-v:3vh; --pad-h:2rem;
@@ -27,7 +28,10 @@
     }
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
-    h1{font-size:4rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px;background:linear-gradient(135deg,#000 0%,#3182CE 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h1{font-size:3rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px}
+    h1 .ai{color:#0b1220}
+    h1 .subtext{color:var(--primary)}
+    h1 .tm{font-size:1rem;vertical-align:super;color:#666}
     h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
     p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
 
@@ -47,6 +51,10 @@
     .btn-ghost:hover{background:#f2f2f2}
     .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.85rem 2rem;border-radius:999px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
     .btn-primary:hover{background:var(--btn-red-hover)}
+    .btn-stripe{background:#635bff;color:#fff;border:none;padding:1rem 2rem;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center;width:100%}
+    .btn-stripe:hover{background:#4b44cc}
+    .btn-secondary{background:#fff;color:#111;border:2px solid #111;padding:.75rem 1.5rem;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s;width:100%}
+    .btn-secondary:hover{background:#f5f5f5}
     .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
     .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
     .pillar .label{font-weight:600}
@@ -69,17 +77,95 @@
     .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
     .llm-row p{margin:0;line-height:1.6}
 
-    .form-section{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);margin-top:3rem;width:100%}
-    .form-section h3{margin:0 0 2rem;font-size:1.8rem;font-weight:700}
-    .form-container{max-width:100%;margin:0 auto}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:0 auto 1rem}
-    .form-full{grid-column:1/-1}
-    .form-section input, .form-section textarea{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:4px;font-size:16px;font-family:inherit}
-    .form-section textarea{min-height:100px;resize:vertical}
-    .form-section input:focus, .form-section textarea:focus{outline:none;border-color:#3182CE}
-    .form-btn{margin-top:1rem;max-width:300px}
+    /* Unlock Section */
+    .unlock-section{
+      width:100%;
+      background:linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+      border:2px solid var(--border);
+      border-radius:16px;
+      padding:2rem;
+      margin-top:2rem;
+    }
+    .unlock-section h3{
+      margin:0 0 .5rem;
+      font-size:1.8rem;
+      font-weight:800;
+      text-align:center;
+    }
+    .unlock-section .subtitle{
+      text-align:center;
+      color:var(--muted);
+      margin-bottom:1.5rem;
+    }
 
-    .consultation-section{text-align:center;padding:3rem 2rem;margin-top:3rem}
+    .unlock-options{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1.5rem;
+    }
+    @media(max-width:640px){
+      .unlock-options{grid-template-columns:1fr}
+    }
+
+    .unlock-box{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:1.5rem;
+      background:#fff;
+    }
+    .unlock-box.featured{
+      border:2px solid var(--primary);
+      box-shadow:0 4px 20px rgba(49,130,206,.15);
+    }
+    .unlock-box h4{
+      margin:0 0 1rem;
+      font-size:1.1rem;
+      font-weight:700;
+    }
+    .unlock-box .price{
+      font-size:2rem;
+      font-weight:800;
+      color:var(--primary);
+      margin-bottom:.5rem;
+    }
+    .unlock-box ul{
+      margin:1rem 0;
+      padding-left:1.2rem;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .unlock-box li{margin:.4rem 0}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+    .form-full{grid-column:1/-1}
+    .unlock-box input{
+      width:100%;
+      padding:10px 14px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      font-size:15px;
+      font-family:inherit;
+    }
+    .unlock-box input:focus{outline:none;border-color:var(--primary)}
+
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:1rem;
+      margin:1.5rem 0;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .divider::before,.divider::after{
+      content:'';
+      flex:1;
+      height:1px;
+      background:var(--border);
+    }
+
+    .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem;display:none}
+
+    .consultation-section{text-align:center;padding:3rem 2rem;margin-top:2rem}
     .consultation-section h3{margin:0 0 1rem;font-size:1.8rem;font-weight:700}
     .consultation-section p{margin:0 0 2rem;color:var(--muted)}
     .consultation-info{color:var(--muted);font-size:.95rem;margin-top:1rem}
@@ -114,9 +200,7 @@
     .modal-content p{margin:12px 0;color:#333}
     .modal-content strong{color:#111}
 
-    .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem}
-
-    /* FOOTER (updated to match full-report.html) */
+    /* FOOTER */
     footer{
       margin-top:3rem;
       border-top:1px solid var(--border);
@@ -136,64 +220,24 @@
       grid-template-columns:1.4fr 1fr 1fr;
       gap:1.6rem;
     }
-    .foot-brand h3{
-      font-size:1.1rem;
-      font-weight:600;
-      margin-bottom:1rem;
-      letter-spacing:-.2px;
-    }
-    .foot-brand p{
-      color:var(--muted);
-      font-weight:400;
-      line-height:1.7;
-      font-size:.95rem;
-    }
-    .disclaimer{
-      margin-top:.75rem;
-      color:var(--muted-2);
-      font-size:.85rem;
-      font-weight:400;
-      line-height:1.6;
-    }
-    .foot-col h4{
-      font-size:.95rem;
-      font-weight:600;
-      margin-bottom:.6rem;
-      color:#0f172a;
-    }
-    .foot-links{
-      list-style:none;
-      margin:0;
-      padding:0;
-      display:flex;
-      flex-direction:column;
-      gap:.45rem;
-    }
-    .foot-links a{
-      color:var(--muted);
-      font-weight:400;
-      text-decoration:none;
-    }
-    .foot-links a:hover{color:#0f172a;text-decoration:none}
-    .foot-bottom{
-      border-top:1px solid var(--border);
-      padding:1rem var(--pad-h);
-      max-width:var(--max-width);
-      margin:0 auto;
-      color:var(--muted-2);
-      font-size:.85rem;
-      font-weight:400;
-      line-height:1.6;
-    }
+    .foot-brand h3{font-size:1.1rem;font-weight:600;margin-bottom:1rem;letter-spacing:-.2px}
+    .foot-brand p{color:var(--muted);font-weight:400;line-height:1.7;font-size:.95rem}
+    .disclaimer{margin-top:.75rem;color:var(--muted-2);font-size:.85rem;font-weight:400;line-height:1.6}
+    .foot-col h4{font-size:.95rem;font-weight:600;margin-bottom:.6rem;color:#0f172a}
+    .foot-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
+    .foot-links a{color:var(--muted);font-weight:400;text-decoration:none}
+    .foot-links a:hover{color:#0f172a}
+    .foot-bottom{border-top:1px solid var(--border);padding:1rem var(--pad-h);max-width:var(--max-width);margin:0 auto;color:var(--muted-2);font-size:.85rem;font-weight:400;line-height:1.6}
 
     @media (max-width:640px){
       .footer-inner{grid-template-columns:1fr}
+      .form-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-  <h1>AiVi</h1>
-  <h2>AI Visibility Analysis</h2>
+  <h1><span class="ai">AI</span><span class="subtext">subtext</span><span class="tm">™</span></h1>
+  <h2>Analysis</h2>
 
   <div class="info-row">
     <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
@@ -222,21 +266,49 @@
     <p style="text-align:center;color:gray;">Loading analysis...</p>
   </section>
 
-  <!-- Get Full Report Form -->
-  <section class="form-section">
-    <h3>Get Your Full Report</h3>
-    <div class="form-container">
-      <form id="full-report-form" novalidate>
-        <div class="form-grid">
-          <input type="text" id="name-input" placeholder="Your Name" required />
-          <input type="email" id="email-input" placeholder="Your Email" required />
-          <input type="tel" id="phone-input" placeholder="Your Phone (optional)" />
-          <input type="text" id="company-input" placeholder="Your Company (optional)" />
-          <textarea class="form-full" id="context-input" placeholder="Share context or ask a specific question — we'll address at your free consult."></textarea>
-        </div>
-        <button type="submit" class="btn-primary form-btn" id="full-report-btn">Get My Full Report</button>
-        <div id="form-error" class="error-note" style="display:none;"></div>
-      </form>
+  <!-- Unlock Full Report Section -->
+  <section class="unlock-section">
+    <h3>Unlock Your Full Report</h3>
+    <p class="subtitle">Get comprehensive AI visibility analysis with actionable recommendations</p>
+
+    <div class="unlock-options">
+      <!-- Buy Report Option -->
+      <div class="unlock-box featured">
+        <h4>Buy Full Report — $500</h4>
+        <form id="buy-form" novalidate>
+          <div class="form-grid">
+            <input type="text" id="buy-name" placeholder="Your Name" required />
+            <input type="text" id="buy-company" placeholder="Company" />
+            <input type="email" id="buy-email" placeholder="Email" required class="form-full" />
+          </div>
+          <button type="submit" class="btn-stripe" id="buy-btn">Buy Full Report — $500</button>
+          <div id="buy-error" class="error-note"></div>
+        </form>
+        <ul>
+          <li>✓ Multi-LLM analysis across 5 AI engines</li>
+          <li>✓ 12+ prioritized issues with fixes</li>
+          <li>✓ Engine-by-engine brand perception</li>
+          <li>✓ Instant delivery</li>
+        </ul>
+      </div>
+
+      <!-- Access Code Option -->
+      <div class="unlock-box">
+        <h4>Have an Access Code?</h4>
+        <form id="code-form" novalidate>
+          <div class="form-grid">
+            <input type="text" id="code-name" placeholder="Your Name" required />
+            <input type="text" id="code-company" placeholder="Company" />
+            <input type="email" id="code-email" placeholder="Email" required class="form-full" />
+            <input type="text" id="access-code" placeholder="Access Code" required class="form-full" />
+          </div>
+          <button type="submit" class="btn-secondary" id="code-btn">Continue with Access Code</button>
+          <div id="code-error" class="error-note"></div>
+        </form>
+        <p style="margin-top:1rem;font-size:.9rem;color:var(--muted);">
+          Access codes are issued to partners and promotional recipients.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -250,19 +322,14 @@
     </div>
   </section>
 
-  <!-- Footer (updated) -->
+  <!-- Footer -->
   <footer>
     <div class="footer-inner">
       <div class="foot-brand">
-        <h3>AiVi — AI Visibility Analysis</h3>
-        <p>
-          Powered by AIVI™, AiVi reveals how AI systems interpret, trust, and represent your website before customers see you.
-        </p>
-        <div class="disclaimer">
-          Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.
-        </div>
+        <h3>AIsubtext — AI Visibility Analysis</h3>
+        <p>AIsubtext reveals how AI systems interpret, trust, and represent your website before customers see you.</p>
+        <div class="disclaimer">Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.</div>
       </div>
-
       <div class="foot-col">
         <h4>Product</h4>
         <ul class="foot-links">
@@ -270,18 +337,16 @@
           <li><a href="index.html#how-it-works">How it works</a></li>
         </ul>
       </div>
-
       <div class="foot-col">
         <h4>Company</h4>
         <ul class="foot-links">
           <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-          <li><a href="mailto:hello@quontora.com?subject=AiVi%20Question">Contact</a></li>
+          <li><a href="mailto:hello@quontora.com?subject=AIsubtext%20Question">Contact</a></li>
         </ul>
       </div>
     </div>
-
     <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> AiVi by Quontora. Powered by AIVI™.</div>
+      <div>© <span id="footer-year"></span> AIsubtext by Quontora.</div>
     </div>
   </footer>
 
@@ -289,7 +354,6 @@
   <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
     <div class="progress-panel">
       <div class="progress-title" id="progress-title">Analyzing your website</div>
-
       <div class="spinner-wrap">
         <div class="spinner" aria-hidden="true"></div>
         <div class="spinner-meta">
@@ -297,10 +361,7 @@
           <div class="spinner-hint" id="spinner-hint">This can take 2 minutes or more on complex sites.</div>
         </div>
       </div>
-
-      <p class="progress-sub" id="progress-sub">
-        We’re analyzing the site and processing the results. This can take <strong>2 minutes or more</strong>.
-      </p>
+      <p class="progress-sub" id="progress-sub">We're analyzing the site and processing the results. This can take <strong>2 minutes or more</strong>.</p>
       <p class="progress-stage" id="progress-stage">Starting analysis…</p>
     </div>
   </div>
@@ -309,84 +370,138 @@
   <div id="breakdown-modal" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <h3 class="modal-title">What goes into your AiVi score?</h3>
+        <h3 class="modal-title">What goes into your score?</h3>
         <button class="modal-close" id="modal-close">×</button>
       </div>
       <div class="modal-content">
-        <p>Your AiVi score is calculated across four core pillars:</p>
-
-        <p><strong>AI Access Readiness (25 points)</strong><br>
-        How easily AI systems can discover, crawl, and understand your site structure.</p>
-
-        <p><strong>Trust & Verification Signals (25 points)</strong><br>
-        Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
-
-        <p><strong>LLM Interpretability & Clarity (25 points)</strong><br>
-        Content organization, semantic markup, and clarity for AI language models.</p>
-
-        <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>
-        How well your content matches common query patterns and question-based discovery.</p>
-
-        <p style="margin-top:16px;font-style:italic;color:#666;">
-          Each factor is weighted based on its impact on AI discovery and visibility.
-        </p>
+        <p>Your AI Visibility score is calculated across four core pillars:</p>
+        <p><strong>AI Access Readiness (25 points)</strong><br>How easily AI systems can discover, crawl, and understand your site structure.</p>
+        <p><strong>Trust & Verification Signals (25 points)</strong><br>Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
+        <p><strong>LLM Interpretability & Clarity (25 points)</strong><br>Content organization, semantic markup, and clarity for AI language models.</p>
+        <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>How well your content matches common query patterns and question-based discovery.</p>
+        <p style="margin-top:16px;font-style:italic;color:#666;">Each factor is weighted based on its impact on AI discovery and visibility.</p>
       </div>
     </div>
   </div>
 
   <script>
-    // Footer year
     document.getElementById("footer-year").textContent = new Date().getFullYear();
 
-    const LOGO_SOURCES = {
-      ChatGPT: '/img/chatgpt-logo.png',
-      Claude: '/img/claude.jpeg',
-      Gemini: '/img/gemini-logo.png',
-      Copilot: '/img/copilot-logo.png',
-      Perplexity: '/img/perplexity-logo.png',
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUrl = urlParams.get("url");
 
-    function logoDivFor(engine){
-      const wrap = document.createElement('div');
-      wrap.className = 'llm-logo';
-      const p = LOGO_SOURCES[engine];
-      if (!p) {
-        wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`;
-        return wrap;
+    function extractDomain(u){
+      if (!u) return '';
+      try {
+        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
+        const { hostname } = new URL(withProto);
+        return hostname.replace(/^www\./i,'');
+      } catch {
+        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
+        return (m ? m[1] : '').replace(/^www\./i,'');
       }
-      const img = document.createElement('img');
-      img.alt = `${engine} logo`;
-      img.src = p;
-      img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
-      img.onerror = () => { wrap.innerHTML = `<span class="llm-fallback">${engine}</span>`; };
-      return wrap;
     }
 
-    function transformAIInsights(root){
-      const title = [...root.querySelectorAll('h2,h3,h4,.section-title')].find(n => /ai\s*engine\s*insights?/i.test((n.textContent || '').trim()));
-      if (!title) return;
-      let ul = title.nextElementSibling;
-      while (ul && ul.tagName && ul.tagName.toLowerCase() !== 'ul') ul = ul.nextElementSibling;
-      if (!ul) return;
-      const bullets = [...ul.querySelectorAll('li')].map(li => (li.textContent || '').trim());
-      if (!bullets.length) return;
-      const engines = ['ChatGPT','Claude','Gemini','Copilot','Perplexity'];
-      const box = document.createElement('div');
-      box.className = 'llm-insights';
-      engines.forEach((e, i) => {
-        const t = bullets[i];
-        if (!t) return;
-        const row = document.createElement('div');
-        row.className = 'llm-row';
-        row.appendChild(logoDivFor(e));
-        const p = document.createElement('p');
-        p.textContent = t;
-        row.appendChild(p);
-        box.appendChild(row);
-      });
-      ul.replaceWith(box);
-    }
+    // Valid access codes
+    const VALID_CODES = ['ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
 
+    // Buy Report Form - Stripe Checkout
+    document.getElementById('buy-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('buy-name').value.trim();
+      const email = document.getElementById('buy-email').value.trim();
+      const company = document.getElementById('buy-company').value.trim();
+      const errorEl = document.getElementById('buy-error');
+      const btn = document.getElementById('buy-btn');
+
+      errorEl.style.display = 'none';
+
+      if (!name || !email) {
+        errorEl.textContent = 'Please provide your name and email.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (!targetUrl) {
+        errorEl.textContent = 'No URL to analyze. Please go back and enter a URL.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Redirecting to checkout...';
+
+      try {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: targetUrl, email, name, company })
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Failed to create checkout session');
+        }
+      } catch (err) {
+        console.error('Checkout error:', err);
+        errorEl.textContent = 'Error connecting to payment. Please try again.';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Buy Full Report — $500';
+      }
+    });
+
+    // Access Code Form
+    document.getElementById('code-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('code-name').value.trim();
+      const email = document.getElementById('code-email').value.trim();
+      const company = document.getElementById('code-company').value.trim();
+      const code = document.getElementById('access-code').value.trim().toUpperCase();
+      const errorEl = document.getElementById('code-error');
+      const btn = document.getElementById('code-btn');
+
+      errorEl.style.display = 'none';
+
+      if (!name || !email || !code) {
+        errorEl.textContent = 'Please fill in all required fields.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (!VALID_CODES.includes(code)) {
+        errorEl.textContent = 'Invalid access code. Please check and try again.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (!targetUrl) {
+        errorEl.textContent = 'No URL to analyze.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Loading Full Report...';
+
+      // Store info and redirect
+      sessionStorage.setItem('aisubtext:name', name);
+      sessionStorage.setItem('aisubtext:email', email);
+      sessionStorage.setItem('aisubtext:company', company);
+      sessionStorage.setItem('aisubtext:code', code);
+
+      const q = new URLSearchParams({
+        url: targetUrl,
+        code: code
+      }).toString();
+
+      window.location.href = `full-report.html?${q}`;
+    });
+
+    // Score rendering functions
     function renderScoreCard(total, pillars, highlights){
       document.getElementById("scoreNumber").textContent = `${total}/100`;
       document.getElementById("scoreBand").textContent =
@@ -421,40 +536,18 @@
       }
     }
 
-    // Always show a stable "pending" score UI immediately (no blank score card)
     function renderScorePending(){
       document.getElementById("scoreNumber").textContent = "—";
       document.getElementById("scoreBand").textContent = "Computing score…";
       const grid = document.getElementById("pillarsGrid");
       grid.innerHTML = "";
-      [
-        "AI Access Readiness",
-        "Trust & Verification Signals",
-        "LLM Interpretability & Clarity",
-        "Prompt-Pattern Alignment"
-      ].forEach((label) => {
+      ["AI Access Readiness","Trust & Verification Signals","LLM Interpretability & Clarity","Prompt-Pattern Alignment"].forEach((label) => {
         const d = document.createElement("div");
         d.className = "pillar";
         d.innerHTML = `<span class="label">${label}</span><span class="badge">—/25</span>`;
         grid.appendChild(d);
       });
       document.getElementById("highlightsBlock").hidden = true;
-      document.getElementById("highlightsList").innerHTML = "";
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetUrl = urlParams.get("url");
-
-    function extractDomain(u){
-      if (!u) return '';
-      try {
-        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
-        const { hostname } = new URL(withProto);
-        return hostname.replace(/^www\./i,'');
-      } catch {
-        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
-        return (m ? m[1] : '').replace(/^www\./i,'');
-      }
     }
 
     function showOverlay(){
@@ -466,91 +559,8 @@
       document.body.style.overflow = '';
     }
 
-    const LARGE_SITE_HOSTS = new Set([
-      'cnn.com','nytimes.com','bbc.com','theguardian.com','washingtonpost.com','wsj.com',
-      'reddit.com','wikipedia.org','amazon.com','linkedin.com','facebook.com','x.com','twitter.com'
-    ]);
-
-    function startOverlayMessaging(domain){
-      const stageEl = document.getElementById('progress-stage');
-      const spinnerLabel = document.getElementById('spinner-label');
-      const spinnerHint = document.getElementById('spinner-hint');
-      const progressSub = document.getElementById('progress-sub');
-
-      const d = (domain || '').toLowerCase();
-      const isLarge = LARGE_SITE_HOSTS.has(d);
-
-      if (d) {
-        document.getElementById('progress-title').textContent = `Analyzing ${d}`;
-        if (isLarge) {
-          spinnerHint.textContent = "Large sites can take up to ~5 minutes to analyze accurately.";
-          progressSub.innerHTML = `We’re scanning <strong>${d}</strong> and processing the results. Large sites can take <strong>up to ~5 minutes</strong>.`;
-        } else {
-          spinnerHint.textContent = "This can take 2 minutes or more on complex sites.";
-          progressSub.innerHTML = `We’re analyzing <strong>${d}</strong> and processing the results. This can take <strong>2 minutes or more</strong>.`;
-        }
-      }
-
-      const start = Date.now();
-
-      const interval = setInterval(() => {
-        const s = Math.floor((Date.now() - start) / 1000);
-
-        if (s < 8) {
-          stageEl.textContent = "Fetching and parsing the website…";
-          spinnerLabel.textContent = "Processing results…";
-        } else if (s < 20) {
-          stageEl.textContent = "Extracting structure and crawl signals…";
-          spinnerLabel.textContent = "Analyzing site signals…";
-        } else if (s < 45) {
-          stageEl.textContent = "Evaluating trust, clarity, and alignment…";
-          spinnerLabel.textContent = "Scoring and summarizing…";
-        } else if (s < 75) {
-          stageEl.textContent = "Generating the analysis report…";
-          spinnerLabel.textContent = "Finalizing report…";
-        } else if (s < 180) {
-          stageEl.textContent = "Still working. Large sites may take several minutes.";
-          spinnerLabel.textContent = "Still analyzing…";
-        } else if (s < 300) {
-          stageEl.textContent = "Still working. We’re continuing to process the site and generate your report.";
-          spinnerLabel.textContent = "Still analyzing…";
-        } else {
-          stageEl.textContent = "Still working. Some sites rate-limit or slow down crawlers.";
-          spinnerLabel.textContent = "Still analyzing…";
-        }
-      }, 800);
-
-      return () => clearInterval(interval);
-    }
-
-    async function fetchWithTimeout(url, opts = {}) {
-      const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 60000;
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { ...opts, signal: controller.signal });
-        return res;
-      } finally {
-        clearTimeout(t);
-      }
-    }
-
-    async function fetchTryPrimaryThenAlt(primaryUrl, altUrl, opts) {
-      let lastErr = null;
-      try {
-        const r1 = await fetchWithTimeout(primaryUrl, opts);
-        if (r1 && r1.ok) return { res: r1, usedAlt: false };
-        lastErr = new Error(`HTTP ${r1.status}`);
-      } catch (e) {
-        lastErr = e;
-      }
-      const r2 = await fetchWithTimeout(altUrl, opts);
-      if (r2 && r2.ok) return { res: r2, usedAlt: true };
-      throw new Error(`HTTP ${r2.status} (alt). Last: ${lastErr && lastErr.message ? lastErr.message : 'unknown'}`);
-    }
-
-    document.getElementById('breakdownBtn').addEventListener('click', (e) => {
-      e.preventDefault();
+    // Modal handlers
+    document.getElementById('breakdownBtn').addEventListener('click', () => {
       document.getElementById('breakdown-modal').style.display = 'flex';
     });
     document.getElementById('modal-close').addEventListener('click', () => {
@@ -569,7 +579,7 @@
       const highlights = [...document.querySelectorAll('#highlightsList li')].map(li => li.textContent.trim());
       const txt = [
         `Website: ${targetUrl}`,
-        `AiVi Score: ${scoreText}`,
+        `AI Visibility Score: ${scoreText}`,
         `Pillars:`, ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
         ``, `Highlights/Issues:`, ...highlights.map(h => `- ${h}`)
       ].join("\n");
@@ -584,156 +594,27 @@
       }
     });
 
-    document.getElementById('full-report-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name-input').value.trim();
-      const email = document.getElementById('email-input').value.trim();
-      const phone = document.getElementById('phone-input').value.trim();
-      const company = document.getElementById('company-input').value.trim();
-      const context = document.getElementById('context-input').value.trim();
-      const errorEl = document.getElementById('form-error');
-      const btn = document.getElementById('full-report-btn');
-
-      errorEl.style.display = 'none';
-      if (!name || !email || !targetUrl) {
-        errorEl.textContent = 'Please provide your name and email.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const domain = extractDomain(targetUrl);
-
-      sessionStorage.setItem('sniperank:name', name);
-      sessionStorage.setItem('sniperank:email', email);
-      sessionStorage.setItem('sniperank:phone', phone);
-      sessionStorage.setItem('sniperank:company', company);
-      sessionStorage.setItem('sniperank:context', context);
-      sessionStorage.setItem('sniperank:url', targetUrl);
-      sessionStorage.setItem('sniperank:domain', domain);
-
-      btn.disabled = true;
-      btn.textContent = 'Preparing Full Report...';
-
-      const q = new URLSearchParams({
-        url: targetUrl,
-        name: encodeURIComponent(name),
-        email: encodeURIComponent(email),
-        domain,
-        source: 'analyze'
-      }).toString();
-
-      window.location.href = `full-report.html?${q}`;
-    });
-
-    async function scoreLoop(primaryBase, altBase, url) {
-      const scoreBand = document.getElementById("scoreBand");
-
-      const TOTAL_WINDOW_MS = 300000;     // 5 minutes total retry window
-      const ATTEMPT_TIMEOUT_MS = 120000;  // 2 minutes per attempt
-      const PAUSE_BETWEEN_MS = 15000;     // 15 seconds between attempts
-
-      const start = Date.now();
-      let attempt = 0;
-
-      while ((Date.now() - start) < TOTAL_WINDOW_MS) {
-        attempt += 1;
-
-        // Keep messaging neutral; do not flip to "unable" mid-stream.
-        scoreBand.textContent = (attempt === 1)
-          ? "Computing score…"
-          : "Computing score… (still working)";
-
-        const primaryUrl = `${primaryBase}/api/score?url=${encodeURIComponent(url)}`;
-        const altUrl = `${altBase}/api/score?url=${encodeURIComponent(url)}`;
-
-        try {
-          const { res } = await fetchTryPrimaryThenAlt(primaryUrl, altUrl, { timeoutMs: ATTEMPT_TIMEOUT_MS });
-          const j = await res.json();
-
-          if (!j || typeof j.score !== 'number' || !j.pillars) {
-            throw new Error("Invalid score payload");
-          }
-
-          renderScoreCard(j.score, j.pillars, j.highlights || []);
-          sessionStorage.setItem('sniperank:data', JSON.stringify(j));
-          return;
-        } catch (e) {
-          console.error('Score attempt failed:', e);
-
-          if ((Date.now() - start) + PAUSE_BETWEEN_MS >= TOTAL_WINDOW_MS) break;
-          await new Promise(r => setTimeout(r, PAUSE_BETWEEN_MS));
-        }
-      }
-
-      // After retry window: final, neutral state (still not "broken").
-      document.getElementById("scoreNumber").textContent = "—";
-      scoreBand.textContent = "Score unavailable for this site right now.";
-      // Keep placeholder pillars; do not blank them.
-    }
-
+    // Initialize
     document.addEventListener("DOMContentLoaded", async () => {
       if (!targetUrl) {
         document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
-        document.getElementById("scoreBand").textContent = "No URL provided";
+        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
         renderScorePending();
         return;
       }
 
       document.getElementById("current-url").textContent = targetUrl;
-
-      // Always show a non-empty score UI immediately.
       renderScorePending();
 
-      const domain = extractDomain(targetUrl);
-
-      showOverlay();
-      const stopMessaging = startOverlayMessaging(domain);
-
-      const FALLBACK_BASE = 'https://sniperank-app2.onrender.com';
-      let apiBase = '';
-
-      // Probe same-origin quickly; fallback to Render if probe fails.
-      try {
-        const probe = await fetchWithTimeout('/api/score?url=' + encodeURIComponent('https://example.com'), {
-          method: 'HEAD',
-          timeoutMs: 9000
-        });
-        if (!probe.ok) throw new Error(`Probe HTTP ${probe.status}`);
-        apiBase = '';
-      } catch {
-        apiBase = FALLBACK_BASE;
-      }
-
-      const primaryBase = apiBase;
-      const altBase = (primaryBase === '') ? FALLBACK_BASE : '';
-
-      // Score retries in the background (not gating overlay).
-      scoreLoop(primaryBase, altBase, targetUrl);
-
-      // Report fetch gates overlay (primary value).
-      const reportPrimaryUrl = `${primaryBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
-      const reportAltUrl     = `${altBase}/report.html?report=analyze&url=${encodeURIComponent(targetUrl)}`;
-
-      const REPORT_TIMEOUT_MS = 480000; // 8 minutes
-
-      try {
-        const { res } = await fetchTryPrimaryThenAlt(reportPrimaryUrl, reportAltUrl, { timeoutMs: REPORT_TIMEOUT_MS });
-        const html = await res.text();
-        const host = document.getElementById('summary-results');
-        host.innerHTML = html;
-        transformAIInsights(host);
-      } catch (e) {
-        console.error('Report error:', e);
-        document.getElementById('summary-results').innerHTML =
-          "<p style='text-align:center;color:red'>Error loading analysis report.</p>";
-      } finally {
-        stopMessaging();
-        hideOverlay();
-      }
+      // For now, show a simplified preview message
+      document.getElementById('summary-results').innerHTML = `
+        <div style="text-align:center;padding:2rem;background:#f8fafc;border-radius:12px;border:1px solid #e5e5e5;">
+          <h3 style="margin:0 0 1rem;font-size:1.4rem;">Preview Analysis Complete</h3>
+          <p style="color:#666;margin:0;">Purchase the full report below to see detailed findings, prioritized recommendations, and AI engine insights.</p>
+        </div>
+      `;
     });
   </script>
 </body>
 </html>
-<!-- Version footer: v2026.01.12-4 -->
+<!-- Version: v2026.02.06-1 -->
