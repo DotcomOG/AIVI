@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <!--
-  analyze.html - v2026.02.06-9
+  analyze.html - v2026.02.06-10
   Free snapshot + pricing section at bottom
+  Updated to match full.js v4.0.0 response format
 -->
 <html lang="en">
 <head>
@@ -51,6 +52,26 @@
       padding:.25rem .6rem;border-radius:20px;
       margin-bottom:.5rem;
     }
+
+    /* Brand Card */
+    .brand-card{
+      background:linear-gradient(135deg,#f8fafc 0%,#eef2ff 100%);
+      border:1px solid #e0e7ff;
+      border-radius:12px;
+      padding:1.25rem;
+      margin-bottom:1.5rem;
+      display:none;
+    }
+    .brand-card.show{display:block}
+    .brand-card h3{font-size:1.2rem;font-weight:700;margin:0 0 .25rem;color:#1e293b}
+    .brand-industry{
+      display:inline-block;
+      background:#e0e7ff;color:#3730a3;
+      font-size:.75rem;font-weight:600;
+      padding:.15rem .5rem;border-radius:12px;
+      margin-bottom:.5rem;
+    }
+    .brand-positioning{font-size:.95rem;color:#334155;line-height:1.5;margin:0}
 
     /* Snapshot Sections */
     .snapshot-section{margin-bottom:1.5rem}
@@ -230,10 +251,18 @@
 
   <div id="snapshot-loading" class="loading">
     <div class="spinner"></div>
-    <p>Analyzing how AI systems see your brand... (30-60 seconds)</p>
+    <p>Analyzing how AI systems see your brand...</p>
+    <p style="font-size:.85rem;color:#999;">This typically takes 30-60 seconds</p>
   </div>
 
   <div id="snapshot-content" style="display:none;">
+    <!-- Brand Card -->
+    <div class="brand-card" id="brand-card">
+      <h3 id="brand-name">—</h3>
+      <span class="brand-industry" id="brand-industry">—</span>
+      <p class="brand-positioning" id="brand-positioning">—</p>
+    </div>
+
     <!-- What's Working (preview) -->
     <div class="snapshot-section">
       <h4 class="section-title">What's Working</h4>
@@ -250,8 +279,8 @@
     <div class="blur-teaser">
       <div class="blur-content">
         <p><strong>Critical Priority:</strong> Your homepage meta description is missing key brand differentiators that AI systems use to generate accurate summaries...</p>
-        <p><strong>Strategic Improvement:</strong> Product pages lack structured data markup, causing AI assistants to miss pricing and availability information...</p>
         <p><strong>Engine Insight:</strong> ChatGPT perceives your brand as a generic provider rather than the market leader you are...</p>
+        <p><strong>Strategic Improvement:</strong> Product pages lack structured data markup, causing AI assistants to miss pricing and availability...</p>
       </div>
       <div class="blur-overlay">
         <p>🔒 Unlock the full report to see detailed findings, priority fixes, and AI engine insights</p>
@@ -259,8 +288,9 @@
     </div>
   </div>
 
-  <div id="snapshot-error" style="display:none;text-align:center;padding:2rem;color:#c00;">
-    <p>Error loading snapshot. Please try again.</p>
+  <div id="snapshot-error" style="display:none;text-align:center;padding:2rem;">
+    <p style="color:#c00;font-weight:600;" id="error-message">Error loading snapshot. Please try again.</p>
+    <button onclick="location.reload()" style="margin-top:1rem;padding:.5rem 1.5rem;border:2px solid #111;border-radius:6px;background:#fff;font-weight:600;cursor:pointer;">Retry</button>
   </div>
 
   <!-- PRICING SECTION -->
@@ -360,29 +390,61 @@
     async function loadSnapshot() {
       if (!targetUrl) {
         document.getElementById('snapshot-loading').style.display = 'none';
-        document.getElementById('snapshot-error').innerHTML = '<p>No URL provided. <a href="index.html">Go back</a> and enter a website.</p>';
+        document.getElementById('error-message').innerHTML = 'No URL provided. <a href="index.html">Go back</a> and enter a website.';
         document.getElementById('snapshot-error').style.display = 'block';
         return;
       }
 
       try {
-        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`);
-        if (!res.ok) throw new Error('API error');
+        // 5 minute timeout for slow analyses
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 300000);
+
+        const res = await fetch(`/api/full?url=${encodeURIComponent(targetUrl)}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        
         const data = await res.json();
+        console.log('API response:', data);
+
+        // Check for fallback/error response
+        if (data.meta?.mode === 'fallback') {
+          throw new Error(data.meta?.reason || 'Analysis failed');
+        }
+
+        // Render brand profile
+        if (data.brandProfile) {
+          const bp = data.brandProfile;
+          document.getElementById('brand-name').textContent = bp.name || '—';
+          document.getElementById('brand-industry').textContent = bp.industry || 'Unknown';
+          document.getElementById('brand-positioning').textContent = bp.positioning || '—';
+          document.getElementById('brand-card').classList.add('show');
+        }
 
         // What's working (show 2-3)
-        const good = data.whatsWorking || data.strengths || ['Strong brand name recognition', 'Clear product categories'];
-        document.getElementById('good-list').innerHTML = good.slice(0, 3).map(item =>
-          `<li class="item item-good">${esc(item)}</li>`
-        ).join('');
+        const good = data.whatsWorking || [];
+        if (good.length > 0) {
+          document.getElementById('good-list').innerHTML = good.slice(0, 3).map(item =>
+            `<li class="item item-good">${esc(item)}</li>`
+          ).join('');
+        } else {
+          document.getElementById('good-list').innerHTML = '<li class="item item-good">Analysis complete - see full report for details</li>';
+        }
 
         // Needs attention (show 2-3)
-        const bad = data.needsAttention || data.issues || ['Missing structured data', 'Inconsistent brand messaging'];
-        const badItems = bad.slice(0, 3).map(item => {
-          const text = typeof item === 'object' ? item.issue : item;
-          return `<li class="item item-bad">${esc(text)}</li>`;
-        }).join('');
-        document.getElementById('bad-list').innerHTML = badItems;
+        const bad = data.needsAttention || [];
+        if (bad.length > 0) {
+          const badItems = bad.slice(0, 3).map(item => {
+            const text = typeof item === 'object' ? item.issue : String(item);
+            return `<li class="item item-bad">${esc(text)}</li>`;
+          }).join('');
+          document.getElementById('bad-list').innerHTML = badItems;
+        } else {
+          document.getElementById('bad-list').innerHTML = '<li class="item item-bad">See full report for detailed recommendations</li>';
+        }
 
         document.getElementById('snapshot-loading').style.display = 'none';
         document.getElementById('snapshot-content').style.display = 'block';
@@ -390,6 +452,9 @@
       } catch (err) {
         console.error('Snapshot error:', err);
         document.getElementById('snapshot-loading').style.display = 'none';
+        document.getElementById('error-message').textContent = err.name === 'AbortError' 
+          ? 'Analysis timed out. Please try again.' 
+          : `Error: ${err.message}`;
         document.getElementById('snapshot-error').style.display = 'block';
       }
     }
@@ -443,15 +508,18 @@
           body: JSON.stringify({ url: targetUrl, email, name, phone, company, tier: 'entry' })
         });
         const data = await res.json();
+        console.log('Checkout response:', data);
+        
         if (data.url) {
           window.location.href = data.url;
         } else {
-          throw new Error(data.error || 'Checkout failed');
+          throw new Error(data.error || data.details || 'Checkout failed');
         }
       } catch (e) {
-        showError('Payment error. Email yoram@quontora.ai for assistance.');
+        console.error('Checkout error:', e);
+        showError('Payment error: ' + e.message + '. Email yoram@quontora.ai for assistance.');
         btn.disabled = false;
-        btn.textContent = 'Request Report →';
+        btn.textContent = 'Pay $500 →';
       }
     });
 
