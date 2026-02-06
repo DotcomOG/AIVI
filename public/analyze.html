@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <!--
-  analyze.html
-  Version: v2026.02.06-1
-  Last updated: 2026-02-06 (America/New_York)
- 
-  Changes:
-  1) Updated branding to AIsubtext
-  2) Added Stripe payment flow for $500 report
-  3) Kept access code option for promos/partners
+  analyze.html - v2026.02.06-5
+  Two pricing tiers side by side, fixed sessionStorage keys
 -->
 <html lang="en">
 <head>
@@ -16,420 +10,349 @@
   <title>AIsubtext - AI Visibility Analysis</title>
   <style>
     :root{
-      --max-width:760px; --pad-v:3vh; --pad-h:2rem;
-      --muted:#666; --border:#e5e5e5;
-      --sr-radius:16px; --sr-border:#e6e6e9; --sr-shadow:0 10px 30px rgba(0,0,0,.12);
-      --sr-text:#111; --sr-muted:#5b5b66; --sr-bg:#fff; --sr-pill-bg:#fafafb; --sr-gap:16px;
-      --btn-red:#dc3545; --btn-red-hover:#c82333;
+      --max-width:900px;
       --primary:#3182CE;
-      --text:#0b1220;
-      --muted-2:#64748b;
+      --muted:#666;
+      --border:#e5e5e5;
       --bg-soft:#f7fafc;
     }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#fff;color:#000;margin:0;padding:var(--pad-v) var(--pad-h);max-width:var(--max-width);margin-inline:auto;display:flex;flex-direction:column;align-items:flex-start}
-    h1{font-size:3rem;font-weight:700;margin:0 0 .25em;line-height:1;letter-spacing:-1px}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+      background:#fff;
+      color:#000;
+      margin:0;
+      padding:2rem;
+      max-width:var(--max-width);
+      margin-inline:auto;
+    }
+    h1{font-size:2.5rem;font-weight:700;margin:0 0 .25rem}
     h1 .ai{color:#0b1220}
     h1 .subtext{color:var(--primary)}
-    h1 .tm{font-size:1rem;vertical-align:super;color:#666}
-    h2{font-size:1.6rem;font-weight:700;margin:0 0 1rem}
-    p{font-size:1.075rem;line-height:1.65;margin:0 0 1rem}
-
-    .info-row{width:100%;display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:.25rem 0 1rem}
-    .powered-by,.for-url{color:var(--muted);font-size:.95rem}
-    .powered-by a{color:#3182CE;text-decoration:none;font-weight:600}
+    h1 .tm{font-size:.9rem;vertical-align:super;color:#888}
+    h2{font-size:1.2rem;font-weight:600;margin:0 0 1.5rem;color:var(--muted)}
+    
+    .info-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:2rem;
+      padding-bottom:1rem;
+      border-bottom:1px solid var(--border);
+      flex-wrap:wrap;
+      gap:.5rem;
+    }
+    .powered-by{color:var(--muted);font-size:.9rem}
+    .powered-by a{color:var(--primary);text-decoration:none;font-weight:600}
+    .for-url{color:var(--muted);font-size:.9rem}
     .for-url strong{color:#000}
 
-    .card{width:100%;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);background:#fff}
-    .score-card{padding:1rem;margin-bottom:2.25rem}
-    .score-top{display:flex;align-items:center;gap:.75rem;justify-content:space-between;flex-wrap:wrap}
-    .score-main{display:flex;align-items:baseline;gap:.5rem}
-    .score-number{font-size:2.25rem;font-weight:800}
-    .score-band{color:var(--muted);font-size:.95rem}
-    .btn-row{display:flex;gap:.5rem;align-items:center}
-    .btn-ghost{border:1px solid #111;background:#fff;color:#111;padding:.55rem .9rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.95rem;transition:.2s}
-    .btn-ghost:hover{background:#f2f2f2}
-    .btn-primary{background:var(--btn-red);color:#fff;border:none;padding:.85rem 2rem;border-radius:999px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center}
-    .btn-primary:hover{background:var(--btn-red-hover)}
-    .btn-stripe{background:#635bff;color:#fff;border:none;padding:1rem 2rem;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:background .2s;display:inline-block;text-decoration:none;text-align:center;width:100%}
-    .btn-stripe:hover{background:#4b44cc}
-    .btn-secondary{background:#fff;color:#111;border:2px solid #111;padding:.75rem 1.5rem;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s;width:100%}
-    .btn-secondary:hover{background:#f5f5f5}
-    .pillars{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
-    .pillar{border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;font-size:.98rem;background:#fff}
-    .pillar .label{font-weight:600}
-    .badge{font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem;background:#fafafa}
-    .highlights{margin-top:.9rem;padding-top:.9rem;border-top:1px dashed var(--border)}
-    .highlights h4{margin:0 0 .55rem;font-size:1.2rem;font-weight:800}
-    .highlights ul{margin:0;padding-left:1rem}
-    .highlights li{margin:.45rem 0;line-height:1.5}
-
-    #summary-results .section-title{font-size:1.25rem!important;font-weight:700!important;margin:2rem 0 .6rem!important}
-    #summary-results p{line-height:1.68!important;margin:0 0 .9rem!important;font-size:1.05rem!important;white-space:pre-line}
-    #summary-results ul{margin:0 0 1.1rem 1.1rem!important;padding-left:.2rem!important;list-style:disc!important}
-    #summary-results li{line-height:1.7!important;margin:.6rem 0!important;font-size:1.05rem!important}
-
-    .llm-insights{margin:.4rem 0 1.2rem}
-    .llm-row{display:flex;flex-direction:column;gap:.6rem;padding:.8rem 0;border-bottom:1px dashed var(--border)}
-    .llm-row:last-child{border-bottom:0}
-    .llm-logo{display:flex;align-items:center;justify-content:flex-start;min-height:36px;height:auto}
-    .llm-logo img{height:32px;width:auto;display:block;object-fit:contain;max-width:140px}
-    .llm-fallback{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem;font-weight:600;color:#333;background:#f8f9fa}
-    .llm-row p{margin:0;line-height:1.6}
-
-    /* Unlock Section */
-    .unlock-section{
-      width:100%;
-      background:linear-gradient(180deg, #f8fafc 0%, #fff 100%);
-      border:2px solid var(--border);
-      border-radius:16px;
-      padding:2rem;
-      margin-top:2rem;
-    }
-    .unlock-section h3{
-      margin:0 0 .5rem;
-      font-size:1.8rem;
-      font-weight:800;
+    /* Pricing Section */
+    .pricing-section h3{
       text-align:center;
+      font-size:1.6rem;
+      margin:0 0 .5rem;
     }
-    .unlock-section .subtitle{
+    .pricing-section .subtitle{
       text-align:center;
       color:var(--muted);
       margin-bottom:1.5rem;
     }
 
-    .unlock-options{
+    .pricing-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:1.5rem;
-    }
-    @media(max-width:640px){
-      .unlock-options{grid-template-columns:1fr}
+      margin-bottom:2rem;
     }
 
-    .unlock-box{
-      border:1px solid var(--border);
+    .pricing-card{
+      border:2px solid var(--border);
       border-radius:12px;
       padding:1.5rem;
       background:#fff;
+      display:flex;
+      flex-direction:column;
     }
-    .unlock-box.featured{
-      border:2px solid var(--primary);
-      box-shadow:0 4px 20px rgba(49,130,206,.15);
+    .pricing-card.featured{
+      border-color:var(--primary);
+      box-shadow:0 4px 20px rgba(49,130,206,.12);
     }
-    .unlock-box h4{
-      margin:0 0 1rem;
-      font-size:1.1rem;
+
+    .tier-label{
+      font-size:.8rem;
       font-weight:700;
-    }
-    .unlock-box .price{
-      font-size:2rem;
-      font-weight:800;
       color:var(--primary);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      margin-bottom:.25rem;
+    }
+    .tier-name{
+      font-size:1.3rem;
+      font-weight:800;
       margin-bottom:.5rem;
     }
-    .unlock-box ul{
-      margin:1rem 0;
-      padding-left:1.2rem;
-      color:var(--muted);
-      font-size:.95rem;
+    .tier-price{
+      font-size:2rem;
+      font-weight:800;
+      margin-bottom:.25rem;
     }
-    .unlock-box li{margin:.4rem 0}
+    .tier-desc{
+      font-size:.9rem;
+      color:var(--muted);
+      margin-bottom:1rem;
+      line-height:1.5;
+    }
+    .tier-features{
+      list-style:none;
+      margin:0 0 1.25rem;
+      padding:0;
+      flex:1;
+    }
+    .tier-features li{
+      padding:.35rem 0;
+      font-size:.9rem;
+      color:#333;
+      display:flex;
+      align-items:flex-start;
+      gap:.5rem;
+    }
+    .tier-features li::before{
+      content:'✓';
+      color:#16a34a;
+      font-weight:700;
+    }
+    .tier-features li.highlight{
+      font-weight:600;
+      color:var(--primary);
+    }
+    .tier-features li.highlight::before{
+      content:'★';
+      color:var(--primary);
+    }
 
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.5rem;
+      margin-bottom:.75rem;
+    }
     .form-full{grid-column:1/-1}
-    .unlock-box input{
+    .pricing-card input{
       width:100%;
-      padding:10px 14px;
+      padding:10px 12px;
       border:1px solid var(--border);
       border-radius:6px;
-      font-size:15px;
+      font-size:14px;
       font-family:inherit;
     }
-    .unlock-box input:focus{outline:none;border-color:var(--primary)}
+    .pricing-card input:focus{outline:none;border-color:var(--primary)}
 
-    .divider{
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      margin:1.5rem 0;
-      color:var(--muted);
-      font-weight:600;
+    .btn-stripe{
+      background:#635bff;
+      color:#fff;
+      border:none;
+      padding:.9rem 1.5rem;
+      border-radius:8px;
+      font-size:1rem;
+      font-weight:700;
+      cursor:pointer;
+      width:100%;
     }
-    .divider::before,.divider::after{
-      content:'';
-      flex:1;
-      height:1px;
-      background:var(--border);
+    .btn-stripe:hover{background:#4b44cc}
+    .btn-stripe:disabled{background:#999;cursor:not-allowed}
+
+    .btn-outline{
+      background:#fff;
+      color:#111;
+      border:2px solid #111;
+      padding:.85rem 1.5rem;
+      border-radius:8px;
+      font-size:1rem;
+      font-weight:700;
+      cursor:pointer;
+      width:100%;
+      text-decoration:none;
+      text-align:center;
+      display:block;
     }
+    .btn-outline:hover{background:#f5f5f5}
 
-    .error-note{color:#c00;text-align:center;margin-top:.5rem;font-size:.95rem;display:none}
-
-    .consultation-section{text-align:center;padding:3rem 2rem;margin-top:2rem}
-    .consultation-section h3{margin:0 0 1rem;font-size:1.8rem;font-weight:700}
-    .consultation-section p{margin:0 0 2rem;color:var(--muted)}
-    .consultation-info{color:var(--muted);font-size:.95rem;margin-top:1rem}
-    .consultation-info strong{color:#000}
-
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;z-index:1000}
-    .progress-panel{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;width:min(520px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12)}
-    .progress-title{font-weight:800;font-size:18px;margin:0 0 10px;color:#111}
-    .progress-sub{color:#555;font-size:14px;line-height:1.45;margin:0 0 14px}
-    .progress-stage{color:#666;font-size:14px;line-height:1.45;margin:0}
-
-    .spinner-wrap{display:flex;gap:14px;align-items:center;margin:10px 0 8px}
-    .spinner{
-      width:42px;height:42px;border-radius:50%;
-      border:4px solid #e9eef7;
-      border-top-color:#3182CE;
-      animation:spin 0.95s linear infinite;
-      flex:0 0 auto;
+    .error-msg{
+      color:#c00;
+      font-size:.85rem;
+      margin-top:.5rem;
+      display:none;
     }
-    .spinner-meta{display:flex;flex-direction:column;gap:2px}
-    .spinner-label{font-weight:800;color:#111;font-size:14px}
-    .spinner-hint{color:#666;font-size:13px;line-height:1.35}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .error-msg.show{display:block}
 
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1001}
-    .modal{width:min(600px,90vw);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .modal-title{font-size:20px;font-weight:700;margin:0}
-    .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer;padding:4px;color:#666}
-    .modal-close:hover{color:#000}
-    .modal-content{line-height:1.6}
-    .modal-content p{margin:12px 0;color:#333}
-    .modal-content strong{color:#111}
-
-    /* FOOTER */
-    footer{
-      margin-top:3rem;
-      border-top:1px solid var(--border);
+    /* Access Code */
+    .access-section{
       background:var(--bg-soft);
-      position:relative;
-      left:50%;
-      right:50%;
-      margin-left:-50vw;
-      margin-right:-50vw;
-      width:100vw;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:1.25rem;
+      margin-bottom:2rem;
     }
-    .footer-inner{
-      max-width:var(--max-width);
-      margin:0 auto;
-      padding:2rem var(--pad-h) 1.25rem;
-      display:grid;
-      grid-template-columns:1.4fr 1fr 1fr;
-      gap:1.6rem;
+    .access-section h4{margin:0 0 .75rem;font-size:1rem}
+    .access-row{
+      display:flex;
+      gap:.5rem;
+      flex-wrap:wrap;
     }
-    .foot-brand h3{font-size:1.1rem;font-weight:600;margin-bottom:1rem;letter-spacing:-.2px}
-    .foot-brand p{color:var(--muted);font-weight:400;line-height:1.7;font-size:.95rem}
-    .disclaimer{margin-top:.75rem;color:var(--muted-2);font-size:.85rem;font-weight:400;line-height:1.6}
-    .foot-col h4{font-size:.95rem;font-weight:600;margin-bottom:.6rem;color:#0f172a}
-    .foot-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
-    .foot-links a{color:var(--muted);font-weight:400;text-decoration:none}
-    .foot-links a:hover{color:#0f172a}
-    .foot-bottom{border-top:1px solid var(--border);padding:1rem var(--pad-h);max-width:var(--max-width);margin:0 auto;color:var(--muted-2);font-size:.85rem;font-weight:400;line-height:1.6}
+    .access-row input{
+      flex:1;
+      min-width:100px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      font-size:14px;
+    }
+    .access-row input:focus{outline:none;border-color:var(--primary)}
+    .access-row button{
+      padding:10px 20px;
+      background:#fff;
+      border:2px solid #111;
+      border-radius:6px;
+      font-weight:700;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .access-row button:hover{background:#f5f5f5}
 
-    @media (max-width:640px){
-      .footer-inner{grid-template-columns:1fr}
+    /* Footer */
+    footer{
+      margin-top:2rem;
+      padding-top:1.5rem;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:.85rem;
+    }
+    footer a{color:var(--primary);text-decoration:none}
+
+    @media(max-width:650px){
+      .pricing-grid{grid-template-columns:1fr}
       .form-grid{grid-template-columns:1fr}
+      .access-row{flex-direction:column}
+      .access-row input{width:100%}
+      .access-row button{width:100%}
     }
   </style>
 </head>
 <body>
+
   <h1><span class="ai">AI</span><span class="subtext">subtext</span><span class="tm">™</span></h1>
-  <h2>Analysis</h2>
+  <h2>AI Visibility Analysis</h2>
 
   <div class="info-row">
-    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></div>
-    <div class="for-url">Analysis for: <strong id="current-url">-</strong></div>
+    <div class="powered-by">Powered by <a href="https://quontora.com" target="_blank">Quontora</a></div>
+    <div class="for-url">Analysis for: <strong id="current-url">—</strong></div>
   </div>
 
-  <section class="card score-card" id="scoreCard" aria-live="polite">
-    <div class="score-top">
-      <div class="score-main">
-        <div class="score-number" id="scoreNumber">—</div>
-        <div class="score-band" id="scoreBand">Computing score…</div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-ghost" id="breakdownBtn" type="button">What goes into this score?</button>
-        <button class="btn-ghost" id="copyBtn" type="button">Copy Shareable Summary</button>
-      </div>
-    </div>
-    <div class="pillars" id="pillarsGrid"></div>
-    <div class="highlights" id="highlightsBlock" hidden>
-      <h4>Highlights</h4>
-      <ul id="highlightsList"></ul>
-    </div>
-  </section>
-
-  <section id="summary-results">
-    <p style="text-align:center;color:gray;">Loading analysis...</p>
-  </section>
-
-  <!-- Unlock Full Report Section -->
-  <section class="unlock-section">
+  <!-- Pricing Section -->
+  <section class="pricing-section">
     <h3>Unlock Your Full Report</h3>
-    <p class="subtitle">Get comprehensive AI visibility analysis with actionable recommendations</p>
+    <p class="subtitle">Choose the depth of analysis that fits your needs</p>
 
-    <div class="unlock-options">
-      <!-- Buy Report Option -->
-      <div class="unlock-box featured">
-        <h4>Buy Full Report — $500</h4>
-        <form id="buy-form" novalidate>
-          <div class="form-grid">
-            <input type="text" id="buy-name" placeholder="Your Name" required />
-            <input type="text" id="buy-company" placeholder="Company" />
-            <input type="email" id="buy-email" placeholder="Email" required class="form-full" />
-          </div>
-          <button type="submit" class="btn-stripe" id="buy-btn">Buy Full Report — $500</button>
-          <div id="buy-error" class="error-note"></div>
-        </form>
-        <ul>
-          <li>✓ Multi-LLM analysis across 5 AI engines</li>
-          <li>✓ 12+ prioritized issues with fixes</li>
-          <li>✓ Engine-by-engine brand perception</li>
-          <li>✓ Instant delivery</li>
+    <div class="pricing-grid">
+      <!-- Entry: $500 -->
+      <div class="pricing-card featured">
+        <div class="tier-label">Entry</div>
+        <div class="tier-name">Diagnostic Report</div>
+        <div class="tier-price">$500</div>
+        <div class="tier-desc">One-time report with actionable insights</div>
+        <ul class="tier-features">
+          <li>Multi-engine AI analysis (5 engines)</li>
+          <li>Narrative & trust gap breakdown</li>
+          <li>Source-level drivers identified</li>
+          <li>Executive-ready PDF report</li>
+          <li>Instant delivery</li>
         </ul>
-      </div>
-
-      <!-- Access Code Option -->
-      <div class="unlock-box">
-        <h4>Have an Access Code?</h4>
-        <form id="code-form" novalidate>
+        <form id="entry-form" novalidate>
           <div class="form-grid">
-            <input type="text" id="code-name" placeholder="Your Name" required />
-            <input type="text" id="code-company" placeholder="Company" />
-            <input type="email" id="code-email" placeholder="Email" required class="form-full" />
-            <input type="text" id="access-code" placeholder="Access Code" required class="form-full" />
+            <input type="text" id="entry-name" placeholder="Your Name" required />
+            <input type="text" id="entry-company" placeholder="Company" />
+            <input type="email" id="entry-email" placeholder="Email" required class="form-full" />
           </div>
-          <button type="submit" class="btn-secondary" id="code-btn">Continue with Access Code</button>
-          <div id="code-error" class="error-note"></div>
+          <button type="submit" class="btn-stripe" id="entry-btn">Buy Report — $500</button>
+          <div id="entry-error" class="error-msg"></div>
         </form>
-        <p style="margin-top:1rem;font-size:.9rem;color:var(--muted);">
-          Access codes are issued to partners and promotional recipients.
-        </p>
+      </div>
+
+      <!-- Core: $1,500+ -->
+      <div class="pricing-card">
+        <div class="tier-label">Core</div>
+        <div class="tier-name">Deep Diagnostic</div>
+        <div class="tier-price">$1,500<span style="font-size:1.2rem">+</span></div>
+        <div class="tier-desc">Comprehensive analysis + strategic guidance</div>
+        <ul class="tier-features">
+          <li class="highlight">Everything in Entry, plus:</li>
+          <li>Deeper narrative analysis</li>
+          <li>Priority remediation roadmap</li>
+          <li>Optional 30-min strategy call</li>
+          <li>Custom scope for complex sites</li>
+        </ul>
+        <a href="mailto:hello@quontora.com?subject=Deep%20Diagnostic%20Request" id="core-link" class="btn-outline">Request Deep Diagnostic →</a>
       </div>
     </div>
   </section>
 
-  <!-- Consultation Section -->
-  <section class="consultation-section">
-    <h3>Ready to Improve Your AI Visibility?</h3>
-    <p>After reviewing your analysis, book a free 30-minute consultation to discuss your specific opportunities and next steps.</p>
-    <a href="https://calendly.com/quontora" class="btn-primary" target="_blank" rel="noopener">Schedule Free Consultation</a>
-    <div class="consultation-info">
-      <strong>What we'll cover:</strong> Your AI Visibility opportunities, implementation timeline, and how to get found across major AI assistants.
-    </div>
+  <!-- Access Code Section -->
+  <section class="access-section">
+    <h4>Have an Access Code?</h4>
+    <form id="code-form" class="access-row" novalidate>
+      <input type="text" id="code-name" placeholder="Name" required />
+      <input type="email" id="code-email" placeholder="Email" required />
+      <input type="text" id="code-input" placeholder="Access Code" required />
+      <button type="submit">Unlock</button>
+    </form>
+    <div id="code-error" class="error-msg"></div>
   </section>
 
-  <!-- Footer -->
   <footer>
-    <div class="footer-inner">
-      <div class="foot-brand">
-        <h3>AIsubtext — AI Visibility Analysis</h3>
-        <p>AIsubtext reveals how AI systems interpret, trust, and represent your website before customers see you.</p>
-        <div class="disclaimer">Results are observational and directional. AI visibility may vary by model, query, and crawl conditions.</div>
-      </div>
-      <div class="foot-col">
-        <h4>Product</h4>
-        <ul class="foot-links">
-          <li><a href="index.html#analyze">Free Analysis</a></li>
-          <li><a href="index.html#how-it-works">How it works</a></li>
-        </ul>
-      </div>
-      <div class="foot-col">
-        <h4>Company</h4>
-        <ul class="foot-links">
-          <li><a href="https://quontora.com" target="_blank" rel="noopener">Quontora</a></li>
-          <li><a href="mailto:hello@quontora.com?subject=AIsubtext%20Question">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <div>© <span id="footer-year"></span> AIsubtext by Quontora.</div>
-    </div>
+    <p>© 2026 AIsubtext by <a href="https://quontora.com" target="_blank">Quontora</a></p>
   </footer>
 
-  <!-- Progress Overlay -->
-  <div id="progress-overlay" class="overlay" aria-live="polite" aria-busy="true">
-    <div class="progress-panel">
-      <div class="progress-title" id="progress-title">Analyzing your website</div>
-      <div class="spinner-wrap">
-        <div class="spinner" aria-hidden="true"></div>
-        <div class="spinner-meta">
-          <div class="spinner-label" id="spinner-label">Processing results…</div>
-          <div class="spinner-hint" id="spinner-hint">This can take 2 minutes or more on complex sites.</div>
-        </div>
-      </div>
-      <p class="progress-sub" id="progress-sub">We're analyzing the site and processing the results. This can take <strong>2 minutes or more</strong>.</p>
-      <p class="progress-stage" id="progress-stage">Starting analysis…</p>
-    </div>
-  </div>
-
-  <!-- Score Breakdown Modal -->
-  <div id="breakdown-modal" class="modal-backdrop">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">What goes into your score?</h3>
-        <button class="modal-close" id="modal-close">×</button>
-      </div>
-      <div class="modal-content">
-        <p>Your AI Visibility score is calculated across four core pillars:</p>
-        <p><strong>AI Access Readiness (25 points)</strong><br>How easily AI systems can discover, crawl, and understand your site structure.</p>
-        <p><strong>Trust & Verification Signals (25 points)</strong><br>Authority indicators, security implementation, and credibility markers that AI engines prioritize.</p>
-        <p><strong>LLM Interpretability & Clarity (25 points)</strong><br>Content organization, semantic markup, and clarity for AI language models.</p>
-        <p><strong>Prompt-Pattern Alignment (25 points)</strong><br>How well your content matches common query patterns and question-based discovery.</p>
-        <p style="margin-top:16px;font-style:italic;color:#666;">Each factor is weighted based on its impact on AI discovery and visibility.</p>
-      </div>
-    </div>
-  </div>
-
   <script>
-    document.getElementById("footer-year").textContent = new Date().getFullYear();
-
     const urlParams = new URLSearchParams(window.location.search);
     const targetUrl = urlParams.get("url");
-
-    function extractDomain(u){
-      if (!u) return '';
-      try {
-        const withProto = /^https?:\/\//i.test(u) ? u : `https://${u}`;
-        const { hostname } = new URL(withProto);
-        return hostname.replace(/^www\./i,'');
-      } catch {
-        const m = String(u).match(/^(?:https?:\/\/)?([^\/?#]+)/i);
-        return (m ? m[1] : '').replace(/^www\./i,'');
-      }
+    
+    if (targetUrl) {
+      document.getElementById("current-url").textContent = targetUrl;
+      document.getElementById("core-link").href = 
+        "mailto:hello@quontora.com?subject=Deep%20Diagnostic%20Request&body=URL:%20" + encodeURIComponent(targetUrl);
+    } else {
+      document.getElementById("current-url").textContent = "No URL provided";
     }
 
-    // Valid access codes
-    const VALID_CODES = ['ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER'];
+    // Valid codes - EZRA is owner master code
+    const VALID_CODES = ['ORBIT', 'QUONTORA', 'DEMO2026', 'PARTNER', 'EZRA'];
 
-    // Buy Report Form - Stripe Checkout
-    document.getElementById('buy-form').addEventListener('submit', async (e) => {
+    // Entry $500 - Stripe
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('buy-name').value.trim();
-      const email = document.getElementById('buy-email').value.trim();
-      const company = document.getElementById('buy-company').value.trim();
-      const errorEl = document.getElementById('buy-error');
-      const btn = document.getElementById('buy-btn');
+      
+      const name = document.getElementById('entry-name').value.trim();
+      const email = document.getElementById('entry-email').value.trim();
+      const company = document.getElementById('entry-company').value.trim();
+      const errorEl = document.getElementById('entry-error');
+      const btn = document.getElementById('entry-btn');
 
-      errorEl.style.display = 'none';
+      errorEl.classList.remove('show');
 
       if (!name || !email) {
-        errorEl.textContent = 'Please provide your name and email.';
-        errorEl.style.display = 'block';
+        errorEl.textContent = 'Please enter your name and email.';
+        errorEl.classList.add('show');
         return;
       }
-
       if (!targetUrl) {
-        errorEl.textContent = 'No URL to analyze. Please go back and enter a URL.';
-        errorEl.style.display = 'block';
+        errorEl.textContent = 'No URL to analyze.';
+        errorEl.classList.add('show');
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Redirecting to checkout...';
+      btn.textContent = 'Connecting...';
 
       try {
         const res = await fetch('/api/checkout', {
@@ -437,184 +360,54 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: targetUrl, email, name, company })
         });
-
         const data = await res.json();
-
         if (data.url) {
           window.location.href = data.url;
         } else {
-          throw new Error(data.error || 'Failed to create checkout session');
+          throw new Error(data.error || 'Checkout failed');
         }
       } catch (err) {
-        console.error('Checkout error:', err);
-        errorEl.textContent = 'Error connecting to payment. Please try again.';
-        errorEl.style.display = 'block';
+        errorEl.textContent = 'Payment error. Please try again.';
+        errorEl.classList.add('show');
         btn.disabled = false;
-        btn.textContent = 'Buy Full Report — $500';
+        btn.textContent = 'Buy Report — $500';
       }
     });
 
-    // Access Code Form
+    // Access Code - uses sniperank: keys to match full-report.html
     document.getElementById('code-form').addEventListener('submit', (e) => {
       e.preventDefault();
+      
       const name = document.getElementById('code-name').value.trim();
       const email = document.getElementById('code-email').value.trim();
-      const company = document.getElementById('code-company').value.trim();
-      const code = document.getElementById('access-code').value.trim().toUpperCase();
+      const code = document.getElementById('code-input').value.trim().toUpperCase();
       const errorEl = document.getElementById('code-error');
-      const btn = document.getElementById('code-btn');
 
-      errorEl.style.display = 'none';
+      errorEl.classList.remove('show');
 
       if (!name || !email || !code) {
-        errorEl.textContent = 'Please fill in all required fields.';
-        errorEl.style.display = 'block';
+        errorEl.textContent = 'Please fill in all fields.';
+        errorEl.classList.add('show');
         return;
       }
-
       if (!VALID_CODES.includes(code)) {
-        errorEl.textContent = 'Invalid access code. Please check and try again.';
-        errorEl.style.display = 'block';
+        errorEl.textContent = 'Invalid access code.';
+        errorEl.classList.add('show');
         return;
       }
-
       if (!targetUrl) {
         errorEl.textContent = 'No URL to analyze.';
-        errorEl.style.display = 'block';
+        errorEl.classList.add('show');
         return;
       }
 
-      btn.disabled = true;
-      btn.textContent = 'Loading Full Report...';
+      // Store with sniperank: prefix to match full-report.html expectations
+      sessionStorage.setItem('sniperank:name', name);
+      sessionStorage.setItem('sniperank:email', email);
 
-      // Store info and redirect
-      sessionStorage.setItem('aisubtext:name', name);
-      sessionStorage.setItem('aisubtext:email', email);
-      sessionStorage.setItem('aisubtext:company', company);
-      sessionStorage.setItem('aisubtext:code', code);
-
-      const q = new URLSearchParams({
-        url: targetUrl,
-        code: code
-      }).toString();
-
-      window.location.href = `full-report.html?${q}`;
-    });
-
-    // Score rendering functions
-    function renderScoreCard(total, pillars, highlights){
-      document.getElementById("scoreNumber").textContent = `${total}/100`;
-      document.getElementById("scoreBand").textContent =
-        total >= 70 ? "Rank: Highly Visible ★★★★☆" :
-        total >= 55 ? "Rank: Partially Visible ★★★☆☆" :
-        total >= 40 ? "Rank: Needs Work ★★☆☆☆" :
-        "Rank: Low Visibility ★☆☆☆☆";
-
-      const grid = document.getElementById("pillarsGrid");
-      grid.innerHTML = "";
-      [
-        ["AI Access Readiness", pillars.access],
-        ["Trust & Verification Signals", pillars.trust],
-        ["LLM Interpretability & Clarity", pillars.clarity],
-        ["Prompt-Pattern Alignment", pillars.alignment]
-      ].forEach(([label, val]) => {
-        const d = document.createElement("div");
-        d.className = "pillar";
-        d.innerHTML = `<span class="label">${label}</span><span class="badge">${val}/25</span>`;
-        grid.appendChild(d);
-      });
-
-      if (highlights && highlights.length) {
-        const ul = document.getElementById("highlightsList");
-        ul.innerHTML = "";
-        highlights.forEach(h => {
-          const li = document.createElement("li");
-          li.textContent = h;
-          ul.appendChild(li);
-        });
-        document.getElementById("highlightsBlock").hidden = false;
-      }
-    }
-
-    function renderScorePending(){
-      document.getElementById("scoreNumber").textContent = "—";
-      document.getElementById("scoreBand").textContent = "Computing score…";
-      const grid = document.getElementById("pillarsGrid");
-      grid.innerHTML = "";
-      ["AI Access Readiness","Trust & Verification Signals","LLM Interpretability & Clarity","Prompt-Pattern Alignment"].forEach((label) => {
-        const d = document.createElement("div");
-        d.className = "pillar";
-        d.innerHTML = `<span class="label">${label}</span><span class="badge">—/25</span>`;
-        grid.appendChild(d);
-      });
-      document.getElementById("highlightsBlock").hidden = true;
-    }
-
-    function showOverlay(){
-      document.getElementById('progress-overlay').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-    function hideOverlay(){
-      document.getElementById('progress-overlay').style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    // Modal handlers
-    document.getElementById('breakdownBtn').addEventListener('click', () => {
-      document.getElementById('breakdown-modal').style.display = 'flex';
-    });
-    document.getElementById('modal-close').addEventListener('click', () => {
-      document.getElementById('breakdown-modal').style.display = 'none';
-    });
-    document.getElementById('breakdown-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('breakdown-modal')) {
-        document.getElementById('breakdown-modal').style.display = 'none';
-      }
-    });
-
-    document.getElementById("copyBtn").addEventListener("click", async () => {
-      const scoreText = document.getElementById("scoreNumber").textContent || "-/100";
-      const labels = [...document.querySelectorAll('.pillar .label')].map(el => el.textContent.trim());
-      const vals = [...document.querySelectorAll('.pillar .badge')].map(el => el.textContent.trim());
-      const highlights = [...document.querySelectorAll('#highlightsList li')].map(li => li.textContent.trim());
-      const txt = [
-        `Website: ${targetUrl}`,
-        `AI Visibility Score: ${scoreText}`,
-        `Pillars:`, ...labels.map((l, i) => `- ${l}: ${vals[i] || ''}`),
-        ``, `Highlights/Issues:`, ...highlights.map(h => `- ${h}`)
-      ].join("\n");
-      try {
-        await navigator.clipboard.writeText(txt);
-        const b = document.getElementById("copyBtn");
-        const old = b.textContent;
-        b.textContent = "Copied!";
-        setTimeout(() => b.textContent = old, 1500);
-      } catch {
-        window.prompt("Copy the summary:", txt);
-      }
-    });
-
-    // Initialize
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!targetUrl) {
-        document.getElementById("current-url").textContent = "No URL provided";
-        document.getElementById('summary-results').innerHTML = "<p style='text-align:center;color:red'>No URL provided. Please go back to the homepage.</p>";
-        renderScorePending();
-        return;
-      }
-
-      document.getElementById("current-url").textContent = targetUrl;
-      renderScorePending();
-
-      // For now, show a simplified preview message
-      document.getElementById('summary-results').innerHTML = `
-        <div style="text-align:center;padding:2rem;background:#f8fafc;border-radius:12px;border:1px solid #e5e5e5;">
-          <h3 style="margin:0 0 1rem;font-size:1.4rem;">Preview Analysis Complete</h3>
-          <p style="color:#666;margin:0;">Purchase the full report below to see detailed findings, prioritized recommendations, and AI engine insights.</p>
-        </div>
-      `;
+      window.location.href = 'full-report.html?url=' + encodeURIComponent(targetUrl) + '&code=' + encodeURIComponent(code);
     });
   </script>
+
 </body>
 </html>
-<!-- Version: v2026.02.06-1 -->
